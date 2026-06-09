@@ -18,13 +18,12 @@ def create():
             from_account_id=int(request.form['from_account_id']),
             to_account_id=int(request.form['to_account_id']),
             amount=float(request.form['amount']),
-            currency_id=int(request.form['currency_id']),
-            merchant_id=None # Manual dashboard transfers have no merchant
+            merchant_id=None 
         )
     except (InsufficientFundsError, AccountNotFoundError, CurrencyMismatchError) as e:
         flash(str(e), 'error')
     except Exception as e:
-        flash("An unexpected error occurred.", 'error')
+        flash(f"An unexpected error occurred: {str(e)}", 'error')
     
     return redirect(url_for('transactions.index'))
 

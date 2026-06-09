@@ -38,7 +38,7 @@ def create_tables(conn):
 
         CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            merchant_id INTEGER NOT NULL,
+            merchant_id INTEGER,
             from_account_id INTEGER NOT NULL,
             to_account_id INTEGER NOT NULL,
             amount REAL NOT NULL,

@@ -6,6 +6,12 @@ def get_all():
     conn.close()
     return currencies
 
+def get_active():
+    conn = get_db_connection()
+    currencies = conn.execute("SELECT * FROM currencies WHERE is_active = 1").fetchall()
+    conn.close()
+    return currencies
+
 def insert(conn, name, code):
     cursor = conn.execute("INSERT INTO currencies (name, code) VALUES (?, ?)", (name, code))
     return cursor.lastrowid

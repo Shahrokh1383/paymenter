@@ -1,3 +1,4 @@
+
 # Paymenter: Custom Payment Gateway Simulator
 
 ## Overview
@@ -23,7 +24,7 @@ The codebase is engineered with maintainability and scalability in mind. It stri
 *   **Secure RESTful API:** Exposes `/api/pay`, `/api/refund`, and `/api/verify` endpoints secured by an `x-api-key` authentication middleware.
 *   **Dynamic Admin Dashboard:** Provides a clean UI to manage entities, top up accounts, and manually approve/decline transactions with seamless Vanilla JS updates (no full page reloads).
 *   **Smart Generators:** Automatically generates secure API keys, unique 16-digit card numbers, and standard account numbers with collision detection.
-*   **Developer Experience (DevEx):** Features one-click startup scripts for both Windows and Linux/macOS.
+*   **Smart Port Allocation & DevEx:** Features one-click startup scripts for both Windows and Linux/macOS. The server automatically detects if the default port is busy and assigns the next available port (5000-5100), then programmatically opens the web browser to the correct dynamically assigned URL. No more `Address already in use` errors when running multiple local projects!
 
 ## Prerequisites
 
@@ -96,7 +97,7 @@ Ensure your virtual environment is activated, then run:
 python app.py
 ```
 
-Upon startup, the system will initialize the database, seed default data, and start the Web UI on port 5000. The default web browser will automatically open to `http://127.0.0.1:5000`.
+Upon startup, the system will initialize the database, seed default data, and dynamically find an available port starting from `5000`. The default web browser will automatically open to the assigned URL (e.g., `http://127.0.0.1:5000`, or `http://127.0.0.1:5001` if 5000 is already in use by another project).
 
 ## Laravel Integration
 
@@ -105,6 +106,8 @@ To route payment requests from a Laravel application to this local simulator, yo
 1.  Update your Laravel project's `.env` file with the following configuration:
 
     ```env
+    # Note: Paymenter dynamically allocates a port starting from 5000. 
+    # Ensure this URL matches the port Paymenter started on in your terminal.
     PAYMENT_GATEWAY_API_URL=http://127.0.0.1:5000/api
     PAYMENT_GATEWAY_API_KEY=your_merchant_api_key_here
     ```
@@ -150,7 +153,7 @@ To route payment requests from a Laravel application to this local simulator, yo
 
 ```text
 paymenter/
-|-- app.py                      # Flask application factory and entry point
+|-- app.py                      # Flask application factory, dynamic port allocation, and entry point
 |-- requirements.txt            # Python dependencies
 |-- start.bat                   # Windows one-click launcher
 |-- start.sh                    # Linux/macOS one-click launcher

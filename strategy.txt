@@ -1,0 +1,143 @@
+Project name : Paymenter
+
+---
+
+# Implementation Plan: Custom Payment Gateway Simulator
+
+## Phase 1: Project Setup & Database Foundation
+**Goal:** Initialize the Flask application, configure SQLite, and create the exact database schema required for the system.
+
+*   **Step 1.1: Project Initialization**
+    *   Create the project directory structure (e.g., `app.py`, `database.py`, `templates/`, `static/`).
+    *   Set up a Python virtual environment.
+    *   Install Flask and create the `requirements.txt` file.
+*   **Step 1.2: Database Configuration (`database.py`)**
+    *   Write a function to initialize the SQLite database connection.
+    *   Ensure `PRAGMA foreign_keys = ON;` is executed on every connection to enforce relational integrity.
+    *   Write the schema creation function to generate the 5 tables exactly as specified:
+        *   `currencies` (id, name, code, is_active)
+        *   `merchants` (id, name, api_key, is_active, settlement_account_id)
+        *   `users` (id, name, phone_email)
+        *   `accounts` (id, user_id, currency_id, account_number, card_number, balance)
+        *   `transactions` (id, merchant_id, from_account_id, to_account_id, amount, currency_id, status, created_at)
+*   **Step 1.3: Seed Data**
+    *   Create a script/function to insert default data (e.g., a default "Toman" currency) so the app isn't empty on first launch.
+
+## Phase 2: Core Utilities & Business Logic
+**Goal:** Build the reusable Python functions that enforce the rules of the system, especially the Double-Entry Bookkeeping principle.
+
+*   **Step 2.1: Unique Identifier Generators**
+    *   Function `generate_api_key()`: Creates a secure, unique string for merchants.
+    *   Function `generate_card_number()`: Creates a unique 16-digit string (check DB to ensure no duplicates).
+    *   Function `generate_account_number()`: Creates a unique standard account number.
+*   **Step 2.2: Database Transaction Manager**
+    *   Create a decorator or context manager that handles DB `commit()` on success and `rollback()` on any exception. This is critical for financial integrity.
+*   **Step 2.3: Core Financial Engine (The Ledger)**
+    *   Function `hold_funds(from_account_id, to_account_id, amount, currency_id, merchant_id=None)`:
+        *   Validates accounts exist and are active.
+        *   Validates currency match.
+        *   Validates sufficient balance.
+        *   Deducts `amount` from `from_account_id`.
+        *   Creates a `Pending` transaction.
+    *   Function `complete_funds(transaction_id)`:
+        *   Validates transaction is `Pending`.
+        *   Adds `amount` to `to_account_id`.
+        *   Updates transaction status to `Success`.
+    *   Function `fail_and_refund(transaction_id)`:
+        *   Validates transaction is `Pending` (or `Success` if allowing post-completion refunds).
+        *   Returns `amount` to `from_account_id`.
+        *   Updates transaction status to `Failed`/`Refunded`.
+
+## Phase 3: Dashboard - Entity Management (Backend & Frontend)
+**Goal:** Build the CRUD operations and UI for Currencies, Merchants, Users, and Accounts.
+
+*   **Step 3.1: Currency Management**
+    *   Route `GET /dashboard/currencies`: List all currencies.
+    *   Route `POST /dashboard/currencies/add`: Add new currency.
+    *   Route `POST /dashboard/currencies/toggle/<id>`: Activate/Deactivate.
+*   **Step 3.2: User Management**
+    *   Route `GET /dashboard/users`: List users and search functionality (Query by name, account number, card number).
+    *   Route `POST /dashboard/users/add`: Create a new user.
+*   **Step 3.3: Account Management**
+    *   Route `POST /dashboard/accounts/add`: Create account for a user (Select currency, auto-generate card/account number, balance starts at 0).
+    *   Route `POST /dashboard/accounts/topup`: Manually add balance to a specific account.
+*   **Step 3.4: Merchant Management**
+    *   Route `GET /dashboard/merchants`: List merchants.
+    *   Route `POST /dashboard/merchants/add`: Create merchant.
+        *   *Crucial Logic:* When creating a merchant, automatically call `generate_api_key()`, create a new Account (acting as the Settlement Account), and link that account's ID to the merchant's `settlement_account_id`.
+    *   Route `POST /dashboard/merchants/toggle/<id>`: Activate/Deactivate merchant.
+*   **Step 3.5: Frontend Implementation**
+    *   Build simple HTML templates (using Jinja2) and CSS for the above routes. Add a "Copy API Key" button using vanilla JavaScript.
+
+## Phase 4: Transaction Simulator (Dashboard)
+**Goal:** Build the UI and backend for the manual Hold -> Complete/Fail workflow.
+
+*   **Step 4.1: Initiate Manual Transfer**
+    *   Route `GET /dashboard/transactions`: Show all transactions, filterable by status.
+    *   Route `POST /dashboard/transactions/create`: Form to input Source Account, Destination Account, Amount, Currency. Calls the `hold_funds()` function.
+*   **Step 4.2: Admin Decision UI**
+    *   In the `Pending` transactions list, add two buttons per row: **[Complete]** and **[Fail]**.
+    *   Route `POST /dashboard/transactions/complete/<id>`: Calls `complete_funds()`.
+    *   Route `POST /dashboard/transactions/fail/<id>`: Calls `fail_and_refund()`.
+*   **Step 4.3: Frontend Polish**
+    *   Use Vanilla JS to handle button clicks (maybe using `fetch()` for a smoother UX without full page reloads) and update the transaction row's status dynamically.
+
+## Phase 5: API Development (Backend Integration)
+**Goal:** Expose the system to external applications (like Laravel) via RESTful endpoints secured by API keys.
+
+*   **Step 5.1: API Authentication Middleware**
+    *   Create a Flask `@before_request` decorator specifically for the `/api/*` routes.
+    *   Extract `x-api-key` from the header.
+    *   Query the `merchants` table. If the key is invalid or `is_active` is False, return `401 Unauthorized`.
+    *   Pass the authenticated merchant object to the route.
+*   **Step 5.2: Endpoint - Initiate Payment**
+    *   Route `POST /api/pay`:
+        *   Receive `destination_card_number`, `amount`, `currency_code`.
+        *   Validate Merchant has an active Settlement Account matching `currency_code`.
+        *   Find the User Account via `destination_card_number` and validate currency match.
+        *   Check User Account balance.
+        *   If all pass, execute `hold_funds(user_account_id, merchant_settlement_account_id, amount, currency_id, merchant_id)`.
+        *   Return JSON: `{"transaction_id": "...", "status": "Pending"}`.
+*   **Step 5.3: Endpoint - Programmatic Refund**
+    *   Route `POST /api/refund`:
+        *   Receive `transaction_id`.
+        *   Validate the transaction belongs to this merchant.
+        *   Execute `fail_and_refund(transaction_id)`.
+        *   Return JSON: `{"transaction_id": "...", "status": "Refunded"}`.
+*   **Step 5.4: Endpoint - Verify Transaction**
+    *   Route `GET /api/verify/<transaction_id>`:
+        *   Validate the transaction belongs to this merchant.
+        *   Return JSON: `{"transaction_id": "...", "amount": ..., "status": "Pending/Success/Failed/Refunded"}`.
+
+## Phase 6: Final Integration & Launcher
+**Goal:** Make the application seamless to run on a Windows environment and perform end-to-end testing.
+
+*   **Step 6.1: Error Handling & Edge Cases**
+    *   Ensure all API errors return proper HTTP status codes (400 Bad Request, 402 Payment Required for insufficient funds, 404 Not Found).
+    *   Ensure the dashboard handles form errors gracefully (e.g., trying to top up a negative amount).
+*   **Step 6.2: Windows Launcher (`.bat` file)**
+    *   Create `start.bat`:
+        ```bat
+        @echo off
+        echo Installing dependencies...
+        pip install -r requirements.txt
+        echo Starting Payment Gateway Simulator...
+        start http://127.0.0.1:5000
+        python app.py
+        pause
+        ```
+*   **Step 6.3: End-to-End Testing (The Real-World Workflow)**
+    *   Run the `.bat` file.
+    *   Create Toman Currency.
+    *   Create Merchant "Laravel Shop" -> Copy API Key.
+    *   Create User "Ali" -> Create Toman Account -> Top-up 1,000,000.
+    *   Use Postman (or curl) to send a `/api/pay` request as Laravel would.
+    *   Go to Dashboard -> Verify Ali's balance dropped -> Click **[Complete]** -> Verify Merchant balance increased.
+    *   Test the **[Fail]** and `/api/refund` flows to ensure money returns to Ali correctly.
+
+---
+
+### Development Best Practices to Keep in Mind:
+1.  **Atomicity:** Always use `conn.commit()` and `conn.rollback()`. Never update an account balance without ensuring the corresponding transaction row is created simultaneously.
+2.  **Row Locking:** In SQLite, when reading a balance to deduct funds, use `SELECT balance FROM accounts WHERE id = ? FOR UPDATE` (or rely on SQLite's inherent database locking during transactions) to prevent race conditions if two API requests hit simultaneously.
+3.  **Separation of Concerns:** Keep database SQL queries in `database.py`, core business logic in a `services.py` or within `app.py` routes logically, and presentation strictly in `templates/`.

@@ -37,7 +37,9 @@ def initiate_payment(merchant, destination_card_number, amount, currency_code):
         )
         return txn_id
 
-    except InsufficientFundsError as e:
+    except InsufficientFundsError:
+        raise
+    except Exception as e:
         raise PaymentError(str(e))
     finally:
         conn.close()

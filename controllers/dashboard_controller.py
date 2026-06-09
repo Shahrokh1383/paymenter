@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from services import currency_service, user_service, account_service, merchant_service
+from  services.account_service import InvalidAmountError
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -62,9 +63,11 @@ def topup_account():
     try:
         account_service.topup(request.form['account_id'], float(request.form['amount']))
         flash("Topup successful.", 'success')
-    except Exception as e:
+    except InvalidAmountError as e:
         flash(str(e), 'error')
-    return redirect(request.referrer or url_for('dashboard.accounts')) # Redirect back to previous page
+    except Exception as e:
+        flash("An unexpected error occurred.", 'error')
+    return redirect(request.referrer or url_for('dashboard.accounts'))
 
 # --- Merchants ---
 @dashboard_bp.route('/merchants', methods=['GET'])

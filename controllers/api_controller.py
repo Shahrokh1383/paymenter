@@ -2,12 +2,12 @@ from flask import Blueprint, request, jsonify, g
 from database.connection import get_db_connection
 from repositories import merchant_repo
 from services import api_service
+from services.ledger import InsufficientFundsError
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.before_request
 def authenticate():
-    """Middleware to secure API endpoints using x-api-key header."""
     api_key = request.headers.get('x-api-key')
     if not api_key:
         return jsonify({"error": "Missing x-api-key header"}), 401
@@ -19,7 +19,6 @@ def authenticate():
     if not merchant or not merchant['is_active']:
         return jsonify({"error": "Invalid or inactive API key"}), 401
 
-    # Store merchant in flask.g so routes can access it
     g.merchant = merchant
 
 @api_bp.route('/pay', methods=['POST'])
@@ -36,6 +35,8 @@ def pay():
             currency_code=data['currency_code']
         )
         return jsonify({"transaction_id": txn_id, "status": "Pending"}), 200
+    except InsufficientFundsError as e:
+        return jsonify({"error": str(e)}), 402
     except api_service.PaymentError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:

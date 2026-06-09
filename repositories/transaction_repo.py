@@ -21,3 +21,12 @@ def get_all(status=None):
     transactions = conn.execute(sql, params).fetchall()
     conn.close()
     return transactions
+
+def get_by_id_and_merchant(conn, transaction_id, merchant_id):
+    cursor = conn.execute("""
+        SELECT t.*, c.code as currency_code
+        FROM transactions t
+        LEFT JOIN currencies c ON t.currency_id = c.id
+        WHERE t.id = ? AND t.merchant_id = ?
+    """, (transaction_id, merchant_id))
+    return cursor.fetchone()

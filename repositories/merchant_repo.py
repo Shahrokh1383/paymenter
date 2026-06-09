@@ -2,7 +2,6 @@ from database.connection import get_db_connection
 
 def get_all():
     conn = get_db_connection()
-    # Join with accounts to potentially show settlement balance later
     merchants = conn.execute("""
         SELECT m.*, a.balance as settlement_balance 
         FROM merchants m
@@ -10,6 +9,10 @@ def get_all():
     """).fetchall()
     conn.close()
     return merchants
+
+def get_by_api_key(conn, api_key):
+    cursor = conn.execute("SELECT * FROM merchants WHERE api_key = ?", (api_key,))
+    return cursor.fetchone()
 
 def insert(conn, name, api_key, settlement_account_id):
     cursor = conn.execute(

@@ -12,6 +12,10 @@ def get_active():
     conn.close()
     return currencies
 
+def get_by_code(conn, code):
+    cursor = conn.execute("SELECT * FROM currencies WHERE code = ?", (code,))
+    return cursor.fetchone()
+
 def insert(conn, name, code):
     cursor = conn.execute("INSERT INTO currencies (name, code) VALUES (?, ?)", (name, code))
     return cursor.lastrowid

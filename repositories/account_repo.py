@@ -14,10 +14,21 @@ def get_all():
     conn.close()
     return accounts
 
+def get_by_card_number(conn, card_number):
+    cursor = conn.execute("SELECT * FROM accounts WHERE card_number = ?", (card_number,))
+    return cursor.fetchone()
+
+def get_settlement_account(conn, merchant_id, currency_id):
+    cursor = conn.execute("""
+        SELECT a.* FROM accounts a
+        JOIN merchants m ON m.settlement_account_id = a.id
+        WHERE m.id = ? AND a.currency_id = ?
+    """, (merchant_id, currency_id))
+    return cursor.fetchone()
+
 def update_currency(conn, account_id, currency_id):
     conn.execute("UPDATE accounts SET currency_id = ? WHERE id = ?", (currency_id, account_id))
 
-# ... (Keep existing insert, topup, exists functions)
 def insert(conn, user_id, currency_id, account_number, card_number):
     cursor = conn.execute(
         "INSERT INTO accounts (user_id, currency_id, account_number, card_number, balance) VALUES (?, ?, ?, ?, 0.0)",

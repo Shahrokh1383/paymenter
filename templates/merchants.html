@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/merchant.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Merchants</h1>
+<form action="{{ url_for('dashboard.add_merchant') }}" method="POST">
+    <input type="text" name="name" placeholder="Merchant Name" required>
+    <button type="submit">Add Merchant</button>
+</form>
+<table>
+    <tr><th>ID</th><th>Name</th><th>API Key</th><th>Settlement Bal</th><th>Active</th><th>Action</th></tr>
+    {% for m in merchants %}
+    <tr>
+        <td>{{ m.id }}</td><td>{{ m.name }}</td>
+        <td>
+            <span id="api-key-{{ m.id }}">{{ m.api_key }}</span>
+            <button class="copy-btn" data-target="api-key-{{ m.id }}">Copy</button>
+        </td>
+        <td>{{ m.settlement_balance or 0.0 }}</td>
+        <td>{{ m.is_active }}</td>
+        <td>
+            <form action="{{ url_for('dashboard.toggle_merchant', id=m.id, is_active=m.is_active) }}" method="POST">
+                <button type="submit">{{ 'Deactivate' if m.is_active else 'Activate' }}</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/merchant.js') }}"></script>
+{% endblock %}

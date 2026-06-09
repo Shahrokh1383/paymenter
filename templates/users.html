@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Users</h1>
+<form action="{{ url_for('dashboard.add_user') }}" method="POST">
+    <input type="text" name="name" placeholder="User Name" required>
+    <input type="text" name="phone_email" placeholder="Phone/Email" required>
+    <button type="submit">Add User</button>
+</form>
+
+<form action="{{ url_for('dashboard.users') }}" method="GET" class="search-form">
+    <input type="text" name="query" value="{{ query }}" placeholder="Search by name, account, or card...">
+    <button type="submit">Search</button>
+</form>
+
+<table>
+    <tr><th>ID</th><th>Name</th><th>Phone/Email</th><th>Account Num</th><th>Card Num</th><th>Actions</th></tr>
+    {% for u in users %}
+    <tr>
+        <td>{{ u.id }}</td><td>{{ u.name }}</td><td>{{ u.phone_email }}</td>
+        <td>{{ u.account_number or 'N/A' }}</td><td>{{ u.card_number or 'N/A' }}</td>
+        <td>
+            <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">
+                <input type="hidden" name="account_id" value="{{ u.account_id }}">
+                <input type="number" name="amount" step="0.01" placeholder="Topup Amt" required style="width:80px;">
+                <button type="submit">Topup</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

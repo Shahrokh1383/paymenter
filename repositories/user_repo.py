@@ -2,7 +2,12 @@ from database.connection import get_db_connection
 
 def get_all():
     conn = get_db_connection()
-    users = conn.execute("SELECT * FROM users").fetchall()
+    # LEFT JOIN ensures we get the user even if they somehow don't have an account yet
+    users = conn.execute("""
+        SELECT u.id, u.name, u.phone_email, a.id as account_id, a.account_number, a.card_number, a.balance
+        FROM users u
+        LEFT JOIN accounts a ON u.id = a.user_id
+    """).fetchall()
     conn.close()
     return users
 
@@ -13,7 +18,7 @@ def insert(conn, name, phone_email):
 def search(conn, query):
     # Join users and accounts to search across name, account_number, and card_number
     sql = """
-        SELECT u.id, u.name, u.phone_email, a.account_number, a.card_number 
+        SELECT u.id, u.name, u.phone_email, a.id as account_id, a.account_number, a.card_number, a.balance
         FROM users u
         LEFT JOIN accounts a ON u.id = a.user_id
         WHERE u.name LIKE ? OR a.account_number LIKE ? OR a.card_number LIKE ?

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for  # Fixed: Added redirect and url_for imports
 from database import init_db
 from controllers.dashboard_controller import dashboard_bp
 
@@ -20,6 +20,5 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    from flask import url_for # Import here just for the redirect above to work cleanly
     app = create_app()
     app.run(debug=True)

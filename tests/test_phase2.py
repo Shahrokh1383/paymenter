@@ -86,7 +86,7 @@ def test_ledger():
         fail_and_refund(txn_id_2)
         cursor.execute("SELECT balance FROM accounts WHERE id = 1")
         alice_bal_after_refund = cursor.fetchone()['balance']
-        print(f"   Alice Balance after refund: {alice_bal_after_refund} (Expected: 700.0, because 100 was returned)")
+        print(f"   Alice Balance after refund: {alice_bal_after_refund} (Expected: 800.0, because 100 was returned)")
 
         # Test 4: Insufficient Funds
         print("4. Testing Insufficient Funds error...")

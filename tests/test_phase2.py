@@ -47,10 +47,14 @@ def test_generators():
     api_key = generate_api_key()
     print(f"Generated API Key: {api_key}")
     
-    # Test uniqueness check by forcing the generator to find a new one
-    def always_true(x): return True
-    card = generate_card_number(check_exists_func=always_true)
+    # Simulate that the number does NOT exist in the database
+    def never_exists(x): return False
+    
+    card = generate_card_number(check_exists_func=never_exists)
     print(f"Generated Card Number: {card} (Length: {len(card)})")
+
+    acc = generate_account_number(check_exists_func=never_exists)
+    print(f"Generated Account Number: {acc} (Length: {len(acc)})")
 
 def test_ledger():
     print("\n--- Testing Ledger Engine ---")

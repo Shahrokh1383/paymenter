@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transaction.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Transactions</h1>
+
+<div class="form-container">
+    <h2>Initiate Manual Transfer</h2>
+    <form action="{{ url_for('transactions.create') }}" method="POST">
+        <input type="number" name="from_account_id" placeholder="Source Account ID" required>
+        <input type="number" name="to_account_id" placeholder="Destination Account ID" required>
+        <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+        <input type="number" name="currency_id" placeholder="Currency ID (1=Toman)" value="1" required>
+        <button type="submit">Hold Funds</button>
+    </form>
+</div>
+
+<div class="filter-container">
+    <a href="{{ url_for('transactions.index') }}" class="{% if not current_filter %}active{% endif %}">All</a>
+    <a href="{{ url_for('transactions.index', status='Pending') }}" class="{% if current_filter == 'Pending' %}active{% endif %}">Pending</a>
+    <a href="{{ url_for('transactions.index', status='Success') }}" class="{% if current_filter == 'Success' %}active{% endif %}">Success</a>
+    <a href="{{ url_for('transactions.index', status='Failed') }}" class="{% if current_filter == 'Failed' %}active{% endif %}">Failed</a>
+</div>
+
+<table id="transactions-table">
+    <tr>
+        <th>ID</th><th>From Acc</th><th>To Acc</th><th>Amount</th><th>Currency</th><th>Status</th><th>Date</th><th>Actions</th>
+    </tr>
+    {% for t in transactions %}
+    <tr id="row-{{ t.id }}">
+        <td>{{ t.id }}</td>
+        <td>{{ t.from_account or 'N/A' }}</td>
+        <td>{{ t.to_account or 'N/A' }}</td>
+        <td>{{ t.amount }}</td>
+        <td>{{ t.currency_code }}</td>
+        <td class="status-cell">{{ t.status }}</td>
+        <td>{{ t.created_at }}</td>
+        <td class="action-cell">
+            {% if t.status == 'Pending' %}
+                <button class="btn-complete" data-id="{{ t.id }}">Complete</button>
+                <button class="btn-fail" data-id="{{ t.id }}">Fail</button>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/transaction.js') }}"></script>
+{% endblock %}

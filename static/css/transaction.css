@@ -1,0 +1,7 @@
+.form-container { background: #fff; padding: 15px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.filter-container { margin-bottom: 15px; }
+.filter-container a { padding: 8px 15px; background: #ddd; color: #333; text-decoration: none; border-radius: 4px; margin-right: 5px; }
+.filter-container a.active { background: #2c3e50; color: #fff; }
+.btn-complete { background: #2ecc71; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+.btn-fail { background: #e74c3c; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+.status-cell { font-weight: bold; text-transform: uppercase; }

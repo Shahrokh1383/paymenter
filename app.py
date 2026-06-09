@@ -1,17 +1,17 @@
-from flask import Flask, redirect, url_for  # Fixed: Added redirect and url_for imports
+from flask import Flask, redirect, url_for
 from database import init_db
 from controllers.dashboard_controller import dashboard_bp
+from controllers.transaction_controller import transaction_bp
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "super_secret_simulator_key" # Needed for flash messages
+    app.secret_key = "super_secret_simulator_key"
 
-    # Initialize the database
     with app.app_context():
         init_db()
 
-    # Register Blueprints (Controllers)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(transaction_bp)
 
     @app.route('/')
     def index():

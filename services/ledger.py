@@ -46,7 +46,7 @@ def hold_funds(from_account_id: int, to_account_id: int, amount: float, merchant
 
         return cursor.lastrowid
 
-# ... (complete_funds and fail_and_refund remain exactly the same as before) ...
+
 def complete_funds(transaction_id: int) -> None:
     with transaction() as conn:
         cursor = conn.cursor()
@@ -54,16 +54,28 @@ def complete_funds(transaction_id: int) -> None:
         txn = cursor.fetchone()
         if not txn: raise InvalidTransactionStateError("Transaction not found.")
         if txn['status'] != 'Pending': raise InvalidTransactionStateError(f"Transaction cannot be completed. Current status: {txn['status']}")
+        
+        # Add funds to destination (Merchant)
         cursor.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (txn['amount'], txn['to_account_id']))
         cursor.execute("UPDATE transactions SET status = 'Success' WHERE id = ?", (transaction_id,))
+
 
 def fail_and_refund(transaction_id: int) -> None:
     with transaction() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, from_account_id, amount, status FROM transactions WHERE id = ?", (transaction_id,))
+        # ADDED to_account_id to the SELECT query so we can deduct from it if needed
+        cursor.execute("SELECT id, from_account_id, to_account_id, amount, status FROM transactions WHERE id = ?", (transaction_id,))
         txn = cursor.fetchone()
         if not txn: raise InvalidTransactionStateError("Transaction not found.")
         if txn['status'] not in ('Pending', 'Success'): raise InvalidTransactionStateError(f"Transaction cannot be refunded. Current status: {txn['status']}")
+        
+        # 1. Always refund the source account (User)
         cursor.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (txn['amount'], txn['from_account_id']))
+        
+        # to maintain double-entry bookkeeping balance.
+        if txn['status'] == 'Success':
+            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (txn['amount'], txn['to_account_id']))
+        
+        # 3. Update transaction status
         new_status = 'Failed' if txn['status'] == 'Pending' else 'Refunded'
         cursor.execute("UPDATE transactions SET status = ? WHERE id = ?", (new_status, transaction_id))

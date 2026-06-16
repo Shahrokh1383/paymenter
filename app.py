@@ -7,6 +7,7 @@ from database import init_db
 from controllers.dashboard_controller import dashboard_bp
 from controllers.transaction_controller import transaction_bp
 from controllers.api_controller import api_bp
+from controllers.gateway_controller import gateway_bp
 
 def find_available_port(start_port=5000, max_port=5100):
     """Finds the first available port from start_port to max_port."""
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(transaction_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(gateway_bp)
 
     @app.route('/')
     def index():

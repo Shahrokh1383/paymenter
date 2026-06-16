@@ -25,11 +25,12 @@
 
 <table id="transactions-table">
     <tr>
-        <th>ID</th><th>From Acc</th><th>To Acc</th><th>Amount</th><th>Currency</th><th>Status</th><th>Date</th><th>Actions</th>
+        <th>ID</th><th>User Email</th><th>From Acc</th><th>To Acc</th><th>Amount</th><th>Currency</th><th>Status</th><th>Date</th><th>Actions</th>
     </tr>
     {% for t in transactions %}
     <tr id="row-{{ t.id }}">
         <td>{{ t.id }}</td>
+        <td>{{ t.user_email or 'Manual' }}</td>
         <td>{{ t.from_account or 'N/A' }}</td>
         <td>{{ t.to_account or 'N/A' }}</td>
         <td>{{ t.amount }}</td>

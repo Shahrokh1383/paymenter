@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Error</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gateway.css') }}">
+</head>
+<body>
+    <div class="gateway-container">
+        <div class="gateway-card error-card">
+            <h2>⚠️ Payment Session Invalid</h2>
+            <p class="error-message">{{ error_message }}</p>
+            <p>Please return to the merchant website and try again.</p>
+        </div>
+    </div>
+</body>
+</html>

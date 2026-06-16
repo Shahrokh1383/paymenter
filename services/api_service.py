@@ -1,67 +1,67 @@
 from database.connection import get_db_connection
-from database.transaction import transaction
-from repositories import account_repo, currency_repo, transaction_repo
-from services.ledger import hold_funds, fail_and_refund
-from services.ledger import InsufficientFundsError, InvalidTransactionStateError
+from repositories import currency_repo, gateway_repo
+from services import email_service
+from utils.generators import generate_gateway_token, generate_otp_code
+from services.ledger import InvalidTransactionStateError
+from repositories import transaction_repo
 
 class PaymentError(Exception): pass
 
-def initiate_payment(merchant, destination_card_number, amount, currency_code):
+def initiate_payment(merchant, amount, currency_code, user_email, callback_url):
     conn = get_db_connection()
     try:
-        # 1. Validate Currency
         currency = currency_repo.get_by_code(conn, currency_code)
         if not currency or not currency['is_active']:
             raise PaymentError("Invalid or inactive currency code.")
 
-        # 2. Find User Account by Card Number
-        user_account = account_repo.get_by_card_number(conn, destination_card_number)
-        if not user_account:
-            raise PaymentError("Destination card number not found.")
+        token = generate_gateway_token(lambda x: gateway_repo.exists_by_token(conn, x))
+        otp = generate_otp_code()
 
-        # 3. Validate User Account Currency matches requested currency
-        if user_account['currency_id'] != currency['id']:
-            raise PaymentError("Destination card currency does not match the requested currency.")
-
-        # 4. Find Merchant Settlement Account for this currency
-        settlement_account = account_repo.get_settlement_account(conn, merchant['id'], currency['id'])
-        if not settlement_account:
-            raise PaymentError("Merchant does not have a settlement account for this currency.")
-
-        # 5. Execute Hold Funds (User pays Merchant)
-        txn_id = hold_funds(
-            from_account_id=user_account['id'],
-            to_account_id=settlement_account['id'],
-            amount=amount,
-            merchant_id=merchant['id']
+        gateway_repo.insert(
+            conn=conn, token=token, merchant_id=merchant['id'], amount=amount,
+            currency_id=currency['id'], user_email=user_email, callback_url=callback_url, otp_code=otp
         )
-        return txn_id
+        conn.commit()
 
-    except InsufficientFundsError:
-        raise
+        email_service.send_otp_email(user_email, otp, merchant['name'], amount, currency['code'])
+        return token
+
     except Exception as e:
+        conn.rollback()
         raise PaymentError(str(e))
     finally:
         conn.close()
 
 def refund_transaction(merchant, transaction_id):
-    with transaction() as conn:
-        # Verify ownership
+    from services.ledger import fail_and_refund
+    from database.transaction import transaction as db_tx
+    
+    with db_tx() as conn:
         txn = transaction_repo.get_by_id_and_merchant(conn, transaction_id, merchant['id'])
-        if not txn:
-            raise PaymentError("Transaction not found or does not belong to this merchant.")
+        if not txn: raise PaymentError("Transaction not found.")
         
         try:
-            fail_and_refund(transaction_id)
-        except InvalidTransactionStateError as e:
-            raise PaymentError(str(e))
+            # We need to run fail_and_refund outside the standard context if it manages its own, 
+            # but since fail_and_refund uses its own context manager, we just call it.
+            pass
+        except Exception: pass
+
+    # Execute outside the read-only conn context
+    try:
+        txn_details = fail_and_refund(transaction_id)
+        if txn_details.get('user_email'):
+            email_service.send_receipt_email(
+                txn_details['user_email'], txn_details['status'], 
+                txn_details['amount'], txn_details['currency_code'], merchant['name']
+            )
+    except InvalidTransactionStateError as e:
+        raise PaymentError(str(e))
 
 def verify_transaction(merchant, transaction_id):
     conn = get_db_connection()
     try:
         txn = transaction_repo.get_by_id_and_merchant(conn, transaction_id, merchant['id'])
-        if not txn:
-            raise PaymentError("Transaction not found or does not belong to this merchant.")
+        if not txn: raise PaymentError("Transaction not found.")
         return txn
     finally:
         conn.close()

@@ -23,3 +23,7 @@ def insert(conn, name, api_key, settlement_account_id):
 
 def toggle(conn, merchant_id, is_active):
     conn.execute("UPDATE merchants SET is_active = ? WHERE id = ?", (not is_active, merchant_id))
+
+def get_by_id(conn, merchant_id):
+    cursor = conn.execute("SELECT * FROM merchants WHERE id = ?", (merchant_id,))
+    return cursor.fetchone()

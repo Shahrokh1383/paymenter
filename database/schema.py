@@ -44,12 +44,37 @@ def create_tables(conn):
             amount REAL NOT NULL,
             currency_id INTEGER NOT NULL,
             status TEXT NOT NULL,
+            user_email TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (merchant_id) REFERENCES merchants(id),
             FOREIGN KEY (from_account_id) REFERENCES accounts(id),
             FOREIGN KEY (to_account_id) REFERENCES accounts(id),
             FOREIGN KEY (currency_id) REFERENCES currencies(id)
         );
+
+        CREATE TABLE IF NOT EXISTS gateway_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL UNIQUE,
+            merchant_id INTEGER NOT NULL,
+            amount REAL NOT NULL,
+            currency_id INTEGER NOT NULL,
+            user_email TEXT NOT NULL,
+            callback_url TEXT NOT NULL,
+            otp_code TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'Initiated',
+            transaction_id INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (merchant_id) REFERENCES merchants(id),
+            FOREIGN KEY (currency_id) REFERENCES currencies(id),
+            FOREIGN KEY (transaction_id) REFERENCES transactions(id)
+        );
     """)
+    
+    # Migration for existing databases (Add user_email to transactions if it doesn't exist)
+    try:
+        cursor.execute("ALTER TABLE transactions ADD COLUMN user_email TEXT")
+        conn.commit()
+    except Exception:
+        pass # Column already exists
 
     conn.commit()

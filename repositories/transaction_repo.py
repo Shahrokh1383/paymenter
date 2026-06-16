@@ -3,7 +3,7 @@ from database.connection import get_db_connection
 def get_all(status=None):
     conn = get_db_connection()
     sql = """
-        SELECT t.id, t.amount, t.status, t.created_at,
+        SELECT t.id, t.amount, t.status, t.created_at, t.user_email,
                from_acc.account_number as from_account,
                to_acc.account_number as to_account,
                c.code as currency_code

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment Gateway</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gateway.css') }}">
+</head>
+<body>
+    <div class="gateway-container">
+        <header class="gateway-header">
+            <h1>🔒 Secure Payment</h1>
+            <p>Authorized by <strong>Paymenter</strong></p>
+        </header>
+
+        <div class="gateway-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alerts">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="order-summary">
+                <div class="merchant-name">{{ session.merchant_name }}</div>
+                <div class="amount">{{ "{:,.2f}".format(session.amount) }} <span class="currency">{{ session.currency_code }}</span></div>
+            </div>
+
+            <form action="{{ url_for('gateway.authorize') }}" method="POST" class="payment-form">
+                <input type="hidden" name="token" value="{{ session.token }}">
+                <div class="form-group">
+                    <label for="card_number">Card Number</label>
+                    <input type="text" id="card_number" name="card_number" placeholder="16-Digit Card Number" maxlength="16" required>
+                </div>
+                <div class="form-group">
+                    <label for="otp_code">Verification Code (OTP)</label>
+                    <input type="text" id="otp_code" name="otp_code" placeholder="5-Digit Code from Email" maxlength="5" required>
+                    <small class="hint">A verification code has been sent to <strong>{{ session.user_email }}</strong></small>
+                </div>
+                <button type="submit" class="btn-pay">Pay Now</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/gateway.js') }}"></script>
+</body>
+</html>

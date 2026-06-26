@@ -16,6 +16,9 @@ class AccountRepository(ABC):
     @abstractmethod
     def add(self, account: Account) -> int: pass
 
+    @abstractmethod
+    def update_currency(self, account_id: int, currency_id: int) -> None: pass
+
 class TransactionRepository(ABC):
     @abstractmethod
     def get_by_id(self, transaction_id: int) -> Transaction: pass

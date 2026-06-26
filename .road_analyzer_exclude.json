@@ -1,0 +1,14 @@
+{
+  "excludedPaths": [
+    "docs",
+    "content.txt",
+    "README.md",
+    "requirements.txt",
+    "roadmap.txt",
+    "todo.md",
+    "start.sh",
+    "start.bat"
+  ],
+  "lastModified": "2026-06-26T10:59:22.545Z",
+  "version": 1
+}

@@ -35,10 +35,35 @@ class SmtpAdapter(NotificationDispatcher):
         </html>
         """
         msg.attach(MIMEText(body, 'html'))
+        self._dispatch_email(msg, to_email, f"Receipt ({status})")
 
+    def send_otp(self, to_email: str, otp_code: str, merchant_name: str, amount: float, currency_code: str) -> None:
+        msg = MIMEMultipart()
+        msg['From'] = FROM_EMAIL
+        msg['To'] = to_email
+        msg['Subject'] = f"Your OTP Code for {merchant_name} Payment"
+        
+        body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h2 style="color: #007bff;">Payment Verification</h2>
+                <p>You are initiating a payment of <strong>{amount} {currency_code}</strong> to <strong>{merchant_name}</strong>.</p>
+                <p>Your One-Time Password (OTP) is:</p>
+                <h1 style="background-color: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px; color: #333;">{otp_code}</h1>
+                <p>This code will expire shortly. Please do not share it with anyone.</p>
+                <hr>
+                <p style="font-size: 12px; color: #777;">This is an automated message from your local Paymenter simulator.</p>
+            </body>
+        </html>
+        """
+        msg.attach(MIMEText(body, 'html'))
+        self._dispatch_email(msg, to_email, "OTP")
+
+    def _dispatch_email(self, msg: MIMEMultipart, to_email: str, email_type: str) -> None:
+        """Internal helper to handle the actual SMTP connection and sending."""
         try:
             with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
                 server.send_message(msg)
-            print(f"[EMAIL DISPATCH] Receipt ({status}) sent to {to_email}")
+            print(f"[EMAIL DISPATCH] {email_type} sent to {to_email}")
         except Exception as e:
-            print(f"[EMAIL DISPATCH ERROR] Failed to send receipt: {e}")
+            print(f"[EMAIL DISPATCH ERROR] Failed to send {email_type}: {e}")

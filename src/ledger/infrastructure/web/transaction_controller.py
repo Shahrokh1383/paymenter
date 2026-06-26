@@ -17,16 +17,41 @@ from src.ledger.application.handlers.fail_and_refund_handler import FailAndRefun
 from src.ledger.application.handlers.get_transactions_handler import GetTransactionsHandler
 
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
+from src.common.infrastructure.event_bus import InMemoryEventBus
+
 from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
 from src.ledger.infrastructure.persistence.sqlite_transaction_repository import SqliteTransactionRepository
 from src.ledger.infrastructure.persistence.sqlite_transaction_read_model import SqliteTransactionReadModel
 
+# Notifications Context Imports
+from src.notifications.application.handlers.receipt_email_handler import ReceiptEmailHandler
+from src.notifications.infrastructure.smtp.smtp_adapter import SmtpAdapter
+from src.notifications.infrastructure.persistence.legacy_merchant_adapter import LegacyMerchantAdapter
+from src.ledger.domain.events.transaction_events import (
+    TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
+)
+
 transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 
-# --- Temporary DI Factory (Will move to di_container.py in Phase 5) ---
+# --- Temporary DI Factory ---
 def _get_uow(): return SqliteUnitOfWork()
 def _get_account_repo(uow): return SqliteAccountRepository(uow)
 def _get_txn_repo(uow): return SqliteTransactionRepository(uow)
+
+def _get_event_bus() -> InMemoryEventBus:
+    """Wires the EventBus and subscribes cross-context handlers."""
+    bus = InMemoryEventBus()
+    
+    receipt_handler = ReceiptEmailHandler(
+        dispatcher=SmtpAdapter(),
+        merchant_port=LegacyMerchantAdapter()
+    )
+    
+    bus.subscribe(TransactionCompletedEvent, receipt_handler.handle_completed)
+    bus.subscribe(TransactionFailedEvent, receipt_handler.handle_failed)
+    bus.subscribe(TransactionRefundedEvent, receipt_handler.handle_refunded)
+    
+    return bus
 
 @transaction_bp.route('/', methods=['GET'])
 def index():
@@ -54,6 +79,7 @@ def create():
         )
         
         uow = _get_uow()
+        # HoldFunds doesn't trigger receipt emails, so no EventBus needed here yet
         handler = HoldFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow))
         handler.handle(command)
         
@@ -70,10 +96,11 @@ def complete(id):
     try:
         command = CompleteFundsCommand(transaction_id=id)
         uow = _get_uow()
-        handler = CompleteFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow))
+        event_bus = _get_event_bus()
+        
+        handler = CompleteFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
         handler.handle(command)
         
-        # NOTE: Email dispatch will be handled via EventBus in Phase 4.
         return jsonify({"success": True, "new_status": "Success"}), 200
     except InvalidTransactionStateError as e:
         return jsonify({"success": False, "message": str(e)}), 400
@@ -85,10 +112,11 @@ def fail(id):
     try:
         command = FailAndRefundCommand(transaction_id=id)
         uow = _get_uow()
-        handler = FailAndRefundHandler(uow, _get_account_repo(uow), _get_txn_repo(uow))
+        event_bus = _get_event_bus()
+        
+        handler = FailAndRefundHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
         handler.handle(command)
         
-        # NOTE: Email dispatch will be handled via EventBus in Phase 4.
         return jsonify({"success": True, "new_status": "Refunded/Failed"}), 200
     except InvalidTransactionStateError as e:
         return jsonify({"success": False, "message": str(e)}), 400

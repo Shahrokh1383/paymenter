@@ -1,10 +1,8 @@
 from flask import Blueprint, request, jsonify, g, url_for
 from decimal import Decimal
 
-# FIXED: Corrected import to the concrete SqliteUnitOfWork
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.common.infrastructure.event_bus import InMemoryEventBus
-
+from flask import current_app
 from src.identity.domain.value_objects.api_key import ApiKey
 from src.identity.infrastructure.persistence.sqlite_merchant_repository import SqliteMerchantRepository
 
@@ -52,7 +50,7 @@ def pay():
 
     try:
         uow = SqliteUnitOfWork()
-        event_bus = InMemoryEventBus()  # Will be injected via DI Container in BATCH 3
+        event_bus = current_app.di_container.event_bus
         
         command = InitiatePaymentCommand(
             merchant_id=g.merchant.id,
@@ -94,7 +92,7 @@ def refund():
         
     try:
         uow = SqliteUnitOfWork()
-        event_bus = InMemoryEventBus()
+        event_bus = current_app.di_container.event_bus
         
         command = RefundPaymentCommand(transaction_id=int(data['transaction_id']))
         handler = RefundPaymentHandler(

@@ -26,7 +26,7 @@ from src.ledger.infrastructure.persistence.sqlite_transaction_read_model import 
 # Notifications Context Imports
 from src.notifications.application.handlers.receipt_email_handler import ReceiptEmailHandler
 from src.notifications.infrastructure.smtp.smtp_adapter import SmtpAdapter
-from src.notifications.infrastructure.persistence.legacy_merchant_adapter import LegacyMerchantAdapter
+from src.notifications.infrastructure.persistence.sqlite_merchant_details_adapter import LegacyMerchantAdapter
 from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
@@ -37,21 +37,8 @@ transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 def _get_uow(): return SqliteUnitOfWork()
 def _get_account_repo(uow): return SqliteAccountRepository(uow)
 def _get_txn_repo(uow): return SqliteTransactionRepository(uow)
+from flask import current_app
 
-def _get_event_bus() -> InMemoryEventBus:
-    """Wires the EventBus and subscribes cross-context handlers."""
-    bus = InMemoryEventBus()
-    
-    receipt_handler = ReceiptEmailHandler(
-        dispatcher=SmtpAdapter(),
-        merchant_port=LegacyMerchantAdapter()
-    )
-    
-    bus.subscribe(TransactionCompletedEvent, receipt_handler.handle_completed)
-    bus.subscribe(TransactionFailedEvent, receipt_handler.handle_failed)
-    bus.subscribe(TransactionRefundedEvent, receipt_handler.handle_refunded)
-    
-    return bus
 
 @transaction_bp.route('/', methods=['GET'])
 def index():
@@ -96,7 +83,7 @@ def complete(id):
     try:
         command = CompleteFundsCommand(transaction_id=id)
         uow = _get_uow()
-        event_bus = _get_event_bus()
+        event_bus = current_app.di_container.event_bus
         
         handler = CompleteFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
         handler.handle(command)
@@ -112,7 +99,7 @@ def fail(id):
     try:
         command = FailAndRefundCommand(transaction_id=id)
         uow = _get_uow()
-        event_bus = _get_event_bus()
+        event_bus = current_app.di_container.event_bus
         
         handler = FailAndRefundHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
         handler.handle(command)

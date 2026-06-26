@@ -3,8 +3,9 @@ import os
 from src.common.domain.ports.unit_of_work import UnitOfWork
 
 # Pointing to the existing database during the Strangler Fig migration phase
-DB_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'database', 'storage')
-DB_PATH = os.path.abspath(os.path.join(DB_DIR, 'paymenter.db'))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+DB_DIR = os.path.join(BASE_DIR, 'storage')
+DB_PATH = os.path.join(DB_DIR, 'paymenter.db')
 
 class SqliteUnitOfWork(UnitOfWork):
     """SQLite implementation of the UnitOfWork pattern."""

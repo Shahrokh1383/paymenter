@@ -4,10 +4,14 @@ import threading
 import webbrowser
 from flask import Flask, redirect, url_for
 from database import init_db
+
+# Legacy Controllers (Still active for Phase 5 migration)
 from controllers.dashboard_controller import dashboard_bp
-from controllers.transaction_controller import transaction_bp
 from controllers.api_controller import api_bp
 from controllers.gateway_controller import gateway_bp
+
+# NEW Hexagonal Architecture Controller (Migrated in Phase 3)
+from src.ledger.infrastructure.web.transaction_controller import transaction_bp 
 
 def find_available_port(start_port=5000, max_port=5100):
     """Finds the first available port from start_port to max_port."""
@@ -32,7 +36,7 @@ def create_app():
         init_db()
 
     app.register_blueprint(dashboard_bp)
-    app.register_blueprint(transaction_bp)
+    app.register_blueprint(transaction_bp) 
     app.register_blueprint(api_bp)
     app.register_blueprint(gateway_bp)
 
@@ -48,9 +52,7 @@ if __name__ == '__main__':
     url = f"http://127.0.0.1:{port}"
     
     # Prevent double browser opening in Flask debug mode
-    # The WERKZEUG_RUN_MAIN environment variable is only set in the reloader child process
     if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
-        # Delay opening the browser by 1.5 seconds to allow the server to start
         threading.Timer(1.5, open_browser, args=[url]).start()
 
     print(f"Starting Paymenter on {url}")

@@ -1,3 +1,4 @@
+from typing import Optional
 from src.common.domain.value_objects.money import Money
 from src.common.domain.exceptions import InvalidTransactionStateError
 from src.ledger.domain.entities.account import Account
@@ -7,11 +8,7 @@ class DoubleEntryLedger:
     """Pure domain service for orchestrating double-entry fund movements."""
 
     @staticmethod
-    def hold_funds(from_acc: Account, to_acc: Account, amount: Money, merchant_id: int, user_email: str) -> Transaction:
-        """
-        Deducts funds from the source account and returns a new Pending transaction.
-        Invariant enforcement is delegated to the Account aggregate.
-        """
+    def hold_funds(from_acc: Account, to_acc: Account, amount: Money, merchant_id: Optional[int], user_email: Optional[str]) -> Transaction:
         from_acc.withdraw(amount)
         return Transaction.create_pending(
             from_account_id=from_acc.id,

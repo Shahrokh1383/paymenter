@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from src.common.domain.value_objects.money import Money
 from src.common.domain.exceptions import InvalidTransactionStateError
 
@@ -9,8 +10,8 @@ class Transaction:
     to_account_id: int
     amount: Money
     status: str
-    merchant_id: int
-    user_email: str
+    merchant_id: Optional[int]
+    user_email: Optional[str]
 
     def mark_as_success(self) -> None:
         if self.status != 'Pending':
@@ -28,10 +29,10 @@ class Transaction:
         self.status = 'Refunded'
 
     @staticmethod
-    def create_pending(from_account_id: int, to_account_id: int, amount: Money, merchant_id: int, user_email: str) -> 'Transaction':
+    def create_pending(from_account_id: int, to_account_id: int, amount: Money, merchant_id: Optional[int], user_email: Optional[str]) -> 'Transaction':
         """Factory method to create a new valid Pending transaction."""
         return Transaction(
-            id=0,  # 0 indicates it hasn't been persisted yet
+            id=0,  
             from_account_id=from_account_id,
             to_account_id=to_account_id,
             amount=amount,

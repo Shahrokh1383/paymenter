@@ -7,8 +7,11 @@
     "roadmap.txt",
     "todo.md",
     "start.sh",
-    "start.bat"
+    "start.bat",
+    "fix.txt",
+    "fix2.txt",
+    "Refactortingplan.md"
   ],
-  "lastModified": "2026-06-26T10:59:22.545Z",
+  "lastModified": "2026-06-26T19:01:08.321Z",
   "version": 1
 }

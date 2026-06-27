@@ -1,11 +1,12 @@
 import sqlite3
+from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.domain.entities.transaction import Transaction
 from src.common.domain.value_objects.money import Money
 from src.ledger.domain.repositories import TransactionRepository
 
 class SqliteTransactionRepository(TransactionRepository):
-    def __init__(self, conn: sqlite3.Connection):
-        self.conn = conn
+    def __init__(self, uow: UnitOfWork):
+        self._uow = uow
 
     def _map_row_to_txn(self, row: sqlite3.Row) -> Transaction:
         return Transaction(
@@ -19,7 +20,7 @@ class SqliteTransactionRepository(TransactionRepository):
         )
 
     def get_by_id(self, transaction_id: int) -> Transaction:
-        cursor = self.conn.execute("""
+        cursor = self._uow.conn.execute("""
             SELECT t.id, t.merchant_id, t.from_account_id, t.to_account_id, 
                    t.amount, t.status, t.user_email, c.code as currency_code
             FROM transactions t
@@ -32,7 +33,7 @@ class SqliteTransactionRepository(TransactionRepository):
         return self._map_row_to_txn(row)
 
     def add(self, transaction: Transaction) -> int:
-        cursor = self.conn.execute("""
+        cursor = self._uow.conn.execute("""
             INSERT INTO transactions (merchant_id, from_account_id, to_account_id, amount, currency_id, status, user_email)
             VALUES (?, ?, ?, ?, (SELECT id FROM currencies WHERE code = ?), ?, ?)
         """, (
@@ -47,7 +48,7 @@ class SqliteTransactionRepository(TransactionRepository):
         return cursor.lastrowid
 
     def update(self, transaction: Transaction) -> None:
-        self.conn.execute(
+        self._uow.conn.execute(
             "UPDATE transactions SET status = ? WHERE id = ?",
             (transaction.status, transaction.id)
         )

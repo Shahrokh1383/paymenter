@@ -1,56 +1,47 @@
 from decimal import Decimal
-from src.common.domain.ports.unit_of_work import UnitOfWork
-from src.ledger.domain.entities.account import Account
-from src.ledger.domain.repositories import AccountRepository
-from src.ledger.domain.value_objects.account_number import AccountNumber
-from src.ledger.domain.value_objects.card_number import CardNumber
-from src.common.domain.value_objects.money import Money
+from typing import List
 
-class SqliteAccountRepository(AccountRepository):
+from src.common.domain.ports.unit_of_work import UnitOfWork
+from src.ledger.application.dto.account_summary import AccountSummary
+from src.ledger.application.ports.account_query_port import AccountQueryPort
+
+
+class SqliteAccountReadModel(AccountQueryPort):
+    """
+    Read-side implementation of AccountQueryPort.
+    Adheres to SRP by handling ONLY read queries for account summaries.
+    """
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
-    def get_by_id(self, account_id: int) -> Account:
-        row = self._uow.conn.execute(
-            "SELECT a.*, c.code as currency_code FROM accounts a JOIN currencies c ON a.currency_id = c.id WHERE a.id = ?", 
-            (account_id,)
-        ).fetchone()
-        if not row: return None
-        return Account(
-            id=row['id'], user_id=row['user_id'],
-            account_number=AccountNumber(row['account_number']),
-            card_number=CardNumber(row['card_number']),
-            balance=Money(Decimal(str(row['balance'])), row['currency_code'])
-        )
+    def get_all_summaries(self) -> List[AccountSummary]:
+        # Joining accounts, currencies, and users to fulfill the AccountSummary DTO contract
+        # without violating primitive obsession (using Decimal for balance).
+        rows = self._uow.conn.execute("""
+            SELECT 
+                a.id, 
+                a.user_id, 
+                u.name AS user_name, 
+                a.currency_id, 
+                c.code AS currency_code, 
+                a.account_number, 
+                a.card_number, 
+                a.balance
+            FROM accounts a
+            JOIN currencies c ON a.currency_id = c.id
+            JOIN users u ON a.user_id = u.id
+        """).fetchall()
 
-    def get_by_card_number(self, card_number: CardNumber) -> Account:
-        row = self._uow.conn.execute(
-            "SELECT a.*, c.code as currency_code FROM accounts a JOIN currencies c ON a.currency_id = c.id WHERE a.card_number = ?", 
-            (card_number.value,)
-        ).fetchone()
-        if not row: return None
-        return Account(
-            id=row['id'], user_id=row['user_id'],
-            account_number=AccountNumber(row['account_number']),
-            card_number=CardNumber(row['card_number']),
-            balance=Money(Decimal(str(row['balance'])), row['currency_code'])
-        )
-
-    def update(self, account: Account) -> None:
-        self._uow.conn.execute(
-            "UPDATE accounts SET balance = ? WHERE id = ?",
-            (float(account.balance.amount), account.id)
-        )
-
-    def add(self, account: Account) -> int:
-        currency_row = self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (account.balance.currency,)).fetchone()
-        currency_id = currency_row['id'] if currency_row else 1
-        
-        cursor = self._uow.conn.execute(
-            "INSERT INTO accounts (user_id, currency_id, account_number, card_number, balance) VALUES (?, ?, ?, ?, ?)",
-            (account.user_id, currency_id, account.account_number.value, account.card_number.value, float(account.balance.amount))
-        )
-        return cursor.lastrowid
-
-    def update_currency(self, account_id: int, currency_id: int) -> None:
-        self._uow.conn.execute("UPDATE accounts SET currency_id = ? WHERE id = ?", (currency_id, account_id))
+        return [
+            AccountSummary(
+                id=row['id'],
+                user_id=row['user_id'],
+                user_name=row['user_name'],
+                currency_id=row['currency_id'],
+                currency_code=row['currency_code'],
+                account_number=row['account_number'],
+                card_number=row['card_number'],
+                balance=Decimal(str(row['balance'])) # Constitution Rule 3: No raw floats for Money
+            )
+            for row in rows
+        ]

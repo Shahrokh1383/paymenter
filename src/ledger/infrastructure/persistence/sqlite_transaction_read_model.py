@@ -1,13 +1,21 @@
-import sqlite3
 from typing import List, Optional
 from datetime import datetime
+from decimal import Decimal
+
+from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.application.ports.transaction_query_port import TransactionQueryPort
 from src.ledger.application.dto.transaction_list_item import TransactionListItem
-from database.connection import get_db_connection # Temporarily using legacy connection for Read Models
+
 
 class SqliteTransactionReadModel(TransactionQueryPort):
+    """
+    Read-side implementation of TransactionQueryPort.
+    Uses UnitOfWork to respect the Dependency Rule (Rule 1).
+    """
+    def __init__(self, uow: UnitOfWork):
+        self._uow = uow
+
     def get_all_summaries(self, status: Optional[str] = None) -> List[TransactionListItem]:
-        conn = get_db_connection()
         sql = """
             SELECT t.id, t.amount, t.status, t.created_at, t.user_email,
                    from_acc.account_number as from_account,
@@ -24,13 +32,12 @@ class SqliteTransactionReadModel(TransactionQueryPort):
             params.append(status)
         
         sql += " ORDER BY t.created_at DESC"
-        rows = conn.execute(sql, params).fetchall()
-        conn.close()
+        rows = self._uow.conn.execute(sql, params).fetchall()
         
         return [
             TransactionListItem(
                 id=row['id'],
-                amount=row['amount'],
+                amount=Decimal(str(row['amount'])), # Rule 3: No Primitive Obsession
                 currency_code=row['currency_code'],
                 status=row['status'],
                 created_at=datetime.fromisoformat(row['created_at']) if isinstance(row['created_at'], str) else row['created_at'],

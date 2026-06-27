@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash, current_app
 from decimal import Decimal, InvalidOperation
 
+from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 from src.common.domain.exceptions import (
     InsufficientFundsError, AccountNotFoundError, 
     CurrencyMismatchError, InvalidTransactionStateError
@@ -16,20 +17,13 @@ from src.ledger.application.handlers.complete_funds_handler import CompleteFunds
 from src.ledger.application.handlers.fail_and_refund_handler import FailAndRefundHandler
 from src.ledger.application.handlers.get_transactions_handler import GetTransactionsHandler
 
-from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.common.infrastructure.event_bus import InMemoryEventBus
-
 from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
 from src.ledger.infrastructure.persistence.sqlite_transaction_repository import SqliteTransactionRepository
 from src.ledger.infrastructure.persistence.sqlite_transaction_read_model import SqliteTransactionReadModel
 
-# Notifications Context Imports
-from src.notifications.application.handlers.receipt_email_handler import ReceiptEmailHandler
-from src.notifications.infrastructure.smtp.smtp_adapter import SmtpAdapter
-from src.notifications.infrastructure.persistence.sqlite_merchant_details_adapter import LegacyMerchantAdapter
-from src.ledger.domain.events.transaction_events import (
-    TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
-)
+# NOTE: Cross-context notifications imports removed. 
+# Per Constitution Rule 5, cross-context communication is handled exclusively 
+# via Domain Events through the DIContainer Event Bus.
 
 transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 
@@ -37,7 +31,6 @@ transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 def _get_uow(): return SqliteUnitOfWork()
 def _get_account_repo(uow): return SqliteAccountRepository(uow)
 def _get_txn_repo(uow): return SqliteTransactionRepository(uow)
-from flask import current_app
 
 
 @transaction_bp.route('/', methods=['GET'])
@@ -45,8 +38,10 @@ def index():
     status_filter = request.args.get('status', '')
     query = GetTransactionsQuery(status_filter=status_filter if status_filter else None)
     
-    handler = GetTransactionsHandler(SqliteTransactionReadModel())
-    transactions = handler.handle(query)
+    uow = SqliteUnitOfWork()
+    with uow:
+        handler = GetTransactionsHandler(SqliteTransactionReadModel(uow))
+        transactions = handler.handle(query)
     
     return render_template('transactions.html', transactions=transactions, current_filter=status_filter)
 

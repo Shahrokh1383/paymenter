@@ -10,3 +10,6 @@ class CurrencyMismatchError(DomainException):
 
 class InvalidTransactionStateError(DomainException):
     pass
+
+class AccountNotFoundError(DomainException):
+    pass

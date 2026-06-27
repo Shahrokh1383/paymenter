@@ -10,8 +10,12 @@
     "start.bat",
     "fix.txt",
     "fix2.txt",
-    "Refactortingplan.md"
+    "Refactortingplan.md",
+    "command.txt",
+    "src\\checkout",
+    "src\\identity",
+    "src\\notifications"
   ],
-  "lastModified": "2026-06-27T12:21:50.588Z",
+  "lastModified": "2026-06-27T20:12:36.838Z",
   "version": 1
 }

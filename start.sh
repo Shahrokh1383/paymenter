@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Installing dependencies..."
 pip install -r requirements.txt
-echo "Starting Payment Gateway Simulator..."
+echo "Starting Paymenter (Hexagonal Architecture)..."
 echo "The browser will open automatically once the server is ready."
-python app.py
+python -m src.app.main

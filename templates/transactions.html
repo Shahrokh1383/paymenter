@@ -31,8 +31,8 @@
     <tr id="row-{{ t.id }}">
         <td>{{ t.id }}</td>
         <td>{{ t.user_email or 'Manual' }}</td>
-        <td>{{ t.from_account or 'N/A' }}</td>
-        <td>{{ t.to_account or 'N/A' }}</td>
+        <td>{{ t.from_account_number or 'N/A' }}</td>
+        <td>{{ t.to_account_number or 'N/A' }}</td>
         <td>{{ t.amount }}</td>
         <td>{{ t.currency_code }}</td>
         <td class="status-cell">{{ t.status }}</td>

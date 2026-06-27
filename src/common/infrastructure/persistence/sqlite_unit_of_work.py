@@ -7,24 +7,28 @@ class SqliteUnitOfWork(UnitOfWork):
     
     def __init__(self):
         self.conn = None
+        self._nesting_level = 0
 
     def __enter__(self):
-        # Directory is already guaranteed to exist via Database.initialize()
-        self.conn = sqlite3.connect(DB_PATH)
-        self.conn.row_factory = sqlite3.Row
-        self.conn.execute("PRAGMA foreign_keys = ON;")
+        if self._nesting_level == 0:
+            self.conn = sqlite3.connect(DB_PATH)
+            self.conn.row_factory = sqlite3.Row
+            self.conn.execute("PRAGMA foreign_keys = ON;")
+        self._nesting_level += 1
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.conn:
-            try:
-                if exc_type is None:
-                    self.commit()
-                else:
-                    self.rollback()
-            finally:
-                self.conn.close()
-                self.conn = None
+        self._nesting_level -= 1
+        if self._nesting_level == 0:
+            if self.conn:
+                try:
+                    if exc_type is None:
+                        self.commit()
+                    else:
+                        self.rollback()
+                finally:
+                    self.conn.close()
+                    self.conn = None
 
     def commit(self):
         if self.conn:

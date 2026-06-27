@@ -61,15 +61,17 @@ def pay():
             callback_url=data['callback_url']
         )
         
-        handler = InitiatePaymentHandler(
-            uow=uow,
-            session_repo=SqliteSessionRepository(uow),
-            event_bus=event_bus,
-            token_gen=SecureSessionTokenGenerator(),
-            otp_gen=SecureOtpGenerator()
-        )
+        with uow:
+            handler = InitiatePaymentHandler(
+                uow=uow,
+                session_repo=SqliteSessionRepository(uow),
+                event_bus=event_bus,
+                token_gen=SecureSessionTokenGenerator(),
+                otp_gen=SecureOtpGenerator()
+            )
+            
+            token = handler.handle(command)
         
-        token = handler.handle(command)
         payment_url = url_for('gateway.show_gateway_page', token=token, _external=True)
         
         return jsonify({
@@ -95,12 +97,14 @@ def refund():
         event_bus = current_app.di_container.event_bus
         
         command = RefundPaymentCommand(transaction_id=int(data['transaction_id']))
-        handler = RefundPaymentHandler(
-            uow=uow,
-            refund_port=LedgerRefundAdapter(uow, event_bus)
-        )
         
-        handler.handle(command)
+        with uow:
+            handler = RefundPaymentHandler(
+                uow=uow,
+                refund_port=LedgerRefundAdapter(uow, event_bus)
+            )
+            
+            handler.handle(command)
         
         return jsonify({
             "transaction_id": data['transaction_id'],
@@ -117,9 +121,11 @@ def verify(transaction_id):
     """Verifies the status of a transaction."""
     try:
         uow = SqliteUnitOfWork()
-        verification_port = LedgerVerificationAdapter(uow)
         
-        status = verification_port.get_transaction_status(transaction_id)
+        with uow:
+            verification_port = LedgerVerificationAdapter(uow)
+            status = verification_port.get_transaction_status(transaction_id)
+        
         if not status:
             return jsonify({"error": "Transaction not found"}), 404
             

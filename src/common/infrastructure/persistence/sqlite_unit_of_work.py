@@ -1,11 +1,6 @@
 import sqlite3
-import os
 from src.common.domain.ports.unit_of_work import UnitOfWork
-
-# Pointing to the existing database during the Strangler Fig migration phase
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-DB_DIR = os.path.join(BASE_DIR, 'storage')
-DB_PATH = os.path.join(DB_DIR, 'paymenter.db')
+from src.common.infrastructure.database import DB_PATH
 
 class SqliteUnitOfWork(UnitOfWork):
     """SQLite implementation of the UnitOfWork pattern."""
@@ -14,7 +9,7 @@ class SqliteUnitOfWork(UnitOfWork):
         self.conn = None
 
     def __enter__(self):
-        os.makedirs(DB_PATH.replace('paymenter.db', ''), exist_ok=True)
+        # Directory is already guaranteed to exist via Database.initialize()
         self.conn = sqlite3.connect(DB_PATH)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON;")

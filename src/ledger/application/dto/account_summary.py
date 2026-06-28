@@ -10,5 +10,5 @@ class AccountSummary:
     currency_id: int
     currency_code: str
     account_number: str
-    card_number: Optional[str] = None
     balance: Decimal
+    card_number: Optional[str] = None

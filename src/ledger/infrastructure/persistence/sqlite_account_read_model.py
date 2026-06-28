@@ -22,10 +22,12 @@ class SqliteAccountReadModel(AccountQueryPort):
                 a.currency_id, 
                 c.code AS currency_code, 
                 a.account_number, 
+                uc.card_number, 
                 a.balance
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             JOIN users u ON a.user_id = u.id
+            LEFT JOIN user_cards uc ON a.id = uc.account_id
         """).fetchall()
 
         return [
@@ -36,6 +38,7 @@ class SqliteAccountReadModel(AccountQueryPort):
                 currency_id=row['currency_id'],
                 currency_code=row['currency_code'],
                 account_number=row['account_number'],
+                card_number=row['card_number'],
                 balance=Decimal(str(row['balance']))
             )
             for row in rows

@@ -33,7 +33,7 @@ def register_ledger(container):
         return CompleteFundsHandler(
             uow=uow,
             account_repo=SqliteAccountRepository(uow),
-            transaction_repo=SqliteTransactionRepository(uow),
+            txn_repo=SqliteTransactionRepository(uow),
             event_bus=container.event_bus
         )
 
@@ -41,13 +41,13 @@ def register_ledger(container):
         return FailAndRefundHandler(
             uow=uow,
             account_repo=SqliteAccountRepository(uow),
-            transaction_repo=SqliteTransactionRepository(uow),
+            txn_repo=SqliteTransactionRepository(uow),
             event_bus=container.event_bus
         )
 
     def get_transactions_handler(uow: SqliteUnitOfWork) -> GetTransactionsHandler:
         return GetTransactionsHandler(
-            query_port=SqliteTransactionReadModel(uow) # Bug Fix: Corrected parameter name
+            query_port=SqliteTransactionReadModel(uow)
         )
 
     def get_topup_account_handler(uow: SqliteUnitOfWork) -> TopupAccountHandler:

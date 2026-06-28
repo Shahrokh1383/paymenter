@@ -1,6 +1,5 @@
 fixed all the bugs in ledger module docs checklist :
 
-1 : Account_Application_Module.md
 
 2 : Account_Domain_Module.md
 

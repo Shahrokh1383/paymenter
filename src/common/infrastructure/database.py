@@ -30,6 +30,15 @@ class Database:
                 FOREIGN KEY (currency_id) REFERENCES currencies(id)
             );
             
+            CREATE TABLE IF NOT EXISTS user_cards (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                user_id INTEGER NOT NULL, 
+                account_id INTEGER NOT NULL, 
+                card_number TEXT NOT NULL UNIQUE, 
+                FOREIGN KEY (user_id) REFERENCES users(id), 
+                FOREIGN KEY (account_id) REFERENCES accounts(id)
+            );
+            
             CREATE TABLE IF NOT EXISTS transactions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 merchant_id INTEGER, 

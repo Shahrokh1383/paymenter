@@ -29,11 +29,14 @@ class Account:
             
         self.balance = self.balance + amount
     
-    def topup(self, amount: float) -> None:
-        from decimal import Decimal
-        if amount <= 0:
+    def topup(self, amount: Money) -> None:
+        if amount.amount <= 0:
             raise ValueError("Topup amount must be greater than zero.")
-        self.balance = Money(self.balance.amount + Decimal(str(amount)), self.balance.currency)
+            
+        if self.balance.currency != amount.currency:
+            raise CurrencyMismatchError("Account currency does not match topup amount currency.")
+            
+        self.balance = self.balance + amount
 
     def can_change_currency(self) -> bool:
         return self.balance.amount == 0

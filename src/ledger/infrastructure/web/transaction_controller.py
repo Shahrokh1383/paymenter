@@ -12,26 +12,7 @@ from src.ledger.application.commands.complete_funds_command import CompleteFunds
 from src.ledger.application.commands.fail_and_refund_command import FailAndRefundCommand
 from src.ledger.application.queries.get_transactions_query import GetTransactionsQuery
 
-from src.ledger.application.handlers.hold_funds_handler import HoldFundsHandler
-from src.ledger.application.handlers.complete_funds_handler import CompleteFundsHandler
-from src.ledger.application.handlers.fail_and_refund_handler import FailAndRefundHandler
-from src.ledger.application.handlers.get_transactions_handler import GetTransactionsHandler
-
-from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
-from src.ledger.infrastructure.persistence.sqlite_transaction_repository import SqliteTransactionRepository
-from src.ledger.infrastructure.persistence.sqlite_transaction_read_model import SqliteTransactionReadModel
-
-# NOTE: Cross-context notifications imports removed. 
-# Per Constitution Rule 5, cross-context communication is handled exclusively 
-# via Domain Events through the DIContainer Event Bus.
-
 transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
-
-# --- Temporary DI Factory ---
-def _get_uow(): return SqliteUnitOfWork()
-def _get_account_repo(uow): return SqliteAccountRepository(uow)
-def _get_txn_repo(uow): return SqliteTransactionRepository(uow)
-
 
 @transaction_bp.route('/', methods=['GET'])
 def index():
@@ -40,7 +21,8 @@ def index():
     
     uow = SqliteUnitOfWork()
     with uow:
-        handler = GetTransactionsHandler(SqliteTransactionReadModel(uow))
+        # FIX TD-9: Resolving handler via DI Container
+        handler = current_app.di_container.get_transactions_handler(uow)
         transactions = handler.handle(query)
     
     return render_template('transactions.html', transactions=transactions, current_filter=status_filter)
@@ -60,9 +42,8 @@ def create():
             user_email=request.form.get('user_email')
         )
         
-        uow = _get_uow()
-        # HoldFunds doesn't trigger receipt emails, so no EventBus needed here yet
-        handler = HoldFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow))
+        uow = SqliteUnitOfWork()
+        handler = current_app.di_container.get_hold_funds_handler(uow)
         handler.handle(command)
         
         flash("Funds held successfully.", "success")
@@ -77,10 +58,9 @@ def create():
 def complete(id):
     try:
         command = CompleteFundsCommand(transaction_id=id)
-        uow = _get_uow()
-        event_bus = current_app.di_container.event_bus
+        uow = SqliteUnitOfWork()
         
-        handler = CompleteFundsHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
+        handler = current_app.di_container.get_complete_funds_handler(uow)
         handler.handle(command)
         
         return jsonify({"success": True, "new_status": "Success"}), 200
@@ -93,10 +73,9 @@ def complete(id):
 def fail(id):
     try:
         command = FailAndRefundCommand(transaction_id=id)
-        uow = _get_uow()
-        event_bus = current_app.di_container.event_bus
+        uow = SqliteUnitOfWork()
         
-        handler = FailAndRefundHandler(uow, _get_account_repo(uow), _get_txn_repo(uow), event_bus)
+        handler = current_app.di_container.get_fail_and_refund_handler(uow)
         handler.handle(command)
         
         return jsonify({"success": True, "new_status": "Refunded/Failed"}), 200

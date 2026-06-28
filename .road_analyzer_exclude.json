@@ -12,10 +12,9 @@
     "fix2.txt",
     "Refactortingplan.md",
     "command.txt",
-    "src\\checkout",
-    "src\\identity",
-    "src\\notifications"
+    "src\\notifications",
+    "src\\ledger"
   ],
-  "lastModified": "2026-06-28T10:19:54.415Z",
+  "lastModified": "2026-06-28T11:18:53.815Z",
   "version": 1
 }

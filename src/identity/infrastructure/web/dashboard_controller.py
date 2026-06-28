@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from decimal import Decimal, InvalidOperation
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
 # Identity Imports
@@ -15,13 +16,8 @@ from src.identity.application.handlers.register_user_handler import RegisterUser
 
 # Ledger Imports
 from src.ledger.application.commands.topup_account_command import TopupAccountCommand
-from src.ledger.application.handlers.topup_account_handler import TopupAccountHandler
 from src.ledger.application.commands.update_account_currency_command import UpdateAccountCurrencyCommand
-from src.ledger.application.handlers.update_account_currency_handler import UpdateAccountCurrencyHandler
 from src.ledger.application.queries.get_all_accounts_query import GetAllAccountsQuery
-from src.ledger.application.handlers.get_all_accounts_handler import GetAllAccountsHandler
-from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
-from src.ledger.infrastructure.persistence.sqlite_account_read_model import SqliteAccountReadModel
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -77,7 +73,8 @@ def add_user():
 def accounts():
     uow = SqliteUnitOfWork()
     with uow:
-        accounts_list = GetAllAccountsHandler(SqliteAccountReadModel(uow)).handle(GetAllAccountsQuery())
+        handler = current_app.di_container.get_all_accounts_handler(uow)
+        accounts_list = handler.handle(GetAllAccountsQuery())
         active_currencies = SqliteCurrencyRepository(uow).get_active()
     return render_template('accounts.html', accounts=accounts_list, currencies=active_currencies)
 
@@ -85,7 +82,7 @@ def accounts():
 def update_account_currency():
     try:
         uow = SqliteUnitOfWork()
-        handler = UpdateAccountCurrencyHandler(uow, SqliteAccountRepository(uow))
+        handler = current_app.di_container.get_update_account_currency_handler(uow)
         handler.handle(UpdateAccountCurrencyCommand(account_id=int(request.form['account_id']), currency_id=int(request.form['currency_id'])))
         flash("Account currency updated successfully.", 'success')
     except Exception as e: flash(str(e), 'error')
@@ -94,9 +91,12 @@ def update_account_currency():
 @dashboard_bp.route('/accounts/topup', methods=['POST'])
 def topup_account():
     try:
+        amount = Decimal(str(request.form['amount']))
+        
         uow = SqliteUnitOfWork()
-        handler = TopupAccountHandler(uow, SqliteAccountRepository(uow))
-        handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=float(request.form['amount'])))
+        # FIX TD-9: Resolved via DI Container
+        handler = current_app.di_container.get_topup_account_handler(uow)
+        handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=amount))
         flash("Topup successful.", 'success')
     except Exception as e: flash(str(e), 'error')
     return redirect(request.referrer or url_for('dashboard.accounts'))

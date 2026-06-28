@@ -26,7 +26,7 @@ def register_ledger(container):
         return HoldFundsHandler(
             uow=uow,
             account_repo=SqliteAccountRepository(uow),
-            transaction_repo=SqliteTransactionRepository(uow)
+            txn_repo=SqliteTransactionRepository(uow)
         )
 
     def get_complete_funds_handler(uow: SqliteUnitOfWork) -> CompleteFundsHandler:

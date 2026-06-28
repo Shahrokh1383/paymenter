@@ -40,3 +40,11 @@ class Account:
 
     def can_change_currency(self) -> bool:
         return self.balance.amount == 0
+
+    def change_currency(self, new_currency_code: str) -> None:
+        """Changes the account's currency. Enforces zero-balance invariant (BR-5)."""
+        if not self.can_change_currency():
+            raise ValueError("Cannot change currency on an account with a balance > 0.")
+            
+        # Reconstruct the Money value object with the new currency code
+        self.balance = Money(self.balance.amount, new_currency_code)

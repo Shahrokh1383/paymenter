@@ -7,9 +7,6 @@ class AccountRepository(ABC):
     def get_by_id(self, account_id: int) -> Account: pass
     
     @abstractmethod
-    def get_by_card_number(self, card_number) -> Account: pass
-    
-    @abstractmethod
     def update(self, account: Account) -> None: pass
     
     @abstractmethod

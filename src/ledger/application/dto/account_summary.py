@@ -9,5 +9,4 @@ class AccountSummary:
     currency_id: int
     currency_code: str
     account_number: str
-    card_number: str
     balance: Decimal

@@ -2,14 +2,11 @@ from dataclasses import dataclass
 from src.common.domain.value_objects.money import Money
 from src.common.domain.exceptions import InsufficientFundsError, CurrencyMismatchError
 from src.ledger.domain.value_objects.account_number import AccountNumber
-from src.ledger.domain.value_objects.card_number import CardNumber
-
 @dataclass
 class Account:
     id: int
     user_id: int
     account_number: AccountNumber
-    card_number: CardNumber
     balance: Money
 
     def withdraw(self, amount: Money) -> None:
@@ -45,6 +42,4 @@ class Account:
         """Changes the account's currency. Enforces zero-balance invariant (BR-5)."""
         if not self.can_change_currency():
             raise ValueError("Cannot change currency on an account with a balance > 0.")
-            
-        # Reconstruct the Money value object with the new currency code
         self.balance = Money(self.balance.amount, new_currency_code)

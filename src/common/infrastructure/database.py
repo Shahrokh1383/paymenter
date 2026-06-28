@@ -25,7 +25,6 @@ class Database:
                 user_id INTEGER NOT NULL, 
                 currency_id INTEGER NOT NULL, 
                 account_number TEXT NOT NULL UNIQUE, 
-                card_number TEXT NOT NULL UNIQUE, 
                 balance TEXT NOT NULL DEFAULT '0.00', 
                 FOREIGN KEY (user_id) REFERENCES users(id), 
                 FOREIGN KEY (currency_id) REFERENCES currencies(id)

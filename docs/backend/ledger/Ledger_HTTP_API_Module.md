@@ -1,13 +1,14 @@
 # Ledger HTTP API Module — Single Source of Truth Documentation
-## Paymenter Project | Version 1.0.0
+## Paymenter Project | Version 1.1.0
 
 ---
 
 ## Table of Contents
 1. [Overview](#overview)
 2. [Backend Architecture — Infrastructure Layer (Web)](#backend-architecture--infrastructure-layer-web)
-   - [Flask Controller](#flask-controller)
-   - [DI Factory (Temporary)](#di-factory-temporary)
+   - [SSR Controller (HTML/Forms)](#ssr-controller-htmlforms)
+   - [REST API Controller (JSON)](#rest-api-controller-json)
+   - [DI Container Integration](#di-container-integration)
 3. [API Contract](#api-contract)
    - [Hold Funds (Create Transaction)](#hold-funds-create-transaction)
    - [Complete Funds](#complete-funds)
@@ -25,45 +26,51 @@
 
 ## Overview
 
-The **Ledger HTTP API** module exposes the transaction lifecycle and query operations via a Flask web controller. It handles incoming HTTP requests for creating, completing, failing/refunding, and listing transactions. Responses are either HTML (for list view) or JSON (for action endpoints). This module currently uses temporary manual dependency injection.
+The **Ledger HTTP API** module exposes the transaction lifecycle and query operations via Flask web controllers. To maintain architectural purity and adhere to the Single Responsibility Principle (SRP), this module is strictly divided into two distinct paradigms: Server-Side Rendering (SSR) for HTML views and a pure RESTful JSON API for programmatic clients. All endpoints strictly enforce input validation, secure error handling, and support idempotency for state-mutating actions.
 
 ### Core Responsibilities
-- **Routing**: Mapping URLs to application handlers.
-- **Request Parsing**: Extracting form/JSON data and creating commands/queries.
-- **Response Rendering**: Returning HTML templates or JSON responses.
-- **Error Handling**: Catching domain exceptions and returning appropriate HTTP status codes and messages.
+- **Routing**: Mapping URLs to application handlers via separated Blueprints.
+- **Request Parsing & Validation**: Extracting form/JSON data, validating schemas (Fail-Fast), and creating commands/queries.
+- **Response Rendering**: Returning HTML templates (SSR) or JSON responses (REST).
+- **Error Handling**: Catching domain exceptions and mapping them to precise HTTP status codes; securely logging system exceptions without leaking data.
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
 |---|---|
-| Rule 6: Infrastructure as Plugin | ✅ Flask is an infrastructure detail. |
+| Rule 6: Infrastructure as Plugin | ✅ Flask, validation schemas, and idempotency decorators are infrastructure details. |
 | Rule 5: Cross-Context via Events | N/A for web layer. |
-| DI Container Integration | ⚠️ Incomplete (see TD-9). |
+| Rule 2: New Feature = New File | ✅ API controller, validation schema, and idempotency wrapper isolated in new files. |
+| DI Container Integration | ✅ Handlers are fully resolved via `DIContainer`. Local factories removed. |
+| Security & Compliance | ✅ No stack traces leaked to clients. Internal logging used for 500s. |
 
 ---
 
 ## Backend Architecture — Infrastructure Layer (Web)
 
-### Flask Controller
+### SSR Controller (HTML/Forms)
 **File**: `src/ledger/infrastructure/web/transaction_controller.py`
-
 **Blueprint**: `transactions` (url_prefix `/transactions`)
+
+Used exclusively for the traditional web UI. Implements the PRG (Post-Redirect-Get) pattern.
 
 | Route | Method | Handler | Response |
 |---|---|---|---|
 | `/` | GET | `GetTransactionsHandler` | Render `transactions.html` with `transactions` list and `current_filter` |
-| `/create` | POST | `HoldFundsHandler` | Flash message + Redirect to `/transactions/` |
-| `/complete/<int:id>` | POST | `CompleteFundsHandler` | JSON `{success, new_status}` |
-| `/fail/<int:id>` | POST | `FailAndRefundHandler` | JSON `{success, new_status}` |
+| `/create` | POST | `HoldFundsHandler` (via `HoldFundsRequestSchema`) | Flash message + Redirect to `/transactions/` |
 
-### DI Factory (Temporary)
-Inside `transaction_controller.py`, dependencies are manually constructed using local factory functions:
-```python
-def _get_uow(): return SqliteUnitOfWork()
-def _get_account_repo(uow): return SqliteAccountRepository(uow)
-def _get_txn_repo(uow): return SqliteTransactionRepository(uow)
-```
-⚠️ This is manual wiring. The DI Container (`app/di_container.py`) exists but is only used for `EventBus` access (`current_app.di_container.event_bus`). Full DI container integration for handlers is incomplete (see TD-9).
+### REST API Controller (JSON)
+**File**: `src/ledger/infrastructure/web/transaction_api_controller.py`
+**Blueprint**: `transactions_api` (url_prefix `/api/transactions`)
+
+Used by programmatic clients (SPAs, mobile, external services). Enforces strict HTTP semantics and supports the `Idempotency-Key` header.
+
+| Route | Method | Handler | Response |
+|---|---|---|---|
+| `/<int:id>/complete` | POST | `CompleteFundsHandler` | JSON `{success, new_status}` |
+| `/<int:id>/fail` | POST | `FailAndRefundHandler` | JSON `{success, new_status}` |
+
+### DI Container Integration
+Controller layers no longer instantiate infrastructure dependencies (like repositories or unit of work) directly for handler creation. The `DIContainer` handles all handler wiring. The controller only instantiates the `SqliteUnitOfWork` context to pass into the handler, maintaining the lifecycle boundary of the request.
 
 ---
 
@@ -76,38 +83,44 @@ Content-Type: application/x-www-form-urlencoded
 
 from_account_id=1&to_account_id=2&amount=100.00&merchant_id=5&user_email=user@example.com
 ```
+**Validation**: Fails fast via `HoldFundsRequestSchema` if IDs are not integers or amount is not a positive decimal.
 **Success**: Flash message "Funds held successfully." + Redirect to `/transactions/`
 
 **Errors** (Flash message):
+- `ValueError` (Validation): Malformed inputs (e.g., missing/invalid amount).
 - `InsufficientFundsError`: Source account lacks funds.
 - `AccountNotFoundError`: One or both accounts do not exist.
 - `CurrencyMismatchError`: Accounts have different currencies.
-- `InvalidOperation`: Malformed Decimal amount.
 
 ### Complete Funds
 ```
-POST /transactions/complete/<id>
+POST /api/transactions/<id>/complete
+Headers: 
+  Idempotency-Key: <optional-uuid>
 ```
-**Success Response**:
+**Success Response** (200):
 ```json
 { "success": true, "new_status": "Success" }
 ```
-**Error Response** (400):
-```json
-{ "success": false, "message": "Transaction cannot be completed. Current status: Failed" }
-```
-**Error Response** (500): Generic catch-all.
+**Error Responses**:
+- `400 Bad Request`: `InvalidTransactionStateError` (e.g., already failed).
+- `409 Conflict`: `InsufficientFundsError`, `AccountNotFoundError`, `CurrencyMismatchError`.
+- `500 Internal Server Error`: Generic catch-all. Logs full trace internally; returns `{"message": "An internal server error occurred."}` to client.
 
 ### Fail & Refund
 ```
-POST /transactions/fail/<id>
+POST /api/transactions/<id>/fail
+Headers: 
+  Idempotency-Key: <optional-uuid>
 ```
-**Success Response**:
+**Success Response** (200):
 ```json
-{ "success": true, "new_status": "Refunded/Failed" }
+{ "success": true, "new_status": "Refunded" }
 ```
-**Error Response** (400): `InvalidTransactionStateError`
-**Error Response** (500): Generic catch-all, including `InsufficientFundsError` from insolvent destination account during refund.
+**Error Responses**:
+- `400 Bad Request`: `InvalidTransactionStateError`.
+- `409 Conflict`: `InsufficientFundsError` (e.g., destination account insolvent during refund), `AccountNotFoundError`.
+- `500 Internal Server Error`: Secure generic message, internal logging applied.
 
 ### List Transactions
 ```
@@ -121,32 +134,37 @@ GET /transactions/?status=Pending
 
 ### 1. Hold Funds
 ```
-[User/Checkout] → POST /transactions/create
-  → Parse form data → HoldFundsCommand(...)
+[User/Checkout UI] → POST /transactions/create
+  → Validate form data via HoldFundsRequestSchema (Fail-Fast)
+  → Map to HoldFundsCommand(...)
   → HoldFundsHandler
     → (See Transaction Application (Commands) module for domain flow)
   → On success: Flash message + Redirect to /transactions/
-  → On error: Flash error message + Redirect to /transactions/
+  → On error: Flash specific error message + Redirect to /transactions/
 ```
 
 ### 2. Complete Funds
 ```
-[User/Merchant] → POST /transactions/complete/<id>
-  → CompleteFundsCommand(transaction_id=id)
+[Merchant/SPA] → POST /api/transactions/complete/<id>
+  → Check Idempotency-Key (if provided)
+  → Map to CompleteFundsCommand(transaction_id=id)
   → CompleteFundsHandler
     → (See Transaction Application (Commands) module for domain flow)
   → On success: JSON {success: true, new_status: "Success"}
-  → On error: JSON {success: false, message: "..."}, HTTP 400 or 500
+  → On Domain Error: JSON {success: false, message: "..."}, HTTP 400 or 409
+  → On System Error: Log stack trace, JSON {success: false, message: "Internal..."}, HTTP 500
 ```
 
 ### 3. Fail & Refund
 ```
-[User/Merchant] → POST /transactions/fail/<id>
-  → FailAndRefundCommand(transaction_id=id)
+[Merchant/SPA] → POST /api/transactions/fail/<id>
+  → Check Idempotency-Key (if provided)
+  → Map to FailAndRefundCommand(transaction_id=id)
   → FailAndRefundHandler
     → (See Transaction Application (Commands) module for domain flow)
-  → On success: JSON {success: true, new_status: "Refunded" or "Failed"}
-  → On error: JSON {success: false, message: "..."}, HTTP 400 or 500
+  → On success: JSON {success: true, new_status: "Refunded"}
+  → On Domain Error: JSON {success: false, message: "..."}, HTTP 400 or 409
+  → On System Error: Log stack trace, JSON {success: false, message: "Internal..."}, HTTP 500
 ```
 
 ### 4. Query Transactions
@@ -163,17 +181,24 @@ GET /transactions/?status=Pending
 ## Edge Cases & Known Issues
 
 ### EC-4: Transaction ID Zero in Events
-**Scenario**: A newly created transaction (via Hold Funds) does not have its `id` updated from `lastrowid`. If any event were emitted downstream after completion, it would carry `transaction_id=0`.
-**Impact**: Correlation issues in notification systems.
-**Status**: Bug. Root cause in repository (see TD-3 in Infrastructure module). The API itself only handles the redirect/flash; the ID problem affects downstream event consumers.
+**Status**: RESOLVED / Outdated.
+**Historical Context**: Previously documented as a bug where `create_pending` used `id=0` and events would capture this before the DB updated it. 
+**Current State**: The repository (`sqlite_transaction_repository.py`) correctly assigns `transaction.id = cursor.lastrowid` atomically before the UoW commits. Furthermore, no events are emitted during the Hold phase, rendering this edge case dormant. If a `TransactionHeldEvent` is added in the future, it must be constructed *after* the repository `add()` method returns, not inside the entity factory.
 
-*(Note: Other edge cases like EC-2, EC-3 are handled at domain/application layers, but the controller catches them as 500 errors.)*
+*(Note: Other edge cases like EC-2, EC-3 are handled safely at domain/application layers and explicitly mapped to 4xx HTTP codes by the controllers).*
 
 ---
 
 ## Notes & Technical Debt
 
 ### TD-9: Incomplete DI Container Integration
-**Location**: `src/ledger/infrastructure/web/transaction_controller.py`
-**Current**: Controller manually instantiates `SqliteUnitOfWork`, `SqliteAccountRepository`, and `SqliteTransactionRepository` using local factory functions. The global `DIContainer` is only accessed for `EventBus`.
-**Required Fix**: Controller should request handlers from the `DIContainer` (e.g., `current_app.di_container.hold_funds_handler`). This ensures all dependencies (including EventBus) are injected consistently and testable. The local factory functions (`_get_uow`, etc.) should be removed after handlers are registered in the container.
+**Status**: RESOLVED.
+**Previous State**: Controller manually instantiated `SqliteUnitOfWork`, `SqliteAccountRepository`, and `SqliteTransactionRepository` using local factory functions.
+**Current State**: Local factory functions (`_get_uow`, `_get_account_repo`, etc.) have been completely removed. The controller strictly requests handlers from `current_app.di_container`.
+
+### Architecture & Security Debt (Resolved in v1.1.0)
+The following technical debts were completely resolved in the latest iteration:
+- **Schizophrenic Architecture (TD-2)**: Resolved by separating `/transactions` (SSR) and `/api/transactions` (REST) into distinct infrastructure files.
+- **Lack of Validation (TD-3)**: Resolved by implementing `HoldFundsRequestSchema` to intercept bad data before it reaches the Application layer.
+- **Information Leakage & 500 Leaks**: Resolved by explicitly catching Domain exceptions (returning 4xx) and masking generic `Exception` traces from the client (returning secure 500 + internal `app.logger.error`).
+- **Missing Idempotency**: Resolved by implementing the `@idempotent` decorator on state-mutating API endpoints.

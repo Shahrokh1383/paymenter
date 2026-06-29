@@ -46,7 +46,13 @@ Bounded Contexts never call each other directly. They communicate exclusively th
 **Rule 6: Infrastructure Is a Plugin**  
 Flask, SQLite, SMTP, HTTP clients, etc. are implementation details. They implement interfaces (Ports) defined in the Domain or Application layers.
 
----
+**Rule 7: Schema Definition Isolation (Strict OCP for Database Migrations)**
+Database schema definitions must never be monolithic. Raw SQL `CREATE TABLE` statements are strictly forbidden inside the central `database.py` orchestrator file. Schemas must be isolated by Bounded Context using a nested aggregator pattern.
+- **DO**: Create a dedicated subfolder for each Bounded Context inside `src/common/infrastructure/database/schemas/` (e.g., `schemas/ledger/`, `schemas/checkout/`).
+- **DO**: Create a context aggregator file inside that subfolder (e.g., `schemas/ledger/ledger.py`). If a context has many tables, split them into separate files within that subfolder and aggregate them inside the context file.
+- **DO**: The central `database.py` must act purely as the root orchestrator. It may only import the aggregated schema constants from the context files, concatenate them, and execute them atomically.
+- **NEVER**: Modify `database.py` to add new tables. Adding a new table means creating/modifying files strictly within its respective Bounded Context subfolder.
+- **Rationale**: Ensures SRP, OCP, perfect mirroring of Domain boundaries in the Infrastructure layer, and prevents merge conflicts in large teams.
 
 ### 🏗️ ARCHITECTURAL LAYERS
 

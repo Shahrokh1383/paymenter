@@ -45,7 +45,10 @@ class SqliteTransactionRepository(TransactionRepository):
             transaction.status,
             transaction.user_email
         ))
-        return cursor.lastrowid
+        
+        transaction.id = cursor.lastrowid
+        
+        return transaction.id
 
     def update(self, transaction: Transaction) -> None:
         self._uow.conn.execute(

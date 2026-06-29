@@ -31,12 +31,10 @@ class CompleteFundsHandler:
             self._account_repo.update(to_acc)
             self._uow.commit()
 
-            # Prepare event ONLY after successful commit to prevent phantom emails
             event_to_publish = TransactionCompletedEvent(
                 transaction_id=txn.id,
                 user_email=txn.user_email,
-                amount=txn.amount.amount,
-                currency_code=txn.amount.currency, # Cleanly replaces legacy DB lookup
+                amount=txn.amount,
                 merchant_id=txn.merchant_id
             )
             

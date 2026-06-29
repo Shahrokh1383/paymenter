@@ -83,13 +83,6 @@ PROJECT STRUCTURE
 │   └── 📄 __init__.py
 └── 📄 __init__.py
 📁 static/
-├── 📁 css/
-│   ├── 📄 account.css
-│   ├── 📄 app.css
-│   ├── 📄 gateway.css
-│   ├── 📄 merchant.css
-│   ├── 📄 transaction.css
-│   └── 📄 user.css
 └── 📁 js/
     ├── 📄 gateway.js
     ├── 📄 main.js

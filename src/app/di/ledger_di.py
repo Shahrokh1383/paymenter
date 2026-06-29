@@ -6,7 +6,6 @@ from src.ledger.infrastructure.persistence.sqlite_account_repository import Sqli
 from src.ledger.infrastructure.persistence.sqlite_transaction_repository import SqliteTransactionRepository
 from src.ledger.infrastructure.persistence.sqlite_transaction_read_model import SqliteTransactionReadModel
 from src.ledger.infrastructure.persistence.sqlite_account_read_model import SqliteAccountReadModel
-from src.ledger.infrastructure.persistence.sqlite_currency_resolver import SqliteCurrencyResolver
 
 # Ledger Application Handlers
 from src.ledger.application.handlers.hold_funds_handler import HoldFundsHandler
@@ -62,8 +61,7 @@ def register_ledger(container):
     def get_update_account_currency_handler(uow: SqliteUnitOfWork) -> UpdateAccountCurrencyHandler:
         return UpdateAccountCurrencyHandler(
             uow=uow,
-            account_repo=SqliteAccountRepository(uow),
-            currency_query=SqliteCurrencyResolver(uow)
+            account_repo=SqliteAccountRepository(uow)
         )
 
     def get_all_accounts_handler(uow: SqliteUnitOfWork) -> GetAllAccountsHandler:

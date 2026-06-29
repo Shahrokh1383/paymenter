@@ -21,7 +21,7 @@ class SqliteAccountRepository(AccountRepository):
 
     def get_by_id(self, account_id: int) -> Account:
         cursor = self._uow.conn.execute("""
-            SELECT a.id, a.user_id, a.account_number, a.balance, c.code as currency_code
+            SELECT a.id, a.user_id, a.account_number, a.balance, a.version, c.code as currency_code
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             WHERE a.id = ?

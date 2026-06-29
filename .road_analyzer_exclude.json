@@ -13,8 +13,10 @@
     "Refactortingplan.md",
     "command.txt",
     "src\\notifications",
-    "src\\ledger"
+    "src\\checkout",
+    "src\\common",
+    "src\\identity"
   ],
-  "lastModified": "2026-06-28T11:18:53.815Z",
+  "lastModified": "2026-06-29T10:20:39.848Z",
   "version": 1
 }

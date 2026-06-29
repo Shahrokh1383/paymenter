@@ -3,6 +3,7 @@ from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.domain.entities.transaction import Transaction
 from src.common.domain.value_objects.money import Money
 from src.ledger.domain.repositories import TransactionRepository
+from src.common.domain.exceptions import ConcurrencyException
 
 class SqliteTransactionRepository(TransactionRepository):
     def __init__(self, uow: UnitOfWork):
@@ -16,7 +17,8 @@ class SqliteTransactionRepository(TransactionRepository):
             amount=Money(str(row['amount']), row['currency_code']),
             status=row['status'],
             merchant_id=row['merchant_id'],
-            user_email=row['user_email']
+            user_email=row['user_email'],
+            version=row['version']
         )
 
     def get_by_id(self, transaction_id: int) -> Transaction:
@@ -51,7 +53,13 @@ class SqliteTransactionRepository(TransactionRepository):
         return transaction.id
 
     def update(self, transaction: Transaction) -> None:
-        self._uow.conn.execute(
-            "UPDATE transactions SET status = ? WHERE id = ?",
-            (transaction.status, transaction.id)
+        cursor = self._uow.conn.execute(
+            "UPDATE transactions SET status = ?, version = version + 1 WHERE id = ? AND version = ?",
+            (transaction.status, transaction.id, transaction.version)
         )
+        
+        if cursor.rowcount == 0:
+            raise ConcurrencyException(f"Optimistic locking conflict while updating transaction {transaction.id}.")
+            
+        # Synchronize in-memory aggregate state
+        transaction.version += 1

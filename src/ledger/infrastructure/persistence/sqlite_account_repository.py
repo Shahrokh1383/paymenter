@@ -4,6 +4,7 @@ from src.ledger.domain.entities.account import Account
 from src.ledger.domain.value_objects.account_number import AccountNumber
 from src.common.domain.value_objects.money import Money
 from src.ledger.domain.repositories import AccountRepository
+from src.common.domain.exceptions import ConcurrencyException
 
 class SqliteAccountRepository(AccountRepository):
     def __init__(self, uow: UnitOfWork):
@@ -14,7 +15,8 @@ class SqliteAccountRepository(AccountRepository):
             id=row['id'],
             user_id=row['user_id'],
             account_number=AccountNumber(row['account_number']),
-            balance=Money(str(row['balance']), row['currency_code'])
+            balance=Money(str(row['balance']), row['currency_code']),
+            version=row['version']
         )
 
     def get_by_id(self, account_id: int) -> Account:
@@ -38,10 +40,16 @@ class SqliteAccountRepository(AccountRepository):
         if not currency_row:
             raise ValueError(f"Currency code {account.balance.currency} not found in database.")
             
-        self._uow.conn.execute(
-            "UPDATE accounts SET balance = ?, currency_id = ? WHERE id = ?",
-            (str(account.balance.amount), currency_row['id'], account.id)
+        cursor = self._uow.conn.execute(
+            "UPDATE accounts SET balance = ?, currency_id = ?, version = version + 1 WHERE id = ? AND version = ?",
+            (str(account.balance.amount), currency_row['id'], account.id, account.version)
         )
+        
+        if cursor.rowcount == 0:
+            raise ConcurrencyException(f"Optimistic locking conflict while updating account {account.id}.")
+            
+        # Synchronize in-memory aggregate state
+        account.version += 1
 
     def add(self, account: Account) -> int:
         currency_row = self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (account.balance.currency,)).fetchone()

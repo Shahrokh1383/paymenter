@@ -15,10 +15,10 @@
             <option value="{{ a.id }}">ID: {{ a.id }} ({{ a.user_name }} - {{ a.account_number }})</option>
             {% endfor %}
         </select>
-        <select name="currency_id" required>
+        <select name="currency_code" required>
             <option value="" disabled selected>Select Currency</option>
             {% for c in currencies %}
-            <option value="{{ c.id }}">{{ c.code }} ({{ c.name }})</option>
+            <option value="{{ c.code }}">{{ c.code }} ({{ c.name }})</option>
             {% endfor %}
         </select>
         <button type="submit">Update Currency</button>

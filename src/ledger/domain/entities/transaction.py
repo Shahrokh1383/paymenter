@@ -12,6 +12,7 @@ class Transaction:
     status: str
     merchant_id: Optional[int]
     user_email: Optional[str]
+    version: int = 0
 
     def mark_as_success(self) -> None:
         if self.status != 'Pending':

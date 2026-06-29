@@ -29,13 +29,15 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 - **Transaction Persistence**: Mapping `Transaction` entities to/from the `transactions` table, including currency resolution.
 - **Transactional Boundary**: `SqliteUnitOfWork` ensures atomic commits and rollbacks.
 - **Schema Definition**: Full DDL for all tables used by the Ledger context.
+- **Concurrency Control**: Enforcing optimistic locking to ensure data integrity under concurrent loads.
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
 |---|---|
 | Rule 1: Dependency Inward | ✅ Infrastructure implements Domain ports. |
+| Rule 3: No Primitive Obsession | ✅ Enforced. Currency is handled via domain `Money` value object and string codes, not DB IDs. |
+| Rule 4: Aggregates Protect Invariants | ✅ Enforced. Currency changes routed strictly through `Account.change_currency()`. |
 | Rule 6: Infrastructure as Plugin | ✅ Enforced. SQLite/Flask are infrastructure details. |
-| Rule 4: Aggregates Protect Invariants | ⚠️ Violated via `update_currency()` (see TD-5). |
 
 ---
 
@@ -48,39 +50,32 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 - Maps database rows to `Account` entities using `_map_row_to_account()`.
 - **`get_by_id(account_id: int) -> Account`**:
   - JOINs with `currencies` table to resolve `currency_code`.
-  - Returns fully hydrated `Account` entity.
-- **`get_by_card_number(card_number: CardNumber) -> Account`**:
-  - Lookup by raw card number string.
-  - ⚠️ Should be removed when TD-2 (CardNumber in Ledger) is addressed.
+  - Returns fully hydrated `Account` entity (including `version` for optimistic locking).
 - **`update(account: Account) -> None`**:
-  - Updates only `balance` column.
+  - Updates `balance` and `currency_id` columns.
   - Converts `Money.amount` to `str` for precision.
-  - ⚠️ No version check for optimistic locking (see TD-4).
-  - Query: `UPDATE accounts SET balance = ? WHERE id = ?`
+  - **Implements Optimistic Locking**: `UPDATE ... SET version = version + 1 WHERE id = ? AND version = ?`.
+  - Raises `ConcurrencyException` if `cursor.rowcount == 0` and synchronizes in-memory `account.version`.
 - **`add(account: Account) -> int`**:
   - Looks up `currency_id` from `currencies` table by `Money.currency`.
   - Inserts full row.
   - Returns `cursor.lastrowid`.
-- **`update_currency(account_id: int, currency_id: int) -> None`**:
-  - Raw SQL update on `currency_id` column.
-  - ⚠️ Does not touch entity state (see TD-5).
-  - Must be eliminated when `Account.change_currency()` is implemented.
 
 **SqliteTransactionRepository**
 - Implements `TransactionRepository` from Domain layer.
 - Maps database rows to `Transaction` entities using `_map_row_to_txn()`.
 - **`get_by_id(transaction_id: int) -> Transaction`**:
   - JOINs with `currencies` to resolve `currency_code`.
-  - Returns fully hydrated `Transaction` entity.
+  - Returns fully hydrated `Transaction` entity (including `version`).
 - **`add(transaction: Transaction) -> int`**:
   - Looks up `currency_id` dynamically from `currencies` table.
   - Inserts transaction row.
-  - Returns `cursor.lastrowid`.
-  - ⚠️ **Critical Bug**: `lastrowid` is never assigned to `transaction.id`. The aggregate remains with `id=0` (see TD-3).
+  - **Assigns Identity**: `transaction.id = cursor.lastrowid` to maintain aggregate integrity.
+  - Returns `transaction.id`.
 - **`update(transaction: Transaction) -> None`**:
-  - Updates only `status` column.
-  - ⚠️ No version check for optimistic locking (see TD-4).
-  - Query: `UPDATE transactions SET status = ? WHERE id = ?`
+  - Updates `status` column.
+  - **Implements Optimistic Locking**: `UPDATE ... SET version = version + 1 WHERE id = ? AND version = ?`.
+  - Raises `ConcurrencyException` if `cursor.rowcount == 0` and synchronizes in-memory `transaction.version`.
 
 ### Unit of Work
 
@@ -89,8 +84,7 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 - Supports nested context managers via `_nesting_level` counter.
 - Enables `PRAGMA foreign_keys = ON` on connection init.
 - Auto-commits on clean exit of outermost context.
-- Auto-rollback on exception.
-- ⚠️ **No Optimistic Locking**: `commit()` does not verify `version` columns (see TD-4).
+- Auto-rollback on exception (Seamlessly catches `ConcurrencyException` raised by repositories, triggering rollback to prevent partial state updates).
 
 ---
 
@@ -127,8 +121,8 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 | `user_id` | INTEGER | NOT NULL, FOREIGN KEY → `users(id)` |
 | `currency_id` | INTEGER | NOT NULL, FOREIGN KEY → `currencies(id)` |
 | `account_number` | TEXT | NOT NULL, UNIQUE |
-| `card_number` | TEXT | NOT NULL, UNIQUE |
-| `balance` | REAL | NOT NULL, DEFAULT 0.0 |
+| `balance` | TEXT | NOT NULL, DEFAULT '0.00' |
+| `version` | INTEGER | NOT NULL, DEFAULT 0 |
 
 ### transactions
 | Column | Type | Constraints |
@@ -137,10 +131,11 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 | `merchant_id` | INTEGER | FOREIGN KEY → `merchants(id)` |
 | `from_account_id` | INTEGER | NOT NULL, FOREIGN KEY → `accounts(id)` |
 | `to_account_id` | INTEGER | NOT NULL, FOREIGN KEY → `accounts(id)` |
-| `amount` | REAL | NOT NULL |
+| `amount` | TEXT | NOT NULL |
 | `currency_id` | INTEGER | NOT NULL, FOREIGN KEY → `currencies(id)` |
 | `status` | TEXT | NOT NULL |
 | `user_email` | TEXT | |
+| `version` | INTEGER | NOT NULL, DEFAULT 0 |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 
 ### gateway_sessions
@@ -162,49 +157,59 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 
 ## Edge Cases & Known Issues
 
-### EC-1: Concurrent Balance Modification (Lost Updates)
-**Scenario**: Two simultaneous `HoldFunds` operations on the same account.
-**Current Behavior**: SQLite writes are serialized at the database level, but there is no application-level optimistic locking. If two requests read the same balance simultaneously, the second write overwrites the first without awareness.
-**Impact**: **CRITICAL**. Double-spending or balance drift.
-**Status**: Unhandled. See TD-4.
+*(No critical edge cases currently active. Concurrency controls are in place.)*
+
+### EC-1: Concurrent Balance Modification (Lost Updates) - MITIGATED
+**Previous Scenario**: Two simultaneous `HoldFunds` operations on the same account resulting in blind overwrites.
+**Current Behavior**: Fully mitigated via Optimistic Locking (`version` column). If a race condition occurs, the second transaction to commit will fail the `WHERE version = ?` check, `cursor.rowcount` will be 0, a `ConcurrencyException` will be raised, and the `SqliteUnitOfWork` will automatically rollback the transaction.
+**Status**: ✅ Resolved
 
 ---
 
 ## Notes & Technical Debt
 
-### TD-3: Transaction ID Assignment Bug
-**Violation**: DDD Aggregate Identity Integrity
-**Location**: `src/ledger/infrastructure/persistence/sqlite_transaction_repository.py` → `add()`
-**Current**:
+### TD-2: Infrastructure Leakage into the Ledger Context - RESOLVED
+**Previous Violation**: DDD Bounded Context Boundaries
+**Previous Issue**: `SqliteAccountRepository.get_by_card_number()` resolved an account using a raw card number string, coupling the Ledger to Checkout/Identity concepts.
+**Resolution**: Method removed. Card-to-account mapping is now handled outside the Ledger bounded context before invoking use cases.
+**Status**: ✅ Resolved
+
+### TD-3: Transaction ID Assignment Bug - RESOLVED
+**Previous Violation**: DDD Aggregate Identity Integrity
+**Previous Issue**: `cursor.lastrowid` was returned but never assigned back to the `Transaction` entity.
+**Resolution**: Modified `SqliteTransactionRepository.add()`:
 ```python
 def add(self, transaction: Transaction) -> int:
     cursor = ... # INSERT
-    return cursor.lastrowid  # Never assigned back
-```
-**Required Fix**:
-```python
-def add(self, transaction: Transaction) -> int:
-    cursor = ... # INSERT
-    transaction.id = cursor.lastrowid  # Assign identity to aggregate
+    transaction.id = cursor.lastrowid  # Identity correctly assigned
     return transaction.id
 ```
-Without this fix, `TransactionCompletedEvent` and similar events carry `transaction_id=0` for newly created transactions.
+**Status**: ✅ Resolved
 
-### TD-4: Missing Optimistic Locking
-**Violation**: Constitution Performance & Scalability — "Aggregates use optimistic locking or SELECT FOR UPDATE"
-**Location**: All SQLite repositories (`SqliteAccountRepository.update()`, `SqliteTransactionRepository.update()`).
-**Current**: `UPDATE accounts SET balance = ? WHERE id = ?` has no version check.
-**Required Fix**:
-1. Add `version INTEGER DEFAULT 0` to `accounts` and `transactions` tables.
-2. Add `version: int` to `Account` and `Transaction` entities.
-3. Modify `UPDATE` queries:
+### TD-4: Missing Optimistic Locking - RESOLVED
+**Previous Violation**: Constitution Performance & Scalability — "Aggregates use optimistic locking or SELECT FOR UPDATE"
+**Previous Issue**: Repositories performed blind overwrites.
+**Resolution**: 
+1. Added `version INTEGER DEFAULT 0` to `accounts` and `transactions` tables.
+2. Added `version: int` to `Account` and `Transaction` entities.
+3. Modified `UPDATE` queries in both repositories:
    ```sql
-   UPDATE accounts SET balance = ?, version = version + 1 WHERE id = ? AND version = ?
+   UPDATE accounts SET balance = ?, currency_id = ?, version = version + 1 WHERE id = ? AND version = ?
    ```
-4. Check `cursor.rowcount`. If `0`, raise `ConcurrencyException`.
+4. Implemented `ConcurrencyException` handling. UoW catches exception and triggers rollback.
+**Status**: ✅ Resolved
 
-### TD-10: Database Schema — `balance REAL`
-**Location**: `src/common/infrastructure/database.py` (accounts table definition).
-**Current**: `accounts.balance REAL NOT NULL DEFAULT 0.0`
-**Issue**: `REAL` in SQLite is IEEE 754 floating point. Although repositories convert to `str` before INSERT, the column type itself is imprecise. If any raw SQL or external tool writes to this column, precision is lost.
-**Required Fix**: Change schema to `balance TEXT NOT NULL DEFAULT '0.00'`. Store `Money` as string representation of `Decimal`. This affects all repository `update()` and `add()` methods that write to the `balance` column, as well as the `amount` column in `transactions` table.
+### TD-5: Bypassing Aggregate Invariants / Primitive Obsession - RESOLVED
+**Previous Violation**: Constitution Rule 3 & Rule 4
+**Previous Issue**: `UpdateAccountCurrencyCommand` accepted `currency_id: int`, leaking infrastructure details into the Application layer. The handler used a Query Port to translate this back to a code, bypassing the aggregate.
+**Resolution**: 
+1. `UpdateAccountCurrencyCommand` now strictly accepts `currency_code: str`.
+2. Handler simplified to pass the string directly to `Account.change_currency(currency_code)`.
+3. Frontend (`accounts.html`) and Controller (`dashboard_controller.py`) updated to submit and route the 3-letter currency code directly.
+**Status**: ✅ Resolved
+
+### TD-10: Database Schema — Floating-Point Imprecision - RESOLVED
+**Previous Violation**: Financial Data Integrity
+**Previous Issue**: `accounts.balance` and `transactions.amount` were defined as `REAL` (IEEE 754 floating-point).
+**Resolution**: Schema migrated to `TEXT NOT NULL DEFAULT '0.00'`. Money is stored as the exact string representation of `Decimal`. All repository read/write mappings utilize `str()` and `Decimal()` to guarantee precision.
+**Status**: ✅ Resolved

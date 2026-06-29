@@ -83,9 +83,14 @@ def update_account_currency():
     try:
         uow = SqliteUnitOfWork()
         handler = current_app.di_container.get_update_account_currency_handler(uow)
-        handler.handle(UpdateAccountCurrencyCommand(account_id=int(request.form['account_id']), currency_id=int(request.form['currency_id'])))
+        
+        handler.handle(UpdateAccountCurrencyCommand(
+            account_id=int(request.form['account_id']), 
+            currency_code=request.form['currency_code']
+        ))
         flash("Account currency updated successfully.", 'success')
-    except Exception as e: flash(str(e), 'error')
+    except Exception as e: 
+        flash(str(e), 'error')
     return redirect(url_for('dashboard.accounts'))
 
 @dashboard_bp.route('/accounts/topup', methods=['POST'])

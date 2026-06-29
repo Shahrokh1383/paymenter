@@ -13,3 +13,7 @@ class InvalidTransactionStateError(DomainException):
 
 class AccountNotFoundError(DomainException):
     pass
+
+class ConcurrencyException(DomainException):
+    """Raised when an optimistic locking conflict occurs (Lost Update)."""
+    pass

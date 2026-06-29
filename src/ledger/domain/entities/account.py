@@ -8,6 +8,7 @@ class Account:
     user_id: int
     account_number: AccountNumber
     balance: Money
+    version: int = 0
 
     def withdraw(self, amount: Money) -> None:
         """Withdraws funds, enforcing the non-negative balance invariant."""

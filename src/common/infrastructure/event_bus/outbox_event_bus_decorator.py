@@ -38,7 +38,7 @@ class OutboxEventBusDecorator(EventBus):
         payload = json.dumps(dataclasses.asdict(event), cls=self._DomainEventEncoder)
         
         try:
-            with sqlite3.connect(DB_PATH) as conn:
+            with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
                 conn.execute(
                     "INSERT INTO outbox_messages (event_type, payload) VALUES (?, ?)",
                     (event_type, payload)

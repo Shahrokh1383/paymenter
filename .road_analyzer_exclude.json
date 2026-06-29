@@ -1,22 +1,5 @@
 {
-  "excludedPaths": [
-    "docs",
-    "content.txt",
-    "README.md",
-    "requirements.txt",
-    "roadmap.txt",
-    "todo.md",
-    "start.sh",
-    "start.bat",
-    "fix.txt",
-    "fix2.txt",
-    "Refactortingplan.md",
-    "command.txt",
-    "src\\common",
-    "src\\identity",
-    "src\\checkout",
-    "src\\ledger"
-  ],
-  "lastModified": "2026-06-29T12:38:24.105Z",
+  "excludedPaths": [],
+  "lastModified": "2026-06-29T16:02:07.492Z",
   "version": 1
 }

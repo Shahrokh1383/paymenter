@@ -2,6 +2,7 @@ import json
 import sqlite3
 import threading
 import time
+import typing
 from typing import Any
 from src.common.domain.ports.event_bus import EventBus
 from src.common.infrastructure.database import DB_PATH
@@ -42,7 +43,7 @@ class OutboxRelayWorker:
 
     def _process_pending_messages(self):
         try:
-            with sqlite3.connect(DB_PATH) as conn:
+            with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 
@@ -92,14 +93,22 @@ class OutboxRelayWorker:
         except Exception as e:
             print(f"[OUTBOX RETRY] Dispatch failed for msg {msg['id']}: {e}")
             return False
-
+        
     def _reconstruct_event(self, event_type_name: str, payload: dict) -> Any:
         """
         Heuristic to reconstruct the frozen dataclass event.
-        This avoids modifying the core domain events to add deserialization logic.
+        Uses type hints to dynamically rebuild nested Value Objects (like Money) 
+        from their serialized dictionary state without hardcoding Domain types.
         """
-        # Check registered subscribers to find the actual class type
         for etype in self._inner_bus._subscribers.keys():
             if etype.__name__ == event_type_name:
+                # Resolve type hints to handle nested Domain Value Objects at the boundary
+                type_hints = typing.get_type_hints(etype)
+                for field_name, field_type in type_hints.items():
+                    if field_name in payload and isinstance(payload[field_name], dict):
+                        try:
+                            payload[field_name] = field_type(**payload[field_name])
+                        except Exception:
+                            pass # Silently skip if reconstruction fails
                 return etype(**payload)
         return None

@@ -1,5 +1,5 @@
-# Eventing & Cross-Context Integration Module — Single Source of Truth Documentation
-## Paymenter Project | Version 1.0.0
+### 📜 Eventing & Cross-Context Integration Module — Single Source of Truth Documentation
+## Paymenter Project | Version 1.1.0
 
 ---
 
@@ -16,32 +16,38 @@
 
 ## Overview
 
-The **Eventing & Cross-Context Integration** module defines how the Ledger bounded context communicates with other contexts (specifically Notifications) through domain events. It includes the `InMemoryEventBus`, the global `DIContainer` that wires subscriptions, and the `ReceiptEmailHandler` that reacts to transaction lifecycle events.
+The **Eventing & Cross-Context Integration** module defines how the Ledger bounded context communicates with other contexts (specifically Notifications) through domain events. It ensures guaranteed delivery, strict boundary encapsulation, and asynchronous side-effect execution.
 
 ### Core Responsibilities
-- **Event Publishing**: Delivering `TransactionCompletedEvent`, `TransactionFailedEvent`, and `TransactionRefundedEvent` to subscribed handlers.
-- **Cross-Context Communication**: Ledger never directly calls other contexts; all communication is via the EventBus.
+- **Event Publishing**: Delivering `TransactionCompletedEvent`, `TransactionFailedEvent`, and `TransactionRefundedEvent` via a persistent Outbox pattern.
+- **Cross-Context Communication**: Ledger never directly calls other contexts; all communication is strictly via the EventBus.
 - **Dependency Wiring**: The `DIContainer` serves as the single point for registering event subscriptions and resolving the EventBus singleton.
-- **Notification Triggering**: `ReceiptEmailHandler` sends email receipts by delegating to `SmtpAdapter`.
+- **Notification Triggering**: `ReceiptEmailHandler` sends idempotent email receipts by delegating to `SmtpAdapter`.
+- **Resilience**: Handles transient failures via exponential backoff and routes unresolvable messages to a Dead-Letter Queue (DLQ).
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
 |---|---|
+| Rule 3: No Primitive Obsession | ✅ Enforced. Events strictly use `Money` Value Object. |
 | Rule 5: Cross-Context via Events | ✅ Enforced. Ledger only communicates via EventBus. |
-| Rule 1: Dependency Inward | ✅ EventBus and handlers depend on abstractions. |
-| Rule 6: Infrastructure as Plugin | ✅ `InMemoryEventBus` and `SmtpAdapter` are infrastructure details. |
+| Rule 1: Dependency Inward | ✅ EventBus, Outbox, and Handlers depend on abstractions (Ports). |
+| Rule 2: New Feature = New File | ✅ Enforced. Outbox, Idempotency, and Schema refactoring done via new files. |
+| Rule 6: Infrastructure as Plugin | ✅ Outbox, InMemoryEventBus, and SmtpAdapter are infrastructure details. |
+| Rule 7: Schema Isolation | ✅ Enforced. DB schemas isolated by Bounded Context. |
 
 ---
 
 ## Backend Architecture — Cross-Context Integration
 
 ### DI Container
-**File**: `app/di_container.py`
+**File**: `app/di_container.py` & `app/di/ledger_di.py`
 
 ```
 DIContainer
-├── event_bus: InMemoryEventBus (singleton)
-└── Subscriptions:
+├── event_bus: OutboxEventBusDecorator (singleton, wraps InMemoryEventBus)
+│   ├── Inner Bus: InMemoryEventBus
+│   └── Worker: OutboxRelayWorker (Background Thread)
+└── Subscriptions (Bound in notifications_di.py):
     ├── TransactionCompletedEvent → ReceiptEmailHandler.handle_completed
     ├── TransactionFailedEvent    → ReceiptEmailHandler.handle_failed
     ├── TransactionRefundedEvent  → ReceiptEmailHandler.handle_refunded
@@ -49,26 +55,30 @@ DIContainer
 ```
 
 **Notes**:
-- The `event_bus` is registered as a singleton within the container.
-- Subscriptions are wired at application startup.
-- Currently, only `EventBus` is accessed from the container in Ledger's web controller (`current_app.di_container.event_bus`). Full handler registration is incomplete (see TD-9 in Ledger HTTP API module).
+- The `event_bus` is registered as a singleton and dynamically wrapped by `OutboxEventBusDecorator` during `ledger_di` registration to ensure resiliency.
+- Subscriptions are wired at application startup to the inner bus.
 
 ### Event Bus
-**Implementation**: `InMemoryEventBus`
+**Implementation**: `OutboxEventBusDecorator` + `InMemoryEventBus`
 
-- **Type**: Synchronous, in-memory publish/subscribe.
-- **Publishing Rule**: Events are published **after** Unit of Work commit to ensure database consistency precedes side effects.
-- **Failure Handling**: If an event handler fails, the database transaction is already committed. There is **no outbox pattern or retry mechanism**. Failures in handlers (e.g., email sending) cause exceptions but do not roll back the Ledger transaction.
+- **Type**: Asynchronous, persistent Outbox with in-memory dispatch via background daemon thread.
+- **Publishing Rule**: Events are published **after** Unit of Work commit. However, instead of direct in-memory dispatch, the event payload is serialized and inserted into an `outbox_messages` table. A background `OutboxRelayWorker` picks up pending messages and publishes them to the inner `InMemoryEventBus`.
+- **Failure Handling**: 
+  - If the outbox DB insert fails, the exception propagates (preventing silent data loss).
+  - If the inner bus handler (e.g., SMTP) fails, the worker catches the exception, increments the `retry_count`, and schedules it for the next cycle.
+  - After 3 failures, the message status is set to `DEAD_LETTER` for manual inspection. It will no longer be retried automatically.
 
 **Subscribed Handlers**:
 - `ReceiptEmailHandler.handle_completed(TransactionCompletedEvent)`
 - `ReceiptEmailHandler.handle_failed(TransactionFailedEvent)`
 - `ReceiptEmailHandler.handle_refunded(TransactionRefundedEvent)`
-- `ReceiptEmailHandler.handle_initiated(PaymentInitiatedEvent)` — Note: This event originates from the Checkout context, not Ledger.
+- `ReceiptEmailHandler.handle_initiated(PaymentInitiatedEvent)` — Originates from the Checkout context.
 
 **ReceiptEmailHandler**:
-- Receives the event, extracts `user_email`, `amount`, `currency_code`, `merchant_id`.
+- Receives the event, extracts `user_email`, `amount` (as `Money` VO), `merchant_id`.
+- Checks `IdempotencyPort` to ensure this event has not been processed before.
 - Delegates to `SmtpAdapter.send()` for actual email delivery.
+- Marks event as processed in `IdempotencyPort` upon success.
 
 ---
 
@@ -78,11 +88,11 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 
 | Event | Fields | Emitted By |
 |---|---|---|
-| `TransactionCompletedEvent` | `transaction_id`, `user_email`, `amount: Decimal`, `currency_code`, `merchant_id` | `CompleteFundsHandler` (after UoW commit) |
+| `TransactionCompletedEvent` | `transaction_id`, `user_email`, `amount: Money`, `merchant_id` | `CompleteFundsHandler` (after UoW commit) |
 | `TransactionFailedEvent` | Same fields | `FailAndRefundHandler` (when Pending → Failed) |
 | `TransactionRefundedEvent` | Same fields | `FailAndRefundHandler` (when Success → Refunded) |
 
-**Publishing Rule**: Events are prepared **inside** the Unit of Work but published **outside** (after `uow.commit()`). This prevents "phantom events" from rolling back transactions.
+**Publishing Rule**: Events are prepared **inside** the Unit of Work but published **outside** (after `uow.commit()`). The `OutboxEventBusDecorator` intercepts this external publish call to guarantee persistence prior to HTTP response return.
 
 ---
 
@@ -90,21 +100,20 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 
 ### EC-3: Phantom Events on Rollback
 **Scenario**: An exception occurs inside `CompleteFundsHandler` after `uow.commit()` but before event publishing.
-**Current Behavior**: The transaction is committed, but the event is never published. Downstream systems (Notifications) never receive the receipt trigger.
-**Impact**: Data inconsistency between Ledger and Notifications contexts.
-**Status**: Partially mitigated by publishing after UoW, but no retry/outbox exists.
+**Previous Behavior**: The transaction was committed, but the event was permanently lost.
+**Current Behavior**: **RESOLVED**. The `OutboxEventBusDecorator` immediately persists the event to the `outbox_messages` table synchronously before returning the HTTP response. Even if the application crashes microseconds later, the background `OutboxRelayWorker` will safely dispatch the event upon application restart.
+**Status**: ✅ Resolved via Approximate ACID Outbox Pattern.
 
 ### EC-4: Transaction ID Zero in Events
-**Scenario**: A newly created transaction emits an event (e.g., if `HoldFundsHandler` were modified to emit events, or during completion of a just‑created transaction).
-**Current Behavior**: `SqliteTransactionRepository.add()` returns `lastrowid` but does not assign it to `transaction.id`. The aggregate retains `id=0`.
-**Impact**: All downstream consumers receiving events for new transactions will see `transaction_id=0`, making correlation impossible.
-**Status**: **BUG**. Root cause in Infrastructure layer (see TD-3 in Ledger Infrastructure module).
+**Scenario**: A newly created transaction emits an event lacking its database-generated ID.
+**Previous Behavior**: `SqliteTransactionRepository.add()` returned `lastrowid` but failed to hydrate the aggregate, leaving `id=0`.
+**Current Behavior**: **RESOLVED**. `SqliteTransactionRepository.add()` now explicitly assigns `transaction.id = cursor.lastrowid` before yielding control back to the application layer. The Aggregate Root is never in a transient state post-persistence.
+**Status**: ✅ Resolved via Infrastructure hydration fix.
 
 ---
 
 ## Notes & Technical Debt
 
-*(No specific TD items are listed in the original master document exclusively for this module beyond those already referenced. The following are cross-references to items detailed in other modules that directly affect eventing.)*
-
-- **TD-3 (Transaction ID Assignment Bug)**: Causes `transaction_id=0` in events for new transactions. Fixed in Infrastructure module.
-- **EC-3 Mitigation**: A future outbox pattern would ensure events are stored within the UoW and published asynchronously with retry, eliminating phantom event inconsistencies.
+- **TD-3 (Transaction ID Assignment Bug)**: **RESOLVED**. Aggregate hydration implemented in `sqlite_transaction_repository.py`.
+- **TD-9 (Incomplete DI Wiring)**: **RESOLVED**. The `OutboxEventBusDecorator` provides a deterministic, automated wrapper around the base `InMemoryEventBus` during context DI registration, ensuring all published events are intercepted for persistence without manual per-handler wiring.
+- **Future Consideration (True Distributed Outbox)**: The current outbox uses an independent, fast SQLite connection. In a distributed database environment (e.g., Postgres across microservices), this would be upgraded to a Postgres CTE inserting into both the business table and outbox table within the exact same shared transaction/connection.

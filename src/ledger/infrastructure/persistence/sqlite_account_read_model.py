@@ -5,7 +5,6 @@ from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.application.dto.account_summary import AccountSummary
 from src.ledger.application.ports.account_query_port import AccountQueryPort
 
-
 class SqliteAccountReadModel(AccountQueryPort):
     """
     Read-side implementation of AccountQueryPort.
@@ -15,8 +14,6 @@ class SqliteAccountReadModel(AccountQueryPort):
         self._uow = uow
 
     def get_all_summaries(self) -> List[AccountSummary]:
-        # Joining accounts, currencies, and users to fulfill the AccountSummary DTO contract
-        # without violating primitive obsession (using Decimal for balance).
         rows = self._uow.conn.execute("""
             SELECT 
                 a.id, 
@@ -25,11 +22,12 @@ class SqliteAccountReadModel(AccountQueryPort):
                 a.currency_id, 
                 c.code AS currency_code, 
                 a.account_number, 
-                a.card_number, 
+                uc.card_number, 
                 a.balance
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             JOIN users u ON a.user_id = u.id
+            LEFT JOIN user_cards uc ON a.id = uc.account_id
         """).fetchall()
 
         return [
@@ -41,7 +39,7 @@ class SqliteAccountReadModel(AccountQueryPort):
                 currency_code=row['currency_code'],
                 account_number=row['account_number'],
                 card_number=row['card_number'],
-                balance=Decimal(str(row['balance'])) # Constitution Rule 3: No raw floats for Money
+                balance=Decimal(str(row['balance']))
             )
             for row in rows
         ]

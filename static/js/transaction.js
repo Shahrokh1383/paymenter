@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target.classList.contains('btn-complete') || target.classList.contains('btn-fail')) {
             const txnId = target.getAttribute('data-id');
             const isComplete = target.classList.contains('btn-complete');
-            const endpoint = isComplete ? `/transactions/complete/${txnId}` : `/transactions/fail/${txnId}`;
+            const endpoint = isComplete ? `/api/transactions/${txnId}/complete` : `/api/transactions/${txnId}/fail`;
             
             // Disable buttons while processing
             const row = document.getElementById(`row-${txnId}`);

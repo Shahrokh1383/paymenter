@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
+from typing import Optional
 
 @dataclass(frozen=True)
 class AccountSummary:
@@ -9,5 +10,5 @@ class AccountSummary:
     currency_id: int
     currency_code: str
     account_number: str
-    card_number: str
     balance: Decimal
+    card_number: Optional[str] = None

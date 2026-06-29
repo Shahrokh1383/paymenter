@@ -34,18 +34,15 @@ class FailAndRefundHandler:
             self._account_repo.update(to_acc)
             self._uow.commit()
 
-            # Determine event type based on final state
             if txn.status == 'Failed':
                 event_to_publish = TransactionFailedEvent(
                     transaction_id=txn.id, user_email=txn.user_email,
-                    amount=txn.amount.amount, currency_code=txn.amount.currency,
-                    merchant_id=txn.merchant_id
+                    amount=txn.amount, merchant_id=txn.merchant_id
                 )
             elif txn.status == 'Refunded':
                 event_to_publish = TransactionRefundedEvent(
                     transaction_id=txn.id, user_email=txn.user_email,
-                    amount=txn.amount.amount, currency_code=txn.amount.currency,
-                    merchant_id=txn.merchant_id
+                    amount=txn.amount, merchant_id=txn.merchant_id
                 )
                 
         if event_to_publish:

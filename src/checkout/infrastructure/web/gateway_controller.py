@@ -9,8 +9,8 @@ from src.checkout.application.commands.authorize_payment_command import Authoriz
 from src.checkout.application.handlers.authorize_payment_handler import AuthorizePaymentHandler
 
 from src.checkout.infrastructure.persistence.sqlite_session_repository import SqliteSessionRepository
-from src.checkout.infrastructure.persistence.ledger_account_lookup_adapter import LedgerAccountLookupAdapter
 from src.checkout.infrastructure.persistence.ledger_fund_reservation_adapter import LedgerFundReservationAdapter
+from src.checkout.infrastructure.persistence.identity_account_lookup_adapter import IdentityAccountLookupAdapter
 
 gateway_bp = Blueprint('gateway', __name__, url_prefix='/gateway')
 
@@ -59,7 +59,7 @@ def authorize():
             uow=uow,
             session_repo=SqliteSessionRepository(uow),
             fund_port=LedgerFundReservationAdapter(uow),
-            lookup_port=LedgerAccountLookupAdapter(uow)
+            lookup_port=IdentityAccountLookupAdapter(uow)
         )
         
         transaction_id, callback_url = handler.handle(command)

@@ -21,17 +21,17 @@ The **Account Domain** module defines the core financial account model within th
 
 ### Core Responsibilities
 - **Balance Invariant**: Ensuring accounts never go negative during normal withdrawals.
-- **Currency Safety**: All deposit/withdraw operations enforce currency homogeneity.
+- **Currency Safety**: All deposit, withdraw, and topup operations enforce currency homogeneity.
 - **Identity**: Every account is uniquely identified by an `AccountNumber` value object.
-- **Currency Change Guard**: Currency can only be changed when balance is exactly zero.
-- **Minimum Topup Rule**: Topup amounts must be positive (business rule, enforced at application level but defined here).
+- **Currency Change Guard**: Currency can only be changed when balance is exactly zero, encapsulated within the aggregate.
+- **Minimum Topup Rule**: Topup amounts must be positive and are strictly enforced at the domain layer.
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
 |---|---|
 | Rule 1: Dependency Inward | ✅ Enforced. Domain has zero external imports. |
-| Rule 3: No Primitive Obsession | ⚠️ Violated — `topup()` accepts primitive `float` (see TD-6 in Account Application module). |
-| Rule 4: Aggregates Protect Invariants | ✅ Enforced for balance/currency; ⚠️ Currency update bypasses aggregate (see TD-5). |
+| Rule 3: No Primitive Obsession | ✅ Enforced. `topup()` accepts `Money` Value Object. |
+| Rule 4: Aggregates Protect Invariants | ✅ Enforced. Currency update logic encapsulated within the aggregate. |
 
 ---
 
@@ -41,13 +41,13 @@ The **Account Domain** module defines the core financial account model within th
 An account balance must never drop below zero during normal operations. `Account.withdraw()` enforces this by raising `InsufficientFundsError` if `balance.amount < amount.amount`.
 
 ### BR-5: Zero-Balance Currency Change
-An account's currency may only be changed if its balance is exactly zero. `Account.can_change_currency()` enforces this.
+An account's currency may only be changed if its balance is exactly zero. `Account.change_currency()` enforces this internally before mutating state.
 
 ### BR-6: Topup Minimum
-Topup amounts must be strictly greater than zero. This rule is defined here and enforced in the application layer (TopupAccountHandler).
+Topup amounts must be strictly greater than zero. This rule is defined and strictly enforced within the Domain layer inside `Account.topup()`, ensuring the invariant cannot be bypassed by any Application layer caller.
 
 ### (Implicit) Currency Homogeneity in Account Operations
-All `deposit` and `withdraw` methods verify that the provided `Money` object has the same currency as the account, raising `CurrencyMismatchError` otherwise. This prevents mixed-currency operations on a single account.
+All `deposit`, `withdraw`, and `topup` methods verify that the provided `Money` object has the same currency as the account, raising `CurrencyMismatchError` otherwise. This prevents mixed-currency operations on a single account.
 
 ---
 
@@ -58,10 +58,8 @@ All `deposit` and `withdraw` methods verify that the provided `Money` object has
 src/ledger/domain/
 ├── entities/
 │   └── account.py          # Account aggregate
-├── value_objects/
-│   ├── account_number.py   # AccountNumber
-│   └── card_number.py      # CardNumber (⚠️ should be removed — see TD-2)
-└── repositories.py         # AccountRepository abstract port
+└── value_objects/
+    └── account_number.py   # AccountNumber
 ```
 
 ### Account Entity
@@ -71,57 +69,51 @@ class Account:
     id: int
     user_id: int
     account_number: AccountNumber
-    card_number: CardNumber          # ⚠️ SECURITY VIOLATION (see TD-2)
     balance: Money
 ```
 **Methods:**
 - `withdraw(amount: Money)`: Validates currency match and sufficient funds. Subtracts from balance.
 - `deposit(amount: Money)`: Validates currency match. Adds to balance.
-- `topup(amount: float)`: ⚠️ Accepts primitive `float` (see TD-6 in Account Application module). Adds to balance using `Decimal(str(amount))`.
+- `topup(amount: Money)`: Validates currency match and positive amount rule (BR-6). Adds to balance.
 - `can_change_currency() -> bool`: Returns `True` only if `balance.amount == 0`.
-- *(Missing)* `change_currency(new_currency: str)` — should be added (see TD-5).
+- `change_currency(new_currency_code: str)`: Enforces zero-balance invariant, reconstructs internal `Money` object with the new currency code.
 
 ### Value Objects
 - **AccountNumber**: Immutable. Exactly 10 digits. Zero-padded or stripped whitespace.
-- **CardNumber**: Immutable. Exactly 16 digits. Luhn algorithm validation. String representation masks as `****-****-****-XXXX`. ⚠️ This should be removed from Ledger context entirely (see TD-2).
 - **Money** (from `src.common`): Immutable. `Decimal` amount + 3-letter ISO currency code. Safe arithmetic (`__add__`, `__sub__`) with currency mismatch protection.
 
 ### Repository Port (Abstract)
 ```python
 class AccountRepository(ABC):
     def get_by_id(self, account_id: int) -> Account
-    def get_by_card_number(self, card_number: CardNumber) -> Account
     def update(self, account: Account) -> None
     def add(self, account: Account) -> int
-    def update_currency(self, account_id: int, currency_id: int) -> None  # ⚠️ See TD-5
 ```
-**Note**: `update_currency` bypasses the aggregate and will be eliminated.
+**Note**: The repository interface is strictly limited to standard aggregate persistence. Direct state mutation methods (e.g., `update_currency`) and cross-context data lookups (e.g., `get_by_card_number`) have been purged to respect Domain boundaries.
 
 ---
 
 ## Edge Cases & Known Issues
 
-### EC-6: Stale Aggregate After Currency Change
-**Scenario**: After an account’s currency is changed via the application handler (UpdateAccountCurrencyHandler), the in‑memory `Account` entity still holds the old currency code.
-**Impact**: If that same entity instance is reused in the same request (e.g., a subsequent topup), a `CurrencyMismatchError` may occur even though the database is correct.
-**Status**: **BUG**. Caused by the repository's `update_currency()` method that does not update the aggregate. See TD-5.
+*No active edge cases.*
+
+*(Resolved) EC-6: Stale Aggregate After Currency Change*
+**Previous Scenario**: After an account’s currency was changed via the application handler, the in‑memory `Account` entity retained the old currency code.
+**Resolution**: The handler now invokes `account.change_currency(new_code)` directly on the aggregate. The aggregate updates its own state in memory, and the handler calls `repo.update(account)` to persist the fully synchronized state. Memory inconsistency eliminated.
 
 ---
 
 ## Notes & Technical Debt
 
-### TD-2: CardNumber in Ledger Context
-**Violation**: Constitution Security & Compliance — “Ledger context never sees card data”
-**Location**: `src/ledger/domain/entities/account.py`, `src/ledger/domain/value_objects/card_number.py`
-**Current**: `Account` entity holds `card_number: CardNumber`. Repository maps it from DB.
-**Required Fix**: Remove `CardNumber` entirely from the Ledger bounded context. The `Account` entity should only contain `account_number: AccountNumber`. Card data must remain in `checkout` or `identity` contexts. If lookup by card is needed, it should be a tokenized reference or handled by an anti‑corruption layer in Checkout. Also delete the `get_by_card_number` method from the repository port.
+*No active technical debt in this module.*
 
-### TD-5: Update Currency Bypasses Aggregate
-**Violation**: Constitution Rule 4 (Aggregates Protect Their Own Invariants)
-**Location**: Repository method `update_currency()` and handler `UpdateAccountCurrencyHandler` (see Account Application module).
-**Current**: Handler calls `repo.update_currency(account_id, currency_id)` directly. The `Account` entity’s `balance.currency` is never updated in memory.
-**Required Fix**:
-1. Add `change_currency(new_currency: str)` method to `Account` entity.
-2. Inside the method, enforce `can_change_currency()`, update `self.balance = Money(self.balance.amount, new_currency)`, and increment version (when optimistic locking is added).
-3. Handler must call `repo.update(account)` after calling `account.change_currency(new_code)`.
-4. Delete `AccountRepository.update_currency()` method.
+*(Resolved) TD-2: CardNumber in Ledger Context*
+**Previous Violation**: Constitution Security & Compliance — “Ledger context never sees card data”.
+**Resolution**: `CardNumber` value object, `card_number` entity attribute, and `get_by_card_number` repository method have been completely removed from the Ledger bounded context. The database schema dropped the `card_number` column. Card data is now strictly isolated to the `Identity` context (`user_cards` table) and mapped to accounts via an Anti-Corruption Layer in the `Checkout` context.
+
+*(Resolved) TD-5: Update Currency Bypasses Aggregate*
+**Previous Violation**: Constitution Rule 4 (Aggregates Protect Their Own Invariants).
+**Resolution**: 
+1. The `update_currency()` bypass method was deleted from both the repository port and SQLite implementation.
+2. A `change_currency(new_currency_code: str)` method was added to the `Account` entity, enforcing `can_change_currency()` and updating `self.balance`.
+3. The Application handler was refactored to orchestrate the domain method followed by `repo.update(account)`.

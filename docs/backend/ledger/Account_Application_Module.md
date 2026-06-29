@@ -25,11 +25,11 @@
 
 ## Overview
 
-The **Account Application** module orchestrates write and read operations on the `Account` aggregate. It defines commands, queries, handlers, and the CQRS read-side projection for account summaries. All operations go through the Domain layer for invariant validation, except where noted as technical debt.
+The **Account Application** module orchestrates write and read operations on the `Account` aggregate. It defines commands, queries, handlers, and the CQRS read-side projection for account summaries. All operations strictly go through the Domain layer for invariant validation.
 
 ### Core Responsibilities
-- **Topup**: Adding funds to an account with minimum amount enforcement.
-- **Currency Update**: Changing an account’s currency when zero‑balance invariant holds.
+- **Topup**: Adding funds to an account with minimum amount enforcement and strict type safety.
+- **Currency Update**: Changing an account’s currency when zero‑balance invariant holds, fully encapsulated within the aggregate.
 - **Account Queries**: Serving optimized, joined read models for UI list views without N+1 problems.
 - **CQRS Separation**: Commands use the domain model; queries use a dedicated read model port.
 
@@ -37,9 +37,9 @@ The **Account Application** module orchestrates write and read operations on the
 | Constitution Rule | Implementation Status |
 |---|---|
 | Rule 1: Dependency Inward | ✅ Application depends on Domain, never the reverse. |
-| Rule 2: New Feature = New File | ✅ Every command/handler/query is isolated. |
-| Rule 3: No Primitive Obsession | ⚠️ Violated in Topup (see TD-6). |
-| Rule 4: Aggregates Protect Invariants | ⚠️ Violated in Currency Update (see TD-5). |
+| Rule 2: New Feature = New File | ✅ Every command/handler/query/port is isolated. |
+| Rule 3: No Primitive Obsession | ✅ Enforced. Topup uses `Decimal` and `Money` Value Objects. |
+| Rule 4: Aggregates Protect Invariants | ✅ Enforced. Currency update delegated to `Account` aggregate. |
 | Rule 5: Cross-Context via Events | N/A for these operations. |
 
 ---
@@ -47,10 +47,10 @@ The **Account Application** module orchestrates write and read operations on the
 ## Business Rules
 
 ### BR-5: Zero-Balance Currency Change
-An account's currency may only be changed if its balance is exactly zero. Validated by `Account.can_change_currency()` in the handler before proceeding.
+An account's currency may only be changed if its balance is exactly zero. Validated internally by `Account.change_currency()` which throws an error if the invariant does not hold.
 
 ### BR-6: Topup Minimum
-Topup amounts must be strictly greater than zero. Enforced in `TopupAccountHandler`.
+Topup amounts must be strictly greater than zero. Enforced inside the Domain layer by `Account.topup()`.
 
 ---
 
@@ -60,7 +60,7 @@ Topup amounts must be strictly greater than zero. Enforced in `TopupAccountHandl
 
 | Command | Fields | Purpose |
 |---|---|---|
-| `TopupAccountCommand` | `account_id: int`, `amount: float` | Add funds to an account |
+| `TopupAccountCommand` | `account_id: int`, `amount: Decimal` | Add funds to an account |
 | `UpdateAccountCurrencyCommand` | `account_id: int`, `currency_id: int` | Change account currency |
 
 ### Queries (Immutable Dataclasses)
@@ -75,24 +75,24 @@ Topup amounts must be strictly greater than zero. Enforced in `TopupAccountHandl
 - Dependencies: `UnitOfWork`, `AccountRepository`
 - Flow:
   1. Load `Account` by `command.account_id`.
-  2. Validate `command.amount > 0` (BR-6).
-  3. Call `account.topup(command.amount)` — ⚠️ Accepts primitive `float` (see TD-6).
+  2. Construct `Money` Value Object from `command.amount` and the account's existing currency.
+  3. Call `account.topup(money)` — Domain enforces BR-6 and currency homogeneity.
   4. Call `AccountRepository.update(account)`.
   5. Commit Unit of Work.
 - **No domain events emitted** for topup operations currently.
 
 **UpdateAccountCurrencyHandler**
-- Dependencies: `UnitOfWork`, `AccountRepository`
+- Dependencies: `UnitOfWork`, `AccountRepository`, `CurrencyQueryPort`
 - Flow:
   1. Load `Account` by `command.account_id`.
-  2. Call `account.can_change_currency()` → raises error if balance ≠ 0 (BR-5).
-  3. Call `repo.update_currency(account_id, currency_id)` — ⚠️ **Bypasses aggregate** (see TD-5).
-  4. Commit Unit of Work.
-- **Post-condition**: The in‑memory `Account` entity still has the old currency code (stale state — see EC-6).
+  2. Resolve `currency_id` to `currency_code` (string) via `CurrencyQueryPort` (respects Dependency Rule).
+  3. Call `account.change_currency(currency_code)` — Aggregate enforces BR-5 and mutates its own state.
+  4. Call `AccountRepository.update(account)` — Persists fully synchronized aggregate state.
+  5. Commit Unit of Work.
 
 **GetAllAccountsHandler**
 - Dependencies: `AccountQueryPort` (CQRS Read Model)
-- Flow: Delegates directly to `query_port.get_all_summaries()`.
+- Flow: Delegates directly to `query_port.get_all_summaries()`. Instantiated via `DIContainer`.
 
 ### DTOs
 
@@ -105,8 +105,7 @@ Topup amounts must be strictly greater than zero. Enforced in `TopupAccountHandl
 | `currency_id` | `int` | `accounts.currency_id` |
 | `currency_code` | `str` | `currencies.code` (JOIN) |
 | `account_number` | `str` | `accounts.account_number` |
-| `card_number` | `str` | `accounts.card_number` (⚠️ Should be removed — see TD-2 in Account Domain module) |
-| `balance` | `Decimal` | `accounts.balance` (converted from REAL) |
+| `balance` | `Decimal` | `accounts.balance` (stored as TEXT) |
 
 ---
 
@@ -127,7 +126,7 @@ class AccountQueryPort(ABC):
 - Query pattern:
   ```sql
   SELECT a.id, a.user_id, u.name AS user_name, a.currency_id,
-         c.code AS currency_code, a.account_number, a.card_number, a.balance
+         c.code AS currency_code, a.account_number, a.balance
   FROM accounts a
   JOIN currencies c ON a.currency_id = c.id
   JOIN users u ON a.user_id = u.id
@@ -139,12 +138,12 @@ class AccountQueryPort(ABC):
 
 ### 1. Topup Account
 ```
-[Internal/Admin] → TopupAccountCommand(account_id, amount: float)
-  → TopupAccountHandler
+[Internal/Admin] → TopupAccountCommand(account_id, amount: Decimal)
+  → TopupAccountHandler (Resolved via DIContainer)
     → UoW.begin()
     → AccountRepository.get_by_id(account_id)
-    → Validate amount > 0.0
-    → account.topup(amount)                    [⚠️ primitive float → Decimal(str(amount))]
+    → Money(amount, account.balance.currency)
+    → account.topup(money)                    [Domain enforces > 0 and currency match]
     → AccountRepository.update(account)
     → UoW.commit()
 ```
@@ -152,19 +151,19 @@ class AccountQueryPort(ABC):
 ### 2. Update Account Currency
 ```
 [Internal/Admin] → UpdateAccountCurrencyCommand(account_id, currency_id)
-  → UpdateAccountCurrencyHandler
+  → UpdateAccountCurrencyHandler (Resolved via DIContainer)
     → UoW.begin()
     → AccountRepository.get_by_id(account_id)
-    → account.can_change_currency()            [Invariant Check — must be zero balance]
-    → repo.update_currency(account_id, currency_id)  [⚠️ Bypasses aggregate]
+    → CurrencyQueryPort.get_currency_code_by_id(currency_id) [ID to Domain concept translation]
+    → account.change_currency(currency_code)                 [Aggregate enforces zero-balance & updates state]
+    → AccountRepository.update(account)
     → UoW.commit()
-    → ⚠️ account.balance.currency remains stale in memory
 ```
 
 ### 3. Query All Accounts
 ```
   → GetAllAccountsQuery()
-    → GetAllAccountsHandler
+    → GetAllAccountsHandler (Resolved via DIContainer)
       → SqliteAccountReadModel.get_all_summaries()
         → JOIN query (accounts + users + currencies)
         → Returns List[AccountSummary]
@@ -174,48 +173,45 @@ class AccountQueryPort(ABC):
 
 ## Edge Cases & Known Issues
 
-### EC-5: Currency Mismatch on Topup (Precision Risk)
-**Scenario**: Topup is called with a `float` amount but no currency is specified. The `topup()` method uses the account’s existing currency.
-**Current Behavior**: Works correctly for existing accounts, but the `float` input risks precision loss before `Decimal(str(amount))` conversion.
-**Impact**: Potential micro‑precision errors in financial records.
-**Status**: Works but violates Constitution Rule 3. See TD-6.
+*No active edge cases.*
 
-### EC-6: Stale Aggregate After Currency Change
-**Scenario**: `UpdateAccountCurrencyHandler` commits successfully.
-**Current Behavior**: The `Account` entity loaded into memory still has the old `balance.currency`. If the same entity instance is reused in the same request (e.g., for a subsequent topup), currency mismatch errors may occur.
-**Impact**: Logic errors in compound operations.
-**Status**: **BUG**. Caused by the repository’s `update_currency()` method that does not update the aggregate. See TD-5.
+*(Resolved) EC-5: Currency Mismatch on Topup (Precision Risk)*
+**Previous Scenario**: Topup was called with a `float` amount, risking precision loss before conversion.
+**Resolution**: Command now strictly accepts `Decimal`. Handler constructs a `Money` Value Object ensuring type safety and currency matching before crossing the domain boundary.
+
+*(Resolved) EC-6: Stale Aggregate After Currency Change*
+**Previous Scenario**: `UpdateAccountCurrencyHandler` committed via a repository bypass, leaving the in-memory `Account` entity with a stale `balance.currency`.
+**Resolution**: Handler now explicitly calls `account.change_currency()`. The aggregate mutates its own state in memory, and `repo.update(account)` persists the synchronized state. Memory inconsistency eliminated.
 
 ---
 
 ## Notes & Technical Debt
 
-### TD-5: Update Currency Bypasses Aggregate
-**Violation**: Constitution Rule 4 (Aggregates Protect Their Own Invariants)
-**Location**: `src/ledger/application/handlers/update_account_currency_handler.py`, `src/ledger/infrastructure/persistence/sqlite_account_repository.py` → `update_currency()`
-**Current**: Handler calls `repo.update_currency(account_id, currency_id)` directly. The `Account` entity’s `balance.currency` remains unchanged.
-**Required Fix**:
-1. Add `change_currency(new_currency: str)` method to `Account` entity (see Account Domain module).
-2. Inside the method, enforce `can_change_currency()`, update `self.balance = Money(self.balance.amount, new_currency)`, and increment version.
-3. Handler must call `account.change_currency(new_code)` followed by `repo.update(account)`.
-4. Delete `AccountRepository.update_currency()` method.
+*No active technical debt in this module.*
 
-### TD-6: Topup Uses Primitive Float
-**Violation**: Constitution Rule 3 (Primitive Obsession) + Financial Precision Risk
-**Location**: `src/ledger/application/commands/topup_account_command.py`, `src/ledger/domain/entities/account.py` → `topup()`
-**Current**: `amount: float` in command → `topup(amount: float)`.
-**Required Fix**:
-1. Change `TopupAccountCommand` to accept `amount: Decimal` and `currency_code: str`.
-2. Change `Account.topup()` to accept `amount: Money`.
-3. Validate currency match inside `topup()`.
+*(Resolved) TD-2: PII Leakage in Read Model*
+**Previous Violation**: `card_number` was exposed in `AccountSummary` DTO and SQL projection.
+**Resolution**: `card_number` completely purged from the DTO and the `SqliteAccountReadModel` JOIN query. Ledger context adheres to Principle of Least Privilege.
 
-### TD-10: Database Schema — `balance REAL`
-**Location**: `src/common/infrastructure/database.py` (accounts table definition)
-**Current**: `accounts.balance REAL NOT NULL DEFAULT 0.0`
-**Issue**: `REAL` in SQLite is IEEE 754 floating point. Although repositories convert to `str` before INSERT, the column type itself is imprecise. If any raw SQL or external tool writes to this column, precision is lost.
-**Required Fix**: Change schema to `balance TEXT NOT NULL DEFAULT '0.00'`. Store `Money` as string representation of `Decimal`. This affects the `AccountSummary` read model and the `SqliteAccountRepository.update()` method.
+*(Resolved) TD-5: Update Currency Bypasses Aggregate*
+**Previous Violation**: Constitution Rule 4. Handler called `repo.update_currency(account_id, currency_id)` directly.
+**Resolution**: 
+1. Added `CurrencyQueryPort` (Application) and `SqliteCurrencyResolver` (Infrastructure) to translate `int` ID to `str` code without breaking Dependency Rule.
+2. Added `change_currency()` to `Account` entity.
+3. Handler calls domain method, then `repo.update(account)`.
+4. Deleted `update_currency()` from repository port and implementation.
 
-### TD-9 (Partial): Incomplete DI Container Integration
-**Location**: Controller layer, but affects handler instantiation.
-**Current**: `GetAllAccountsHandler` is likely manually instantiated in the controller alongside other handlers. The global `DIContainer` is only accessed for `EventBus`.
-**Required Fix**: All handlers (including `GetAllAccountsHandler`, `TopupAccountHandler`, `UpdateAccountCurrencyHandler`) should be registered in and requested from the `DIContainer`.
+*(Resolved) TD-6: Topup Uses Primitive Float*
+**Previous Violation**: Constitution Rule 3. `amount: float` in command → `topup(amount: float)`.
+**Resolution**: 
+1. `TopupAccountCommand.amount` changed to `Decimal`.
+2. `Account.topup()` changed to accept `Money`.
+3. Currency homogeneity enforced inside the aggregate.
+
+*(Resolved) TD-10: Database Schema — `balance REAL`*
+**Previous Violation**: `accounts.balance REAL NOT NULL DEFAULT 0.0` risked IEEE 754 precision loss.
+**Resolution**: Schema migrated to `balance TEXT NOT NULL DEFAULT '0.00'`. Applied to `accounts.balance`, `transactions.amount`, and `gateway_sessions.amount`.
+
+*(Resolved) TD-9: Incomplete DI Container Integration*
+**Previous Violation**: Handlers manually instantiated in Controllers (tight coupling).
+**Resolution**: Factory methods added to `DIContainer` for all handlers. Controllers refactored to resolve handlers via `current_app.di_container`.

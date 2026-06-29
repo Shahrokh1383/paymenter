@@ -21,7 +21,7 @@ class SqliteSessionRepository(PaymentSessionRepository):
         """, (
             session.token.value,
             session.merchant_id,
-            float(session.amount.amount),
+            str(session.amount.amount),
             session.amount.currency,
             session.user_email.value,
             session.callback_url.value,

@@ -11,7 +11,7 @@ class SqliteUnitOfWork(UnitOfWork):
 
     def __enter__(self):
         if self._nesting_level == 0:
-            self.conn = sqlite3.connect(DB_PATH)
+            self.conn = sqlite3.connect(DB_PATH, timeout=10.0)
             self.conn.row_factory = sqlite3.Row
             self.conn.execute("PRAGMA foreign_keys = ON;")
         self._nesting_level += 1

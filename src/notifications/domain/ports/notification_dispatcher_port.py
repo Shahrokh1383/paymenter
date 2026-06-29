@@ -6,6 +6,6 @@ class NotificationDispatcher(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def send_otp(self, to_email: str, otp_code: str, merchant_name: str, amount: float, currency_code: str) -> None:
+    def send_otp(self, to_email: str, otp_code: str, merchant_name: str, amount: str, currency_code: str) -> None:
         """Sends a One-Time Password (OTP) to the user for payment verification."""
         raise NotImplementedError

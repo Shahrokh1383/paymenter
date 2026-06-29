@@ -1,12 +1,5 @@
 fixed all the bugs in ledger module docs checklist :
 
-1 : Account_Application_Module.md
-
-2 : Account_Domain_Module.md
-
-3 : Eventing_&_Cross-Context_Integration_Module.md
-
-4 : Ledger_HTTP_API_Module.md
 
 5 : Ledger_Infrastructure_&_Persistence_Module.md
 

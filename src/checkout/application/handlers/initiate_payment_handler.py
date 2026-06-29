@@ -56,7 +56,7 @@ class InitiatePaymentHandler:
             user_email=email_vo.value,
             otp_code=otp_vo.value,
             merchant_name=command.merchant_name,
-            amount=money_vo.amount,
+            amount=str(money_vo.amount),
             currency_code=money_vo.currency
         ))
 

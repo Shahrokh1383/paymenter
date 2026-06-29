@@ -24,7 +24,7 @@ class SqliteTransactionRepository(TransactionRepository):
     def get_by_id(self, transaction_id: int) -> Transaction:
         cursor = self._uow.conn.execute("""
             SELECT t.id, t.merchant_id, t.from_account_id, t.to_account_id, 
-                   t.amount, t.status, t.user_email, c.code as currency_code
+                   t.amount, t.status, t.user_email, t.version, c.code as currency_code
             FROM transactions t
             JOIN currencies c ON t.currency_id = c.id
             WHERE t.id = ?

@@ -25,11 +25,13 @@ def create_app():
     from src.ledger.infrastructure.web.transaction_controller import transaction_bp
     from src.checkout.infrastructure.web.gateway_controller import gateway_bp
     from src.checkout.infrastructure.web.api_controller import api_bp
+    from src.ledger.infrastructure.web.schemas.transaction_api_controller import transaction_api_bp
 
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(transaction_bp)
     app.register_blueprint(gateway_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(transaction_api_bp)
 
     @app.route('/')
     def index():

@@ -1,5 +1,23 @@
 {
-  "excludedPaths": [],
-  "lastModified": "2026-06-29T16:02:07.492Z",
+  "excludedPaths": [
+    "docs",
+    "src\\checkout",
+    "src\\common",
+    "src\\identity",
+    "src\\notifications",
+    "todo1.md",
+    "todo.md",
+    "start.sh",
+    "start.bat",
+    "roadmap.txt",
+    "requirements.txt",
+    "fix2.txt",
+    "README.md",
+    "fix.txt",
+    "content.txt",
+    "command.txt",
+    "tests"
+  ],
+  "lastModified": "2026-06-29T17:35:18.054Z",
   "version": 1
 }

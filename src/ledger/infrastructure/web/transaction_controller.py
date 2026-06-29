@@ -1,15 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash, current_app
-from decimal import Decimal, InvalidOperation
-
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from src.ledger.infrastructure.web.schemas.hold_funds_request import HoldFundsRequestSchema
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 from src.common.domain.exceptions import (
     InsufficientFundsError, AccountNotFoundError, 
-    CurrencyMismatchError, InvalidTransactionStateError
+    CurrencyMismatchError
 )
 
 from src.ledger.application.commands.hold_funds_command import HoldFundsCommand
-from src.ledger.application.commands.complete_funds_command import CompleteFundsCommand
-from src.ledger.application.commands.fail_and_refund_command import FailAndRefundCommand
 from src.ledger.application.queries.get_transactions_query import GetTransactionsQuery
 
 transaction_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
@@ -21,7 +18,6 @@ def index():
     
     uow = SqliteUnitOfWork()
     with uow:
-        # FIX TD-9: Resolving handler via DI Container
         handler = current_app.di_container.get_transactions_handler(uow)
         transactions = handler.handle(query)
     
@@ -30,16 +26,14 @@ def index():
 @transaction_bp.route('/create', methods=['POST'])
 def create():
     try:
-        amount = Decimal(str(request.form['amount']))
-        merchant_id_str = request.form.get('merchant_id')
-        merchant_id = int(merchant_id_str) if merchant_id_str else None
+        validated_data = HoldFundsRequestSchema.validate(request.form)
         
         command = HoldFundsCommand(
-            from_account_id=int(request.form['from_account_id']),
-            to_account_id=int(request.form['to_account_id']),
-            amount=amount,
-            merchant_id=merchant_id,
-            user_email=request.form.get('user_email')
+            from_account_id=validated_data['from_account_id'],
+            to_account_id=validated_data['to_account_id'],
+            amount=validated_data['amount'],
+            merchant_id=validated_data['merchant_id'],
+            user_email=validated_data['user_email']
         )
         
         uow = SqliteUnitOfWork()
@@ -47,39 +41,14 @@ def create():
         handler.handle(command)
         
         flash("Funds held successfully.", "success")
-    except (InsufficientFundsError, AccountNotFoundError, CurrencyMismatchError, InvalidOperation) as e:
+        
+    except (InsufficientFundsError, AccountNotFoundError, CurrencyMismatchError) as e:
+        flash(str(e), 'error')
+    except ValueError as e:
+        # Caught from HoldFundsRequestSchema
         flash(str(e), 'error')
     except Exception as e:
-        flash(f"An unexpected error occurred: {str(e)}", 'error')
+        current_app.logger.error(f"Unexpected error creating transaction: {str(e)}", exc_info=True)
+        flash("An unexpected system error occurred. Please try again.", 'error')
         
     return redirect(url_for('transactions.index'))
-
-@transaction_bp.route('/complete/<int:id>', methods=['POST'])
-def complete(id):
-    try:
-        command = CompleteFundsCommand(transaction_id=id)
-        uow = SqliteUnitOfWork()
-        
-        handler = current_app.di_container.get_complete_funds_handler(uow)
-        handler.handle(command)
-        
-        return jsonify({"success": True, "new_status": "Success"}), 200
-    except InvalidTransactionStateError as e:
-        return jsonify({"success": False, "message": str(e)}), 400
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@transaction_bp.route('/fail/<int:id>', methods=['POST'])
-def fail(id):
-    try:
-        command = FailAndRefundCommand(transaction_id=id)
-        uow = SqliteUnitOfWork()
-        
-        handler = current_app.di_container.get_fail_and_refund_handler(uow)
-        handler.handle(command)
-        
-        return jsonify({"success": True, "new_status": "Refunded/Failed"}), 200
-    except InvalidTransactionStateError as e:
-        return jsonify({"success": False, "message": str(e)}), 400
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500

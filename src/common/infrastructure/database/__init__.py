@@ -22,7 +22,11 @@ class Database:
         cursor = conn.cursor()
         
         # Aggregate and execute all schemas atomically
-        cursor.executescript(IDENTITY_SCHEMA + LEDGER_SCHEMA + CHECKOUT_SCHEMA + EVENTING_SCHEMA)
+        master_schema = IDENTITY_SCHEMA + LEDGER_SCHEMA + CHECKOUT_SCHEMA + EVENTING_SCHEMA
+        cursor.executescript(master_schema)
+        
+        # Enable WAL mode to prevent 'database is locked' errors in multi-threaded Outbox pattern
+        cursor.execute("PRAGMA journal_mode=WAL;")
         
         # Seed default currency
         cursor.execute("SELECT COUNT(*) FROM currencies")

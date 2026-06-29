@@ -38,17 +38,17 @@ class SmtpAdapter(NotificationDispatcher):
         msg.attach(MIMEText(body, 'html'))
         self._dispatch_email(msg, to_email, f"Receipt ({status})")
 
-    def send_otp(self, to_email: str, otp_code: str, merchant_name: str, amount: Money, currency_code: str) -> None:
+    def send_otp(self, to_email: str, otp_code: str, merchant_name: str, amount: str, currency_code: str) -> None:
         msg = MIMEMultipart()
         msg['From'] = FROM_EMAIL
         msg['To'] = to_email
         msg['Subject'] = f"Your OTP Code for {merchant_name} Payment"
-        
+
         body = f"""
         <html>
             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                 <h2 style="color: #007bff;">Payment Verification</h2>
-                <p>You are initiating a payment of <strong>{amount.amount} {amount.currency}</strong> to <strong>{merchant_name}</strong>.</p>
+                <p>You are initiating a payment of <strong>{amount} {currency_code}</strong> to <strong>{merchant_name}</strong>.</p>
                 <p>Your One-Time Password (OTP) is:</p>
                 <h1 style="background-color: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px; color: #333;">{otp_code}</h1>
                 <p>This code will expire shortly. Please do not share it with anyone.</p>
@@ -57,6 +57,7 @@ class SmtpAdapter(NotificationDispatcher):
             </body>
         </html>
         """
+
         msg.attach(MIMEText(body, 'html'))
         self._dispatch_email(msg, to_email, "OTP")
 

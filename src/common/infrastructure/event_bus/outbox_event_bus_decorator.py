@@ -1,7 +1,7 @@
 import json
 import dataclasses
 import sqlite3
-import threading
+import decimal
 from typing import Any, Callable, Dict, List
 from src.common.domain.ports.event_bus import EventBus
 from src.common.infrastructure.database import DB_PATH
@@ -25,13 +25,18 @@ class OutboxEventBusDecorator(EventBus):
         # Subscriptions still go to the inner bus for actual execution
         self._inner_bus.subscribe(event_type, handler)
 
+    class _DomainEventEncoder(json.JSONEncoder):
+        """Custom encoder to handle Domain Value Objects safely at the infrastructure boundary."""
+        def default(self, obj):
+            if isinstance(obj, decimal.Decimal):
+                return str(obj)
+            return super().default(obj)
+
     def publish(self, event: Any) -> None:
         event_type = type(event).__name__
         
-        # Serialize the event (dataclass to dict to JSON string)
-        payload = json.dumps(dataclasses.asdict(event))
-
-        # 1. Persist to Outbox Table (Approximate ACID - separate fast connection)
+        payload = json.dumps(dataclasses.asdict(event), cls=self._DomainEventEncoder)
+        
         try:
             with sqlite3.connect(DB_PATH) as conn:
                 conn.execute(

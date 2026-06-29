@@ -63,6 +63,7 @@ DIContainer
 
 - **Type**: Asynchronous, persistent Outbox with in-memory dispatch via background daemon thread.
 - **Publishing Rule**: Events are published **after** Unit of Work commit. However, instead of direct in-memory dispatch, the event payload is serialized and inserted into an `outbox_messages` table. A background `OutboxRelayWorker` picks up pending messages and publishes them to the inner `InMemoryEventBus`.
+- **Serialization Strategy**: Because Domain Events strictly contain Value Objects like `Money` (which encapsulate `Decimal` types per Constitution Rule 3), the `OutboxEventBusDecorator` utilizes a custom `_DomainEventEncoder` inheriting from `json.JSONEncoder`. This encoder safely translates `decimal.Decimal` to `str` at the Infrastructure boundary, preventing `TypeError` during outbox persistence while preserving absolute financial precision. A similar boundary translation is applied in the Checkout API controller for the `PaymentInitiatedEvent` payload.
 - **Failure Handling**: 
   - If the outbox DB insert fails, the exception propagates (preventing silent data loss).
   - If the inner bus handler (e.g., SMTP) fails, the worker catches the exception, increments the `retry_count`, and schedules it for the next cycle.
@@ -110,6 +111,11 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 **Current Behavior**: **RESOLVED**. `SqliteTransactionRepository.add()` now explicitly assigns `transaction.id = cursor.lastrowid` before yielding control back to the application layer. The Aggregate Root is never in a transient state post-persistence.
 **Status**: ✅ Resolved via Infrastructure hydration fix.
 
+### EC-5: Domain Value Object Serialization Failure at Infrastructure Boundaries
+**Scenario**: Publishing a `TransactionCompletedEvent` (containing a `Money` Value Object with a `Decimal` amount) via the API or the `OutboxEventBusDecorator` causes a `TypeError: Object of type Decimal is not JSON serializable`, crashing the HTTP request or outbox persistence.
+**Previous Behavior**: Standard `json.dumps(dataclasses.asdict(event))` failed on non-primitive Domain types crossing the infrastructure boundary.
+**Current Behavior**: **RESOLVED**. Implemented a custom `json.JSONEncoder` inside the `OutboxEventBusDecorator` and applied primitive string mapping in the API controller to safely serialize Domain Value Objects into JSON without polluting the Domain layer with framework-level serialization logic.
+**Status**: ✅ Resolved via Infrastructure boundary encoding.
 ---
 
 ## Notes & Technical Debt
@@ -117,3 +123,4 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 - **TD-3 (Transaction ID Assignment Bug)**: **RESOLVED**. Aggregate hydration implemented in `sqlite_transaction_repository.py`.
 - **TD-9 (Incomplete DI Wiring)**: **RESOLVED**. The `OutboxEventBusDecorator` provides a deterministic, automated wrapper around the base `InMemoryEventBus` during context DI registration, ensuring all published events are intercepted for persistence without manual per-handler wiring.
 - **Future Consideration (True Distributed Outbox)**: The current outbox uses an independent, fast SQLite connection. In a distributed database environment (e.g., Postgres across microservices), this would be upgraded to a Postgres CTE inserting into both the business table and outbox table within the exact same shared transaction/connection.
+- **TD-11 (Outbox & API JSON Serialization Crash)**: **RESOLVED**. Added `_DomainEventEncoder` to `OutboxEventBusDecorator` and updated API controller primitive mapping to safely serialize Domain Value Objects (like `Money`'s `Decimal`) into JSON payloads without violating Constitution Rule 3.

@@ -1,2 +1,6 @@
 __pycache__
+src/notifications/domain/ports/__pycache__
+src/notifications/application/handlers/__pycache__
+src/checkout/application/handlers/__pycache__
+src/notifications/infrastructure/smtp/__pycache__
 paymenter.db

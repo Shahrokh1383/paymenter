@@ -33,7 +33,7 @@ class ReceiptEmailHandler:
     # --- Checkout Events ---
     def handle_initiated(self, event: PaymentInitiatedEvent) -> None:
         """Dispatches the OTP email when a payment session is initiated in the Checkout context."""
-        idempotency_key = f"{type(event).__name__}_{event.token}" # Assuming token is unique
+        idempotency_key = f"{type(event).__name__}_{event.session_token}"
         if self._idempotency_port.is_processed(idempotency_key):
             return
 

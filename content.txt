@@ -1,0 +1,249 @@
+خیلی خب ما تونستیم بطور کامل و دقیق مشکل تراکنش رو بطور کامل حل کنیم اما مشکلاتی باقی مانده رو در زیر برات شرح میدم :
+
+ابتدا لاگ هارو برات در زیر قرار میدم :
+127.0.0.1 - - [29/Jun/2026 17:28:23] "POST /api/pay HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 17:28:24] "GET /gateway/gw_cv5VMPgcEnNd5CPZYopeMDL-BZL0gD12 HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 17:28:24] "GET /static/js/gateway.js HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:24] "GET /static/css/gateway.css HTTP/1.1" 304 -
+[EMAIL DISPATCH] OTP sent to milad1383@gmail.com
+[EMAIL DISPATCH] OTP sent to milad1383@gmail.com
+[OUTBOX RETRY] Dispatch failed for msg 6: database is locked
+[EMAIL DISPATCH] OTP sent to milad1383@gmail.com
+127.0.0.1 - - [29/Jun/2026 17:28:30] "GET /dashboard/accounts HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 17:28:30] "GET /static/js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:30] "GET /static/css/app.css HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:30] "GET /static/css/account.css HTTP/1.1" 304 -
+[OUTBOX RETRY] Dispatch failed for msg 7: database is locked
+127.0.0.1 - - [29/Jun/2026 17:28:46] "POST /gateway/authorize HTTP/1.1" 302 -
+127.0.0.1 - - [29/Jun/2026 17:28:49] "GET /api/verify/3 HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 17:28:50] "GET /transactions/ HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 17:28:50] "GET /static/js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:50] "GET /static/js/transaction.js HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:50] "GET /static/css/app.css HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:50] "GET /static/css/transaction.css HTTP/1.1" 304 -
+127.0.0.1 - - [29/Jun/2026 17:28:52] "POST /transactions/complete/3 HTTP/1.1" 200 -
+[EMAIL DISPATCH] OTP sent to milad1383@gmail.com
+[EMAIL DISPATCH] OTP sent to milad1383@gmail.com
+127.0.0.1 - - [29/Jun/2026 17:28:58] "GET /api/verify/3 HTTP/1.1" 200 -
+[OUTBOX RETRY] Dispatch failed for msg 7: database is locked
+[OUTBOX RETRY] Dispatch failed for msg 8: 'dict' object has no attribute 'currency'
+
+1 : مشکل فعلی ما این هست که الان به کاربر 5 کد otp ارسال شده این از اولین مشکل در صورتیکه فقط باید یک کد otp ارسال بشه 
+
+2 : مشکل بعدی این هست که کاربر تراکنشش بطور کامل به درستی انجام شده اما از سمت smtp-server ارسال ایمیل رخ نمیده که چقدر از حساب کاربر کم شده 
+
+3 : از انجاییکه مورد دوم رخ نمیده مطمین هستم که مشکل ارسال پیامک refunded هم همچنان باقی مانده است
+
+4 : از انجایی که تا به اینجای کار یک مشکلمون رو حل کردیم با توجه به مشکلی که حل کردیم بهم تنها مستنداتی که باید بروز بشن بخشی که باید بروز بکنتم رو بهم تحویل بده تا مستنداتم به عنوان منبع SSOT باقی بمانند برای توسعه دهندگان و هوش مصنوعی ها 
+
+5 : از انجاییکه تا به اینجای کار دو مشکل ورود به gateway از سمت برنامه لاراول و مشکل decimal برای تکمیل یا لغو عملیات تراکنش رو حل کردیم بهم دستور git commit رو به همراه پیغام مناسب تحویلم بده
+
+6 : من در زیر برات مستند CONSTITUTION.md رو قرار میدم تا یکبار دیگه ان را برای تاکید و یاداوری و درک دوباره بطور کامل انالیز کنی مثل برنامه نویس سینیور با 12 سال تجربه 
+
+**✅ DOCUMENT : SINGLE SOURCE OF TRUTH – CONSTITUTION**  
+**Project:** Paymenter  
+**Version:** 1.0.0 (IMMUTABLE)  
+**Effective Date:** Upon Delivery  
+**Status:** This document is the permanent, unchangeable source of truth for all development, debugging, code generation, and architectural decisions.
+
+---
+
+### 📜 PREAMBLE: THE IRON LAWS
+
+**Rule 0: This Document Is Immutable**  
+This constitution is sealed. It will never be edited, appended, or deprecated. All future development, debugging, refactoring, and AI code generation **MUST** derive authority from this document. If a new requirement appears to conflict with this constitution, the requirement must be adjusted — not this document.
+
+**Rule 1: The Dependency Rule (Inviolable)**  
+Source code dependencies must point **only inward** toward higher-level policies:
+
+- **Domain** → Never imports Application, Infrastructure, or any framework  
+- **Application** → May import Domain, but never Infrastructure or Framework  
+- **Infrastructure** → May import Domain and Application (to implement ports), but never the reverse  
+- **Framework / Delivery** → May import all layers to wire the application, but business logic never knows about Flask, SQLite, etc.
+
+**Rule 2: New Feature = New File (Strict OCP & SRP Enforcement)**  
+When adding new capability:
+- **DO**: Create new files (Command, Handler, Event, Adapter, Port, etc.)
+- **NEVER**: Modify existing files to add behavior
+- **Allowed modifications** (strict exceptions):
+  - Pure bug fixes inside the file’s single responsibility
+  - Wiring new components within their specific Bounded Context DI module (e.g., app/di/ledger_di.py). The main app/di_container.py must only be modified to register a newly created context module, never individual handlers.
+  - Registering new routes/blueprints in framework configuration
+  - Extending event catalog when absolutely necessary
+
+**Rule 3: Primitive Obsession Is Forbidden**  
+Never pass raw primitives (`float`, `str`, `int`) across layer boundaries for domain concepts. Always use **Value Objects**:
+
+- `float amount + str currency` → `Money(amount: Decimal, currency: CurrencyCode)`
+- `str card_number` → `CardNumber(value: str)` (with Luhn validation)
+- `str email` → `EmailAddress(value: str)`
+- `str token` → `SessionToken(value: str)`
+
+**Rule 4: Aggregates Protect Their Own Invariants**  
+Business rules and invariants live **inside Aggregate Roots**. Application services only orchestrate.
+
+**Rule 5: Cross-Context Communication via Domain Events Only**  
+Bounded Contexts never call each other directly. They communicate exclusively through **Domain Events** (in-memory EventBus in development, replaceable with Kafka/RabbitMQ in production).
+
+**Rule 6: Infrastructure Is a Plugin**  
+Flask, SQLite, SMTP, HTTP clients, etc. are implementation details. They implement interfaces (Ports) defined in the Domain or Application layers.
+
+**Rule 7: Schema Definition Isolation (Strict OCP for Database Migrations)**
+Database schema definitions must never be monolithic. Raw SQL `CREATE TABLE` statements are strictly forbidden inside the central `database.py` orchestrator file. Schemas must be isolated by Bounded Context using a nested aggregator pattern.
+- **DO**: Create a dedicated subfolder for each Bounded Context inside `src/common/infrastructure/database/schemas/` (e.g., `schemas/ledger/`, `schemas/checkout/`).
+- **DO**: Create a context aggregator file inside that subfolder (e.g., `schemas/ledger/ledger.py`). If a context has many tables, split them into separate files within that subfolder and aggregate them inside the context file.
+- **DO**: The central `database.py` must act purely as the root orchestrator. It may only import the aggregated schema constants from the context files, concatenate them, and execute them atomically.
+- **NEVER**: Modify `database.py` to add new tables. Adding a new table means creating/modifying files strictly within its respective Bounded Context subfolder.
+- **Rationale**: Ensures SRP, OCP, perfect mirroring of Domain boundaries in the Infrastructure layer, and prevents merge conflicts in large teams.
+
+### 🏗️ ARCHITECTURAL LAYERS
+
+1. **Domain Layer** (Core)  
+   Pure Python. Entities, Value Objects, Domain Events, Repository Ports, Domain Services.  
+   Zero external imports.
+
+2. **Application Layer**  
+   Use Cases: Commands, Queries, Handlers, DTOs.  
+   Orchestrates Domain and emits events. No infrastructure.
+
+3. **Infrastructure Layer**  
+   Adapters (SQLite repositories, HTTP clients, SMTP, etc.), Controllers, DI Container, Framework wiring.
+
+---
+
+### 🗂️ FILE CREATION PROTOCOL – ADDING A NEW FEATURE
+
+**Example:** Adding Webhook Notification on successful transaction.
+
+1. Identify Bounded Context (`ledger`, `checkout`, `notifications`, `identity`, etc.)
+2. Create new files:
+   - Domain Event: `src/ledger/domain/events/transaction_captured_event.py`
+   - Port: `src/notifications/domain/ports/webhook_dispatcher_port.py`
+   - Adapter: `src/notifications/infrastructure/adapters/http_webhook_adapter.py`
+   - Handler: `src/notifications/application/handlers/webhook_event_handler.py`
+3. Wire in `app/di_container.py` (only allowed modification)
+4. Write tests first
+
+---
+
+### 🧭 DEVELOPMENT WORKFLOW (SOP)
+
+**For Bug Fixes:**
+1. Reproduce the bug with a failing unit test
+2. Locate the responsible Aggregate or Domain Service
+3. Fix the logic inside the Domain layer
+4. Ensure all tests pass
+5. Submit PR with test + minimal fix
+
+**For New Features:**
+1. Define Domain Model (Entities, Value Objects, Events)
+2. Create Command + Handler in Application layer
+3. Implement Infrastructure adapters
+4. Wire dependencies
+5. Write integration + unit tests
+6. Document only in API/UI layer
+
+**For Refactoring:**
+1. Write characterization tests first
+2. Extract Value Objects and move logic into Aggregates
+3. Replace direct calls with Ports
+4. Delete old code only after full test coverage
+
+---
+
+### 🧪 TESTING STRATEGY – THE TEST PYRAMID
+
+**Unit Tests (Domain) – 70%**  
+Location: `tests/unit/<context>/domain/`  
+- Zero external dependencies  
+- Test invariants and business rules  
+- Must run under 10ms
+
+**Integration Tests – 25%**  
+Location: `tests/integration/<context>/`  
+- Use real in-memory SQLite  
+- Test handlers, repositories, event bus  
+- Mock only external services
+
+**End-to-End Tests – 5%**  
+Location: `tests/e2e/`  
+- Full HTTP flow using Flask test client  
+- Test observable behavior only
+
+---
+
+### 🏷️ NAMING CONVENTIONS & CODE STANDARDS
+
+**File Naming (snake_case):**
+- Domain: `entities.py`, `value_objects.py`, `events.py`, `repositories.py`
+- Application: `commands.py`, `handlers.py`, `queries.py`
+- Infrastructure: `sqlite_transaction_repo.py`, `http_webhook_adapter.py`
+
+**Class Naming:**
+- Aggregates: `Transaction`, `Account`, `PaymentSession`
+- Value Objects: `Money`, `CardNumber`, `EmailAddress` (`@dataclass(frozen=True)`)
+- Commands: `CaptureFundsCommand`
+- Handlers: `CaptureFundsHandler`
+- Events: `TransactionCapturedEvent`
+
+**Method Naming:**
+- Domain: `capture()`, `authorize()`, `deposit()`
+- Application: `handle(command)`
+- Infrastructure: `save()`, `post()`
+
+**Type Hints:** Mandatory everywhere.
+
+---
+
+### 🔐 SECURITY & COMPLIANCE
+
+- Sensitive data (card numbers, OTPs) must **never** be logged
+- Raw card numbers exist only temporarily in `checkout` context
+- Ledger context never sees card data — only `AccountId` and `Money`
+- All state changes must emit Domain Events for audit
+- Use proper encryption and hashing (bcrypt, etc.)
+
+---
+
+### 🚀 PERFORMANCE & SCALABILITY
+
+- All queries must be indexed (verified with `EXPLAIN QUERY PLAN`)
+- No N+1 queries
+- Pagination required for all list endpoints
+- Aggregates use optimistic locking or `SELECT FOR UPDATE`
+- Cache invalidation driven by Domain Events (never in Domain logic)
+
+---
+
+### 📚 GLOSSARY – UBIQUITOUS LANGUAGE
+
+| Term                  | Definition                                                                 | Context      |
+|-----------------------|----------------------------------------------------------------------------|--------------|
+| Transaction           | Immutable record of fund movement with strict state machine                | ledger       |
+| PaymentSession        | Temporary tokenized checkout flow with card + OTP                          | checkout     |
+| Money                 | Value Object (Decimal + CurrencyCode)                                      | common       |
+| Capture               | Finalizing a Pending transaction                                           | ledger       |
+| Hold                  | Reserving funds in a Pending state                                         | ledger       |
+| Bounded Context       | Logical boundary with its own domain model                                 | Architecture |
+| Domain Event          | Immutable fact that something happened in the domain                       | All          |
+
+---
+
+### ✅ CODE REVIEW CHECKLIST (MANDATORY)
+
+- No primitives for domain concepts
+- No infrastructure imports in Domain/Application
+- New files created instead of modifying existing ones (unless exception)
+- Communication via Domain Events only
+- All invariants protected inside Aggregates
+- Tests follow the pyramid
+- Follows SOLID, KISS, DRY, and this Constitution
+
+---
+
+**This document is the Single Source of Truth.**  
+Every developer, AI agent, and automated pipeline **must** follow it strictly. Any code violating this constitution will be rejected.
+
+---
+
+حالا تمام موارد بالارو انجام بده و سپس منتظر باش تا بهت اعلام کنم که اقدامات بعدی برای حل مشکلمون رو انجام بدیم و بدون اینکه من چیزی بگم هیچکاری رو انجام نده و حتی به حل مشکلات نپرداز فقط مواردی که ذکر کردم رو انجام بده مثل برنامه نویس سینیور با 12 سال تجربه

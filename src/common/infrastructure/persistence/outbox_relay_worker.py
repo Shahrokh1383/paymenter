@@ -42,50 +42,61 @@ class OutboxRelayWorker:
                 time.sleep(0.5) # Sleep to prevent CPU spinning
 
     def _process_pending_messages(self):
+        messages_to_process = []
+        
+        # 1. FETCH PHASE (Read Lock only)
         try:
             with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
                 conn.row_factory = sqlite3.Row
+                conn.execute("PRAGMA journal_mode=WAL;")
                 cursor = conn.cursor()
-                
                 cursor.execute(
                     "SELECT * FROM outbox_messages WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10"
                 )
-                messages = cursor.fetchall()
+                messages_to_process = [dict(row) for row in cursor.fetchall()]
+        except Exception as e:
+            print(f"[OUTBOX ERROR] Failed to fetch messages: {e}")
+            return
 
-                for msg in messages:
-                    success = self._attempt_dispatch(cursor, msg)
-                    
+        # 2. PROCESSING PHASE (Locks Released - Safe to call Handlers/SMTP/UoW)
+        results = []
+        for msg in messages_to_process:
+            success = self._attempt_dispatch(msg)
+            results.append((msg['id'], success, msg['retry_count']))
+
+        # 3. UPDATE PHASE (Write Lock)
+        if not results:
+            return
+
+        try:
+            with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                cursor = conn.cursor()
+                
+                for msg_id, success, current_retries in results:
                     if success:
-                        cursor.execute("UPDATE outbox_messages SET status = 'PROCESSED' WHERE id = ?", (msg['id'],))
+                        cursor.execute("UPDATE outbox_messages SET status = 'PROCESSED' WHERE id = ?", (msg_id,))
                     else:
-                        new_retry_count = msg['retry_count'] + 1
+                        new_retry_count = current_retries + 1
                         if new_retry_count >= self.MAX_RETRIES:
                             cursor.execute(
                                 "UPDATE outbox_messages SET status = 'DEAD_LETTER', retry_count = ? WHERE id = ?", 
-                                (new_retry_count, msg['id'])
+                                (new_retry_count, msg_id)
                             )
-                            print(f"[OUTBOX DLQ] Message {msg['id']} moved to Dead Letter Queue after {self.MAX_RETRIES} retries.")
+                            print(f"[OUTBOX DLQ] Message {msg_id} moved to Dead Letter Queue.")
                         else:
-                            # Exponential backoff is implicitly handled by the next trigger cycle
                             cursor.execute(
                                 "UPDATE outbox_messages SET retry_count = ? WHERE id = ?", 
-                                (new_retry_count, msg['id'])
+                                (new_retry_count, msg_id)
                             )
-                            
                 conn.commit()
         except Exception as e:
-            print(f"[OUTBOX ERROR] Relay worker crashed: {e}")
+            print(f"[OUTBOX ERROR] Failed to update message statuses: {e}")
 
     def _attempt_dispatch(self, cursor, msg) -> bool:
         try:
-            # Reconstruct event object (Simplified for this architecture)
-            # We pass the raw dictionary to the handlers. Handlers typed to dataclasses will fail.
-            # To fix this strictly without modifying existing handlers, we dynamically instantiate.
             payload_dict = json.loads(msg['payload'])
-            
-            # Find the actual event class in the handler subscriptions (heuristic approach)
             event_instance = self._reconstruct_event(msg['event_type'], payload_dict)
-            
             if event_instance:
                 self._inner_bus.publish(event_instance)
                 return True

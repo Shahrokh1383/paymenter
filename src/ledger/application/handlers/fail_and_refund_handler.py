@@ -36,12 +36,12 @@ class FailAndRefundHandler:
 
             if txn.status == 'Failed':
                 event_to_publish = TransactionFailedEvent(
-                    transaction_id=txn.id, user_email=txn.user_email,
+                    transaction_id=txn.id, payer_account_id=txn.from_account_id,
                     amount=txn.amount, merchant_id=txn.merchant_id
                 )
             elif txn.status == 'Refunded':
                 event_to_publish = TransactionRefundedEvent(
-                    transaction_id=txn.id, user_email=txn.user_email,
+                    transaction_id=txn.id, payer_account_id=txn.from_account_id,
                     amount=txn.amount, merchant_id=txn.merchant_id
                 )
                 

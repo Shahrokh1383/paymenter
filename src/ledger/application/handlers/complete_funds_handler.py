@@ -33,7 +33,7 @@ class CompleteFundsHandler:
 
             event_to_publish = TransactionCompletedEvent(
                 transaction_id=txn.id,
-                user_email=txn.user_email,
+                payer_account_id=txn.from_account_id,
                 amount=txn.amount,
                 merchant_id=txn.merchant_id
             )

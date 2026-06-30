@@ -3,6 +3,7 @@ from src.notifications.application.handlers.otp_notification_handler import OtpN
 from src.notifications.infrastructure.smtp.smtp_adapter import SmtpAdapter
 from src.notifications.infrastructure.persistence.sqlite_merchant_details_adapter import SqliteMerchantDetailsAdapter
 from src.notifications.infrastructure.persistence.sqlite_idempotency_adapter import SqliteIdempotencyAdapter
+from src.notifications.infrastructure.persistence.sqlite_account_owner_adapter import SqliteAccountOwnerAdapter
 
 # Events (Cross-Context Subscriptions)
 from src.ledger.domain.events.transaction_events import (
@@ -18,11 +19,13 @@ def register_notifications(container):
     smtp_adapter = SmtpAdapter()
     merchant_adapter = SqliteMerchantDetailsAdapter()
     idempotency_adapter = SqliteIdempotencyAdapter()
+    account_resolver = SqliteAccountOwnerAdapter()
     
     receipt_handler = ReceiptEmailHandler(
         dispatcher=smtp_adapter,
         merchant_port=merchant_adapter,
-        idempotency_port=idempotency_adapter
+        idempotency_port=idempotency_adapter,
+        account_resolver=account_resolver
     )
     
     otp_handler = OtpNotificationHandler(

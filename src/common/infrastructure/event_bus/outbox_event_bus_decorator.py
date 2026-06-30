@@ -39,6 +39,7 @@ class OutboxEventBusDecorator(EventBus):
         
         try:
             with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
                 conn.execute(
                     "INSERT INTO outbox_messages (event_type, payload) VALUES (?, ?)",
                     (event_type, payload)

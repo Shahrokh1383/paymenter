@@ -2,6 +2,7 @@ from typing import Tuple
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.common.domain.exceptions import DomainException
 from src.checkout.domain.value_objects.session_token import SessionToken
+from src.checkout.domain.value_objects.card_number import CardNumber # NEW
 from src.checkout.domain.repositories import PaymentSessionRepository
 from src.checkout.domain.ports.fund_reservation_port import FundReservationPort
 from src.checkout.domain.ports.account_lookup_port import AccountLookupPort
@@ -22,14 +23,15 @@ class AuthorizePaymentHandler:
 
     def handle(self, command: AuthorizePaymentCommand) -> Tuple[int, str]:
         token_vo = SessionToken(command.session_token)
+        card_vo = CardNumber(command.card_number)
         
         with self._uow:
-            # 1. Load Aggregate & Validate State + OTP
             session = self._session_repo.get_by_token(token_vo)
-            session.authorize(command.otp_input)
             
-            # 2. Resolve Ledger Accounts via ACL Port
-            from_account_id = self._lookup_port.get_account_id_by_card_number(command.card_number)
+            # Validate State, Card Match, Expiration, and OTP
+            session.authorize(card_vo, command.otp_input)
+            
+            from_account_id = self._lookup_port.get_account_id_by_card_number(card_vo.value)
             if not from_account_id:
                 raise DomainException("Card number not found in our system.")
                 
@@ -37,7 +39,6 @@ class AuthorizePaymentHandler:
             if not to_account_id:
                 raise DomainException("Merchant settlement configuration error.")
 
-            # 3. Request Ledger to Hold Funds
             txn_id = self._fund_port.hold_funds(
                 from_account_id=from_account_id,
                 to_account_id=to_account_id,
@@ -47,7 +48,6 @@ class AuthorizePaymentHandler:
                 user_email=session.user_email.value
             )
 
-            # 4. Mutate Aggregate State & Persist
             session.attach_transaction(txn_id)
             self._session_repo.update(session)
             self._uow.commit()

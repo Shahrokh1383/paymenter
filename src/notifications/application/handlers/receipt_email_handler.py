@@ -6,9 +6,6 @@ from src.notifications.domain.ports.idempotency_port import IdempotencyPort
 from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
-# Checkout Events
-from src.checkout.domain.events.payment_initiated_event import PaymentInitiatedEvent
-
 class ReceiptEmailHandler:
     """Listens to cross-context Domain events and orchestrates the notification dispatch."""
     
@@ -30,24 +27,8 @@ class ReceiptEmailHandler:
     def handle_refunded(self, event: TransactionRefundedEvent) -> None:
         self._dispatch_receipt_with_idempotency(event, "Refunded")
         
-    # --- Checkout Events ---
-    def handle_initiated(self, event: PaymentInitiatedEvent) -> None:
-        """Dispatches the OTP email when a payment session is initiated in the Checkout context."""
-        idempotency_key = f"{type(event).__name__}_{event.session_token}"
-        if self._idempotency_port.is_processed(idempotency_key):
-            return
-
-        self._dispatcher.send_otp(
-            to_email=event.user_email,
-            otp_code=event.otp_code,
-            merchant_name=event.merchant_name,
-            amount=event.amount,
-            currency_code=event.currency_code
-        )
-        self._idempotency_port.mark_as_processed(idempotency_key)
-
     def _dispatch_receipt_with_idempotency(self, event, status: str) -> None:
-        if not event.user_email:
+        if not getattr(event, 'user_email', None):
             return 
         
         idempotency_key = self._generate_idempotency_key(event)
@@ -55,8 +36,9 @@ class ReceiptEmailHandler:
             return # Prevent duplicate emails
         
         merchant_name = "Manual Transfer"
-        if event.merchant_id:
-            name = self._merchant_port.get_merchant_name(event.merchant_id)
+        merchant_id = getattr(event, 'merchant_id', None)
+        if merchant_id:
+            name = self._merchant_port.get_merchant_name(merchant_id)
             if name:
                 merchant_name = name
 
@@ -64,7 +46,7 @@ class ReceiptEmailHandler:
             to_email=event.user_email,
             status=status,
             amount=event.amount,
-            currency_code=event.amount.currency, # Redundant but kept for adapter signature compatibility
+            currency_code=event.amount.currency,
             merchant_name=merchant_name
         )
         

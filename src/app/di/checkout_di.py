@@ -2,8 +2,8 @@ from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnit
 from src.checkout.infrastructure.persistence.sqlite_session_repository import SqliteSessionRepository
 from src.checkout.infrastructure.persistence.ledger_fund_reservation_adapter import LedgerFundReservationAdapter
 from src.checkout.infrastructure.persistence.identity_account_lookup_adapter import IdentityAccountLookupAdapter
-from src.checkout.infrastructure.services.otp_generator import RandomOtpGenerator
-from src.checkout.infrastructure.services.session_token_generator import UuidSessionTokenGenerator
+from src.checkout.infrastructure.services.otp_generator import SecureOtpGenerator
+from src.checkout.infrastructure.services.session_token_generator import SecureSessionTokenGenerator
 
 from src.checkout.application.handlers.initiate_payment_handler import InitiatePaymentHandler
 from src.checkout.application.handlers.request_otp_handler import RequestOtpHandler
@@ -15,7 +15,7 @@ def register_checkout(container):
             uow=uow,
             session_repo=SqliteSessionRepository(uow),
             event_bus=container.event_bus,
-            token_gen=UuidSessionTokenGenerator()
+            token_gen=SecureSessionTokenGenerator()
         )
 
     def get_request_otp_handler(uow: SqliteUnitOfWork) -> RequestOtpHandler:
@@ -23,7 +23,7 @@ def register_checkout(container):
             uow=uow,
             session_repo=SqliteSessionRepository(uow),
             lookup_port=IdentityAccountLookupAdapter(uow),
-            otp_gen=RandomOtpGenerator(),
+            otp_gen=SecureOtpGenerator(),
             event_bus=container.event_bus
         )
 

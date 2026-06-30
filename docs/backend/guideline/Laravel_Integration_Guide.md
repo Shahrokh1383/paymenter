@@ -233,9 +233,9 @@ public function processRefund($orderId, PaymenterService $paymenter)
 
 When testing your Laravel application with Paymenter, remember the exact flow:
 
-1.  **Laravel creates Session**: Laravel calls `/api/pay`. Paymenter emails an OTP to the local SMTP sink.
-2.  **User Authorization**: Laravel redirects the user to the `payment_url`. The user opens the SMTP Web UI, gets the OTP, and enters it + their Card Number on the Paymenter Gateway page.
-3.  **Callback**: Paymenter holds the funds and redirects the user back to Laravel. The transaction is now `Pending`.
-4.  **MANUAL ACTION REQUIRED**: You (the developer) must open the Paymenter Admin Dashboard, find the Pending transaction, and click **[Complete]** or **[Fail]**.
-5.  **Automated Receipts**: The moment you click Complete/Fail, check your SMTP Web UI. A beautifully formatted HTML receipt has instantly arrived in the user's inbox!
-```
+1.  **Laravel creates Session**: Laravel calls `/api/pay`. Paymenter creates a secure session token and returns the `payment_url`. **NO OTP is sent at this stage.**
+2.  **User Authorization**: Laravel redirects the user to the `payment_url`. The user enters their Card Number on the Paymenter Gateway page and clicks **"Request OTP"**. 
+3.  **OTP Dispatch**: Paymenter verifies the card, resolves the **registered Paymenter account email** tied to that specific card (ignoring the Laravel email), and sends the OTP to the local SMTP sink.
+4.  **Callback**: The user enters the OTP, Paymenter holds the funds, and redirects the user back to Laravel. The transaction is now `Pending`.
+5.  **MANUAL ACTION REQUIRED**: You (the developer) must open the Paymenter Admin Dashboard, find the Pending transaction, and click **[Complete]** or **[Fail]**.
+6.  **Automated Receipts**: The moment you click Complete/Fail, check your SMTP Web UI. A beautifully formatted HTML receipt has instantly arrived in the **actual Paymenter account owner's inbox** (the user whose funds were moved).

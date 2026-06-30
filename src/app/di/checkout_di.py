@@ -9,6 +9,9 @@ from src.checkout.application.handlers.initiate_payment_handler import InitiateP
 from src.checkout.application.handlers.request_otp_handler import RequestOtpHandler
 from src.checkout.application.handlers.authorize_payment_handler import AuthorizePaymentHandler
 
+from src.checkout.application.handlers.refund_payment_handler import RefundPaymentHandler
+from src.checkout.infrastructure.persistence.ledger_refund_adapter import LedgerRefundAdapter
+
 def register_checkout(container):
     def get_initiate_payment_handler(uow: SqliteUnitOfWork) -> InitiatePaymentHandler:
         return InitiatePaymentHandler(
@@ -34,7 +37,14 @@ def register_checkout(container):
             fund_port=LedgerFundReservationAdapter(uow),
             lookup_port=IdentityAccountLookupAdapter(uow)
         )
+    
+    def get_refund_payment_handler(uow: SqliteUnitOfWork) -> RefundPaymentHandler:
+        return RefundPaymentHandler(
+            uow=uow,
+            refund_port=LedgerRefundAdapter(uow, container.event_bus)
+        )
 
     container.get_initiate_payment_handler = get_initiate_payment_handler
     container.get_request_otp_handler = get_request_otp_handler
     container.get_authorize_payment_handler = get_authorize_payment_handler
+    container.get_refund_payment_handler = get_refund_payment_handler

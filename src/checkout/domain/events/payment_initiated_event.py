@@ -5,7 +5,6 @@ from decimal import Decimal
 class PaymentInitiatedEvent:
     session_token: str
     user_email: str
-    otp_code: str
     merchant_name: str
     amount: Decimal
     currency_code: str

@@ -3,7 +3,6 @@
     "docs",
     "src\\common",
     "src\\identity",
-    "src\\ledger",
     "todo1.md",
     "todo.md",
     "start.sh",
@@ -16,8 +15,9 @@
     "content.txt",
     "command.txt",
     "tests",
-    "static\\css"
+    "static\\css",
+    "src\\checkout"
   ],
-  "lastModified": "2026-06-29T23:44:21.802Z",
+  "lastModified": "2026-06-30T01:07:43.643Z",
   "version": 1
 }

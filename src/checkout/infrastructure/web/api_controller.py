@@ -7,15 +7,11 @@ from src.identity.domain.value_objects.api_key import ApiKey
 from src.identity.infrastructure.persistence.sqlite_merchant_repository import SqliteMerchantRepository
 
 from src.checkout.application.commands.initiate_payment_command import InitiatePaymentCommand
-from src.checkout.application.handlers.initiate_payment_handler import InitiatePaymentHandler
 from src.checkout.application.commands.refund_payment_command import RefundPaymentCommand
 from src.checkout.application.handlers.refund_payment_handler import RefundPaymentHandler
 
-from src.checkout.infrastructure.persistence.sqlite_session_repository import SqliteSessionRepository
 from src.checkout.infrastructure.persistence.ledger_refund_adapter import LedgerRefundAdapter
 from src.checkout.infrastructure.persistence.ledger_verification_adapter import LedgerVerificationAdapter
-from src.checkout.infrastructure.services.session_token_generator import SecureSessionTokenGenerator
-from src.checkout.infrastructure.services.otp_generator import SecureOtpGenerator
 from src.common.domain.exceptions import DomainException
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -62,13 +58,7 @@ def pay():
         )
         
         with uow:
-            handler = InitiatePaymentHandler(
-                uow=uow,
-                session_repo=SqliteSessionRepository(uow),
-                event_bus=event_bus,
-                token_gen=SecureSessionTokenGenerator(),
-                otp_gen=SecureOtpGenerator()
-            )
+            handler = current_app.di_container.get_initiate_payment_handler(uow)
             
             token = handler.handle(command)
         
@@ -99,10 +89,7 @@ def refund():
         command = RefundPaymentCommand(transaction_id=int(data['transaction_id']))
         
         with uow:
-            handler = RefundPaymentHandler(
-                uow=uow,
-                refund_port=LedgerRefundAdapter(uow, event_bus)
-            )
+            handler = current_app.di_container.get_refund_payment_handler(uow)
             
             handler.handle(command)
         

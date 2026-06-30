@@ -30,6 +30,7 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 - **Transactional Boundary**: `SqliteUnitOfWork` ensures atomic commits and rollbacks.
 - **Schema Definition**: Full DDL for all tables used by the Ledger context.
 - **Concurrency Control**: Enforcing optimistic locking to ensure data integrity under concurrent loads.
+- **Concurrency & Locking**: Enables `PRAGMA journal_mode=WAL;` on connection initialization. This transitions SQLite from rollback journal mode to Write-Ahead Logging, allowing concurrent readers and writers. This is critical to prevent "database is locked" errors when the background Outbox Relay Worker processes events simultaneously with foreground HTTP requests.
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
@@ -144,11 +145,13 @@ The **Ledger Infrastructure & Persistence** module implements the repository por
 | `id` | INTEGER | PRIMARY KEY AUTOINCREMENT |
 | `token` | TEXT | NOT NULL, UNIQUE |
 | `merchant_id` | INTEGER | NOT NULL, FOREIGN KEY → `merchants(id)` |
-| `amount` | REAL | NOT NULL |
+| `amount` | TEXT | NOT NULL |
 | `currency_id` | INTEGER | NOT NULL, FOREIGN KEY → `currencies(id)` |
 | `user_email` | TEXT | NOT NULL |
 | `callback_url` | TEXT | NOT NULL |
-| `otp_code` | TEXT | NOT NULL |
+| `otp_code` | TEXT | Nullable. Generated only upon explicit user request. |
+| `otp_locked_card` | TEXT | Nullable. The specific card number the OTP is cryptographically bound to. |
+| `otp_expires_at` | TIMESTAMP | Nullable. Expiration time for the OTP (e.g., 3 minutes). |
 | `status` | TEXT | DEFAULT 'Initiated' |
 | `transaction_id` | INTEGER | FOREIGN KEY → `transactions(id)` |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
@@ -212,4 +215,20 @@ def add(self, transaction: Transaction) -> int:
 **Previous Violation**: Financial Data Integrity
 **Previous Issue**: `accounts.balance` and `transactions.amount` were defined as `REAL` (IEEE 754 floating-point).
 **Resolution**: Schema migrated to `TEXT NOT NULL DEFAULT '0.00'`. Money is stored as the exact string representation of `Decimal`. All repository read/write mappings utilize `str()` and `Decimal()` to guarantee precision.
+**Status**: ✅ Resolved
+### TD-11: Identity Leakage in Ledger Domain Events - RESOLVED
+**Previous Violation**: Constitution Rule 1 (Dependency Inward) & Rule 5 (Cross-Context Boundaries).
+**Previous Issue**: Ledger domain events (`TransactionCompletedEvent`, etc.) carried a `user_email` string. This leaked an Identity concept into the Ledger bounded context and caused receipts to be routed to the Laravel shopper rather than the actual Paymenter account owner.
+**Resolution**: 
+1. Removed `user_email` from all Ledger transaction events.
+2. Replaced it with `payer_account_id: int` (derived from `transaction.from_account_id`).
+3. Introduced an Anti-Corruption Layer (ACL) port (`AccountOwnerResolverPort`) in the Notifications context to dynamically resolve the registered Paymenter user email via the `account_id` at the moment of dispatch.
+**Status**: ✅ Resolved
+
+### TD-12: SQLite Write-Lock Contention & Double Dispatch - RESOLVED
+**Previous Violation**: Infrastructure Reliability & Outbox Pattern Integrity.
+**Previous Issue**: The Outbox Relay Worker held database connections open while executing slow SMTP handlers, causing strict exclusive write locks to collide with foreground HTTP requests. This resulted in "database is locked" errors, causing the worker to falsely assume dispatch failure and send duplicate emails on retry.
+**Resolution**: 
+1. Enabled `PRAGMA journal_mode=WAL;` globally across `SqliteUnitOfWork`, `OutboxEventBusDecorator`, and `OutboxRelayWorker`.
+2. Refactored `OutboxRelayWorker` to strictly decouple the Fetch, Process, and Update phases. Messages are fetched and the read-lock is released *before* handlers execute, and a new transaction is opened *after* execution to update statuses.
 **Status**: ✅ Resolved

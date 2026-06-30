@@ -82,6 +82,9 @@ POST /transactions/create
 Content-Type: application/x-www-form-urlencoded
 
 from_account_id=1&to_account_id=2&amount=100.00&merchant_id=5&user_email=user@example.com
+
+**Architectural Note on `user_email`**: 
+While the payload still accepts `user_email`, this field is now retained **strictly for legacy audit and transaction history purposes**. It is completely decoupled from notification routing. Transaction receipts are now routed asynchronously via the `payer_account_id` (derived from `from_account_id`) using an Anti-Corruption Layer in the Notifications context, ensuring receipts always reach the actual Paymenter account owner.
 ```
 **Validation**: Fails fast via `HoldFundsRequestSchema` if IDs are not integers or amount is not a positive decimal.
 **Success**: Flash message "Funds held successfully." + Redirect to `/transactions/`
@@ -149,10 +152,10 @@ GET /transactions/?status=Pending
   → Check Idempotency-Key (if provided)
   → Map to CompleteFundsCommand(transaction_id=id)
   → CompleteFundsHandler
-    → (See Transaction Application (Commands) module for domain flow)
-  → On success: JSON {success: true, new_status: "Success"}
-  → On Domain Error: JSON {success: false, message: "..."}, HTTP 400 or 409
-  → On System Error: Log stack trace, JSON {success: false, message: "Internal..."}, HTTP 500
+    → Mutates Aggregate & Persists State
+    → Writes Domain Event to Outbox table (Synchronous DB Write)
+  → On success: JSON {success: true, new_status: "Success"} (HTTP Response returns immediately)
+  → Background Outbox Worker asynchronously picks up the event and dispatches it to the Notification context.
 ```
 
 ### 3. Fail & Refund
@@ -161,10 +164,10 @@ GET /transactions/?status=Pending
   → Check Idempotency-Key (if provided)
   → Map to FailAndRefundCommand(transaction_id=id)
   → FailAndRefundHandler
-    → (See Transaction Application (Commands) module for domain flow)
-  → On success: JSON {success: true, new_status: "Refunded"}
-  → On Domain Error: JSON {success: false, message: "..."}, HTTP 400 or 409
-  → On System Error: Log stack trace, JSON {success: false, message: "Internal..."}, HTTP 500
+    → Mutates Aggregates & Persists State
+    → Writes Domain Event to Outbox table (Synchronous DB Write)
+  → On success: JSON {success: true, new_status: "Refunded"} (HTTP Response returns immediately)
+  → Background Outbox Worker asynchronously picks up the event and dispatches it to the Notification context.
 ```
 
 ### 4. Query Transactions
@@ -202,3 +205,8 @@ The following technical debts were completely resolved in the latest iteration:
 - **Lack of Validation (TD-3)**: Resolved by implementing `HoldFundsRequestSchema` to intercept bad data before it reaches the Application layer.
 - **Information Leakage & 500 Leaks**: Resolved by explicitly catching Domain exceptions (returning 4xx) and masking generic `Exception` traces from the client (returning secure 500 + internal `app.logger.error`).
 - **Missing Idempotency**: Resolved by implementing the `@idempotent` decorator on state-mutating API endpoints.
+
+### TD-14: Synchronous HTTP Blocking via Email Dispatch - RESOLVED
+**Previous Issue**: State-mutating API endpoints (Complete/Fail) were blocked from returning HTTP responses until the SMTP adapter finished sending the receipt email.
+**Resolution**: Implemented the Approximate ACID Outbox Pattern. The HTTP request now only performs a fast, local SQLite insert into the `outbox_messages` table. The HTTP response is returned immediately to the client. A background daemon thread (`OutboxRelayWorker`) guarantees eventual delivery of the event to the email dispatcher, complete with exponential backoff and a Dead-Letter Queue (DLQ).
+**Status**: ✅ Resolved

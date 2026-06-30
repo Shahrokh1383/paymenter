@@ -61,7 +61,7 @@ Topup amounts must be strictly greater than zero. Enforced inside the Domain lay
 | Command | Fields | Purpose |
 |---|---|---|
 | `TopupAccountCommand` | `account_id: int`, `amount: Decimal` | Add funds to an account |
-| `UpdateAccountCurrencyCommand` | `account_id: int`, `currency_id: int` | Change account currency |
+| `UpdateAccountCurrencyCommand` | `account_id: int`, `currency_code: str` | Change account currency |
 
 ### Queries (Immutable Dataclasses)
 
@@ -82,13 +82,12 @@ Topup amounts must be strictly greater than zero. Enforced inside the Domain lay
 - **No domain events emitted** for topup operations currently.
 
 **UpdateAccountCurrencyHandler**
-- Dependencies: `UnitOfWork`, `AccountRepository`, `CurrencyQueryPort`
+- Dependencies: `UnitOfWork`, `AccountRepository`
 - Flow:
   1. Load `Account` by `command.account_id`.
-  2. Resolve `currency_id` to `currency_code` (string) via `CurrencyQueryPort` (respects Dependency Rule).
-  3. Call `account.change_currency(currency_code)` — Aggregate enforces BR-5 and mutates its own state.
-  4. Call `AccountRepository.update(account)` — Persists fully synchronized aggregate state.
-  5. Commit Unit of Work.
+  2. Call `account.change_currency(command.currency_code)` — Aggregate enforces BR-5 and mutates its own state.
+  3. Call `AccountRepository.update(account)` — Persists fully synchronized aggregate state.
+  4. Commit Unit of Work.
 
 **GetAllAccountsHandler**
 - Dependencies: `AccountQueryPort` (CQRS Read Model)
@@ -150,11 +149,10 @@ class AccountQueryPort(ABC):
 
 ### 2. Update Account Currency
 ```
-[Internal/Admin] → UpdateAccountCurrencyCommand(account_id, currency_id)
+[Internal/Admin] → UpdateAccountCurrencyCommand(account_id, currency_code: str)
   → UpdateAccountCurrencyHandler (Resolved via DIContainer)
     → UoW.begin()
     → AccountRepository.get_by_id(account_id)
-    → CurrencyQueryPort.get_currency_code_by_id(currency_id) [ID to Domain concept translation]
     → account.change_currency(currency_code)                 [Aggregate enforces zero-balance & updates state]
     → AccountRepository.update(account)
     → UoW.commit()

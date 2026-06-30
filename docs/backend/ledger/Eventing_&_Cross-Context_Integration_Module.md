@@ -47,11 +47,12 @@ DIContainer
 ├── event_bus: OutboxEventBusDecorator (singleton, wraps InMemoryEventBus)
 │   ├── Inner Bus: InMemoryEventBus
 │   └── Worker: OutboxRelayWorker (Background Thread)
-└── Subscriptions (Bound in notifications_di.py):
+└── Subscriptions (Bound in notifications_di.py & checkout_di.py):
     ├── TransactionCompletedEvent → ReceiptEmailHandler.handle_completed
     ├── TransactionFailedEvent    → ReceiptEmailHandler.handle_failed
     ├── TransactionRefundedEvent  → ReceiptEmailHandler.handle_refunded
-    └── PaymentInitiatedEvent     → ReceiptEmailHandler.handle_initiated
+    ├── PaymentInitiatedEvent     → (No active subscribers, retained strictly for audit/logging)
+    └── OtpRequestedEvent         → OtpNotificationHandler.handle_otp_requested
 ```
 
 **Notes**:
@@ -73,13 +74,20 @@ DIContainer
 - `ReceiptEmailHandler.handle_completed(TransactionCompletedEvent)`
 - `ReceiptEmailHandler.handle_failed(TransactionFailedEvent)`
 - `ReceiptEmailHandler.handle_refunded(TransactionRefundedEvent)`
-- `ReceiptEmailHandler.handle_initiated(PaymentInitiatedEvent)` — Originates from the Checkout context.
+- `OtpNotificationHandler.handle_otp_requested(OtpRequestedEvent)` — Originates from the Checkout context.
 
 **ReceiptEmailHandler**:
-- Receives the event, extracts `user_email`, `amount` (as `Money` VO), `merchant_id`.
+- Receives Ledger events, extracts `payer_account_id`, `amount` (as `Money` VO), and `merchant_id`.
+- Uses the `AccountOwnerResolverPort` (Anti-Corruption Layer) to dynamically resolve the registered Paymenter user email linked to the `payer_account_id`, ensuring receipts never leak to the Laravel shopper email.
 - Checks `IdempotencyPort` to ensure this event has not been processed before.
-- Delegates to `SmtpAdapter.send()` for actual email delivery.
+- Delegates to `SmtpAdapter.send_receipt()` for actual email delivery.
 - Marks event as processed in `IdempotencyPort` upon success.
+
+**OtpNotificationHandler**:
+- Receives `OtpRequestedEvent` from the Checkout context.
+- Extracts the explicitly resolved `registered_email`, `otp_code`, and transaction details.
+- Checks `IdempotencyPort` to prevent duplicate dispatches.
+- Delegates to `SmtpAdapter.send_otp()`.
 
 ---
 
@@ -89,9 +97,10 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 
 | Event | Fields | Emitted By |
 |---|---|---|
-| `TransactionCompletedEvent` | `transaction_id`, `user_email`, `amount: Money`, `merchant_id` | `CompleteFundsHandler` (after UoW commit) |
+| `TransactionCompletedEvent` | `transaction_id`, `payer_account_id`, `amount: Money`, `merchant_id` | `CompleteFundsHandler` (after UoW commit) |
 | `TransactionFailedEvent` | Same fields | `FailAndRefundHandler` (when Pending → Failed) |
 | `TransactionRefundedEvent` | Same fields | `FailAndRefundHandler` (when Success → Refunded) |
+| `OtpRequestedEvent` | `session_token`, `registered_email`, `otp_code`, `merchant_name`, `amount`, `currency_code` | `RequestOtpHandler` (after UoW commit) |
 
 **Publishing Rule**: Events are prepared **inside** the Unit of Work but published **outside** (after `uow.commit()`). The `OutboxEventBusDecorator` intercepts this external publish call to guarantee persistence prior to HTTP response return.
 
@@ -124,3 +133,6 @@ All events are frozen dataclasses defined in `src/ledger/domain/events/`. They a
 - **TD-9 (Incomplete DI Wiring)**: **RESOLVED**. The `OutboxEventBusDecorator` provides a deterministic, automated wrapper around the base `InMemoryEventBus` during context DI registration, ensuring all published events are intercepted for persistence without manual per-handler wiring.
 - **Future Consideration (True Distributed Outbox)**: The current outbox uses an independent, fast SQLite connection. In a distributed database environment (e.g., Postgres across microservices), this would be upgraded to a Postgres CTE inserting into both the business table and outbox table within the exact same shared transaction/connection.
 - **TD-11 (Outbox & API JSON Serialization Crash)**: **RESOLVED**. Added `_DomainEventEncoder` to `OutboxEventBusDecorator` and updated API controller primitive mapping to safely serialize Domain Value Objects (like `Money`'s `Decimal`) into JSON payloads without violating Constitution Rule 3.
+- **TD-11 (Identity Leakage in Ledger Domain Events)**: **RESOLVED**. Removed `user_email` from Ledger events to respect Bounded Context boundaries (Constitution Rule 1). Replaced with `payer_account_id`. The Notifications context now uses `AccountOwnerResolverPort` (ACL) to resolve the actual account owner's email.
+- **TD-12 (SQLite Write-Lock Contention & Double Dispatch)**: **RESOLVED**. Enabled `PRAGMA journal_mode=WAL;` globally across UoW and Outbox. Refactored `OutboxRelayWorker` to strictly decouple Fetch, Process, and Update phases, preventing background thread collisions with foreground HTTP requests and eliminating duplicate email dispatches.
+- **TD-13 (Premature OTP Generation & Routing)**: **RESOLVED**. Removed OTP generation from `InitiatePaymentHandler`. Introduced explicit `RequestOtpCommand` and `OtpRequestedEvent`. OTPs are now strictly bound to a specific `CardNumber` and routed exclusively to the registered Paymenter email, ignoring the external Laravel shopper email.

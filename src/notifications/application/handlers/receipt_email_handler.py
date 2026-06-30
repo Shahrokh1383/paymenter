@@ -14,7 +14,7 @@ class ReceiptEmailHandler:
         self._dispatcher = dispatcher
         self._merchant_port = merchant_port
         self._idempotency_port = idempotency_port
-        self.acount_resolver = account_resolver
+        self._account_resolver = account_resolver
 
     def _generate_idempotency_key(self, event) -> str:
         return f"{type(event).__name__}_{event.transaction_id}"

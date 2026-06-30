@@ -93,10 +93,15 @@ class OutboxRelayWorker:
         except Exception as e:
             print(f"[OUTBOX ERROR] Failed to update message statuses: {e}")
 
-    def _attempt_dispatch(self, cursor, msg) -> bool:
+    def _attempt_dispatch(self, msg: dict) -> bool:
+        """
+        Attempts to reconstruct and publish a single event to the inner EventBus.
+        Executes outside the database transaction to prevent SQLite locking.
+        """
         try:
             payload_dict = json.loads(msg['payload'])
             event_instance = self._reconstruct_event(msg['event_type'], payload_dict)
+            
             if event_instance:
                 self._inner_bus.publish(event_instance)
                 return True

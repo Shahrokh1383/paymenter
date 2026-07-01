@@ -23,12 +23,12 @@
 
 ## Overview
 
-The **Transaction Application (Commands)** module orchestrates the write-side lifecycle of financial transactions. It defines the three core commands (`HoldFundsCommand`, `CompleteFundsCommand`, `FailAndRefundCommand`) and their corresponding handlers, which coordinate the `Transaction` aggregate, `DoubleEntryLedger` domain service, `Account` aggregates, and domain event publishing.
+The **Transaction Application (Commands)** module orchestrates the write-side lifecycle of financial transactions. It defines the three core commands (`HoldFundsCommand`, `CompleteFundsCommand`, `FailAndRefundCommand`) and their corresponding handlers, which coordinate the `Transaction` aggregate, `DoubleEntryLedger` domain service, `Account` aggregates (including System Escrow), and domain event publishing.
 
 ### Core Responsibilities
-- **Hold Funds**: Initiate a pending transfer between two accounts.
-- **Complete Funds**: Finalize a pending transaction, moving funds to the receiver.
-- **Fail & Refund**: Cancel a pending transaction or reverse a completed one.
+- **Hold Funds**: Initiate a pending transfer between two accounts via a System Escrow account to maintain ledger balance.
+- **Complete Funds**: Finalize a pending transaction, moving funds from Escrow to the receiver.
+- **Fail & Refund**: Cancel a pending transaction (refunding from Escrow) or reverse a completed one (using system reversals).
 - **Event Publishing**: Emit `TransactionCompletedEvent`, `TransactionFailedEvent`, or `TransactionRefundedEvent` after successful commit for cross-context communication.
 - **Unit of Work Coordination**: All handlers manage transactional boundaries via `UnitOfWork`.
 
@@ -36,7 +36,7 @@ The **Transaction Application (Commands)** module orchestrates the write-side li
 | Constitution Rule | Implementation Status |
 |---|---|
 | Rule 1: Dependency Inward | ✅ Application depends on Domain, never the reverse. |
-| Rule 2: New Feature = New File | ✅ Every command/handler is isolated. |
+| Rule 2: New Feature = New File | ✅ Every command/handler/config is isolated (`ledger_config.py` added for Escrow). |
 | Rule 5: Cross-Context via Events | ✅ Enforced. Handlers publish events after UoW commit. |
 | Rule 6: Infrastructure as Plugin | ✅ Handlers depend on abstractions (Repository ports, UoW, EventBus). |
 
@@ -48,7 +48,7 @@ The **Transaction Application (Commands)** module orchestrates the write-side li
 All operations involving two accounts require identical currencies. `CurrencyMismatchError` is raised if `from_acc.balance.currency != to_acc.balance.currency`. Enforced in `HoldFundsHandler` before calling the domain service.
 
 ### BR-4: Double-Entry Accounting
-Every fund movement must balance. Handlers delegate to `DoubleEntryLedger` domain service which enforces the double-entry logic.
+Every fund movement must balance. Handlers delegate to `DoubleEntryLedger` domain service which enforces the double-entry logic by routing pending funds through a System Escrow account.
 
 ### BR-7: Audit Trail
 All state changes (Transaction status changes) must emit a `DomainEvent` for downstream audit and notification. Handlers prepare events inside the UoW but publish them after `uow.commit()`.
@@ -70,35 +70,35 @@ All state changes (Transaction status changes) must emit a `DomainEvent` for dow
 **HoldFundsHandler**
 - Dependencies: `UnitOfWork`, `AccountRepository`, `TransactionRepository`
 - Flow:
-  1. Load `from_acc` and `to_acc` by ID.
-  2. Validate currency match between accounts.
+  1. Load `from_acc`, `to_acc`, and `escrow_acc` (via `SYSTEM_ESCROW_ACCOUNT_ID` from `ledger_config.py`) by ID.
+  2. Validate currency match between sender and receiver.
   3. Convert primitive `Decimal` to `Money` VO using `from_acc.balance.currency`.
   4. Call `DoubleEntryLedger.hold_funds(...)` → returns `Transaction`.
-  5. Update `from_acc` in repository.
-  6. Add `Transaction` to repository (returns `lastrowid`).
+  5. Update `from_acc` and `escrow_acc` in repository.
+  6. Add `Transaction` to repository (returns assigned `txn_id`).
   7. Commit UoW.
   8. Return `txn_id`.
-- ⚠️ **Bug**: The returned `lastrowid` is never assigned to `transaction.id`. The aggregate remains with `id=0`.
 
 **CompleteFundsHandler**
 - Dependencies: `UnitOfWork`, `AccountRepository`, `TransactionRepository`, `EventBus`
 - Flow:
   1. Load `Transaction` by ID.
-  2. Load `to_acc` by `txn.to_account_id`.
-  3. Call `DoubleEntryLedger.complete_funds(txn, to_acc)`.
-  4. Update `txn` and `to_acc` in repositories.
+  2. Load `to_acc` and `escrow_acc` by IDs.
+  3. Call `DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)`.
+  4. Update `txn`, `to_acc`, and `escrow_acc` in repositories.
   5. Commit UoW.
-  6. Prepare `TransactionCompletedEvent` (uses `txn.id` — **will be 0 if transaction was just created**).
+  6. Prepare `TransactionCompletedEvent` (uses correctly assigned `txn.id`).
   7. Publish event outside UoW.
 
 **FailAndRefundHandler**
 - Dependencies: Same as CompleteFundsHandler.
 - Flow:
-  1. Load `Transaction`, `from_acc`, `to_acc`.
-  2. Call `DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc)`.
-  3. Update all three aggregates.
-  4. Commit UoW.
-  5. Publish `TransactionFailedEvent` or `TransactionRefundedEvent` based on final status.
+  1. Load `Transaction`, `from_acc`, `to_acc`, and `escrow_acc`.
+  2. Call `DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc, escrow_acc)`.
+  3. Update `txn`, `from_acc`, and `to_acc` in repositories.
+  4. If status is `Failed`, also update `escrow_acc` in repository. (If `Refunded`, Escrow is untouched as it was zeroed out during completion).
+  5. Commit UoW.
+  6. Publish `TransactionFailedEvent` or `TransactionRefundedEvent` based on final status.
 
 ---
 
@@ -124,16 +124,18 @@ Events are prepared **inside** the Unit of Work but published **outside** (after
     → UoW.begin()
     → AccountRepository.get_by_id(from_id)
     → AccountRepository.get_by_id(to_id)
+    → AccountRepository.get_by_id(SYSTEM_ESCROW_ACCOUNT_ID)
     → Currency Match Validation
     → Money(command.amount, from_acc.currency)
-    → DoubleEntryLedger.hold_funds(from_acc, to_acc, amount, ...)
+    → DoubleEntryLedger.hold_funds(from_acc, to_acc, amount, escrow_acc, ...)
       → from_acc.withdraw(amount)              [Debit Sender]
+      → escrow_acc.deposit(amount)             [Credit Escrow - Fixes TD-7]
       → Transaction.create_pending(...)        [Create Pending Record]
-      → ⚠️ NO CREDIT TO to_acc (LIMBO — see TD-7 in Transaction Domain module)
     → AccountRepository.update(from_acc)
-    → TransactionRepository.add(txn)           → returns lastrowid
+    → AccountRepository.update(escrow_acc)
+    → TransactionRepository.add(txn)           → returns & assigns lastrowid
     → UoW.commit()
-    → Return txn_id (but txn.id still 0)
+    → Return txn_id
 ```
 
 ### 2. Complete Funds
@@ -143,14 +145,18 @@ Events are prepared **inside** the Unit of Work but published **outside** (after
     → UoW.begin()
     → TransactionRepository.get_by_id(id)
     → AccountRepository.get_by_id(txn.to_account_id)
-    → DoubleEntryLedger.complete_funds(txn, to_acc)
+    → AccountRepository.get_by_id(SYSTEM_ESCROW_ACCOUNT_ID)
+    → DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)
       → txn.mark_as_success()                  [State Machine Check]
+      → escrow_acc.withdraw(txn.amount)        [Debit Escrow - Fixes TD-7]
       → to_acc.deposit(txn.amount)             [Credit Receiver]
     → TransactionRepository.update(txn)
     → AccountRepository.update(to_acc)
+    → AccountRepository.update(escrow_acc)
     → UoW.commit()
     → Prepare TransactionCompletedEvent
   → EventBus.publish(event)                    [After UoW]
+    → OutboxEventBusDecorator persists to DB   [Fixes EC-3]
     → ReceiptEmailHandler.handle_completed()
       → SmtpAdapter.send()
 ```
@@ -163,16 +169,18 @@ Events are prepared **inside** the Unit of Work but published **outside** (after
     → TransactionRepository.get_by_id(id)
     → AccountRepository.get_by_id(txn.from_account_id)
     → AccountRepository.get_by_id(txn.to_account_id)
-    → DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc)
+    → AccountRepository.get_by_id(SYSTEM_ESCROW_ACCOUNT_ID)
+    → DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc, escrow_acc)
       → IF status == 'Pending':
         → txn.mark_as_failed()
-        → from_acc.deposit(amount)             [Refund Sender]
+        → escrow_acc.withdraw(amount)         [Debit Escrow]
+        → from_acc.deposit(amount)            [Credit Sender]
       → ELIF status == 'Success':
         → txn.mark_as_refunded()
-        → from_acc.deposit(amount)             [Refund Sender]
-        → to_acc.withdraw(amount)              [Debit Receiver]
-        → ⚠️ May raise InsufficientFundsError if receiver spent funds (see TD-8)
-    → Update all repositories
+        → from_acc.deposit(amount)            [Credit Sender]
+        → to_acc.apply_system_reversal(amount) [Force Debit Receiver - Fixes TD-8]
+    → Update txn, from_acc, to_acc repositories
+    → IF status == 'Failed': Update escrow_acc repository
     → UoW.commit()
     → Prepare TransactionFailedEvent OR TransactionRefundedEvent
   → EventBus.publish(event)
@@ -182,36 +190,37 @@ Events are prepared **inside** the Unit of Work but published **outside** (after
 
 ## Edge Cases & Known Issues
 
-### EC-3: Phantom Events on Rollback
-**Scenario**: An exception occurs inside `CompleteFundsHandler` after `uow.commit()` but before event publishing.
-**Current Behavior**: The transaction is committed, but the event is never published. Downstream systems (Notifications) never receive the receipt trigger.
-**Impact**: Data inconsistency between Ledger and Notifications contexts.
-**Status**: Partially mitigated by publishing after UoW, but no retry/outbox exists.
+### EC-3: Phantom Events on Rollback — ✅ RESOLVED
+**Previous Scenario**: An exception occurs inside `CompleteFundsHandler` after `uow.commit()` but before event publishing.
+**Resolution**: The `OutboxEventBusDecorator` has been implemented and wired via `ledger_di.py`. Events are now atomically persisted to the `outbox_messages` table within the publish call, and a background `OutboxRelayWorker` handles safe delivery. Data consistency is guaranteed.
 
-### EC-4: Transaction ID Zero in Events
-**Scenario**: A newly created transaction emits an event (e.g., if HoldFunds were modified to emit events).
-**Current Behavior**: `SqliteTransactionRepository.add()` returns `lastrowid` but does not assign it to `transaction.id`. The aggregate retains `id=0`.
-**Impact**: All downstream consumers receiving events for new transactions will see `transaction_id=0`, making correlation impossible.
-**Status**: **BUG**. See TD-3.
+### EC-4: Transaction ID Zero in Events — ✅ RESOLVED
+**Previous Scenario**: A newly created transaction emits an event, but `SqliteTransactionRepository.add()` never assigned `lastrowid` back to the aggregate.
+**Resolution**: The `add()` method in `sqlite_transaction_repository.py` now explicitly mutates the aggregate (`transaction.id = cursor.lastrowid`) before returning. Event correlation works perfectly.
 
 ---
 
 ## Notes & Technical Debt
 
-### TD-3: Transaction ID Assignment Bug
-**Violation**: DDD Aggregate Identity Integrity
-**Location**: `src/ledger/infrastructure/persistence/sqlite_transaction_repository.py` → `add()`
-**Current**:
+### TD-3: Transaction ID Assignment Bug — ✅ RESOLVED
+**Previous Violation**: DDD Aggregate Identity Integrity
+**Current Implementation**:
 ```python
+# src/ledger/infrastructure/persistence/sqlite_transaction_repository.py
 def add(self, transaction: Transaction) -> int:
     cursor = ... # INSERT
-    return cursor.lastrowid  # Never assigned back
-```
-**Required Fix**:
-```python
-def add(self, transaction: Transaction) -> int:
-    cursor = ... # INSERT
-    transaction.id = cursor.lastrowid  # Assign identity to aggregate
+    transaction.id = cursor.lastrowid  # Identity correctly synchronized
     return transaction.id
 ```
-Without this fix, `TransactionCompletedEvent` and similar events carry `transaction_id=0` when the transaction was just created (relevant if HoldFunds ever emits events directly, or for any flow that queries the transaction ID after creation).
+
+### TD-7: Double-Entry Violation via "Limbo" Funds — ✅ RESOLVED
+**Previous Violation**: Strict double-entry accounting dictated that every debit must have an immediate credit. Funds were vanishing during the Pending state.
+**Resolution**: Introduced a System Escrow Account (configured in `src/ledger/application/ledger_config.py` as `SYSTEM_ESCROW_ACCOUNT_ID`). 
+- **Hold Flow:** Debit Sender → Credit Escrow.
+- **Complete Flow:** Debit Escrow → Credit Receiver.
+- **Fail Flow:** Debit Escrow → Credit Sender.
+The global ledger now remains perfectly balanced at every micro-step. *(Note: DB must be seeded with the Escrow account ID prior to operation).*
+
+### TD-8: Unrecoverable Refund State on Spent Funds — ✅ RESOLVED
+**Previous Violation**: Reversing a completed transaction called `to_acc.withdraw(amount)`. If the receiver had spent the funds, `InsufficientFundsError` was raised, crashing the refund process.
+**Resolution**: Added a dedicated domain method `Account.apply_system_reversal(amount)` in `account.py`. This method forces a debit (allowing negative balances) specifically for system-initiated chargebacks, bypassing the standard user-facing `withdraw()` invariant checks.

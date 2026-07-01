@@ -20,11 +20,12 @@ class SqliteMerchantRepository(MerchantRepository):
     def toggle_status(self, merchant_id: int) -> None:
         self._uow.conn.execute("UPDATE merchants SET is_active = NOT is_active WHERE id = ?", (merchant_id,))
 
-    def get_all_summaries(self) -> List[Any]:
-        return self._uow.conn.execute("""
+    def get_all_summaries(self) -> List[dict]:
+        rows = self._uow.conn.execute("""
             SELECT m.*, a.balance as settlement_balance 
             FROM merchants m LEFT JOIN accounts a ON m.settlement_account_id = a.id
         """).fetchall()
+        return [dict(row) for row in rows]
 
     def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]:
         row = self._uow.conn.execute("SELECT * FROM merchants WHERE api_key = ?", (api_key.value,)).fetchone()

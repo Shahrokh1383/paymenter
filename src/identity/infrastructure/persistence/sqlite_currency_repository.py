@@ -16,6 +16,13 @@ class SqliteCurrencyRepository(CurrencyRepository):
     def toggle_status(self, currency_id: int) -> None:
         self._uow.conn.execute("UPDATE currencies SET is_active = NOT is_active WHERE id = ?", (currency_id,))
 
-    def get_all(self) -> List[Any]: return self._uow.conn.execute("SELECT * FROM currencies").fetchall()
-    def get_active(self) -> List[Any]: return self._uow.conn.execute("SELECT * FROM currencies WHERE is_active = 1").fetchall()
-    def exists_by_code(self, code: str) -> bool: return self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (code,)).fetchone() is not None
+    def get_all(self) -> List[Currency]: 
+        rows = self._uow.conn.execute("SELECT * FROM currencies").fetchall()
+        return [Currency(id=r['id'], name=r['name'], code=r['code'], is_active=bool(r['is_active'])) for r in rows]
+        
+    def get_active(self) -> List[Currency]: 
+        rows = self._uow.conn.execute("SELECT * FROM currencies WHERE is_active = 1").fetchall()
+        return [Currency(id=r['id'], name=r['name'], code=r['code'], is_active=bool(r['is_active'])) for r in rows]
+        
+    def exists_by_code(self, code: str) -> bool: 
+        return self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (code,)).fetchone() is not None

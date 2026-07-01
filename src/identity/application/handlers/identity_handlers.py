@@ -20,11 +20,24 @@ class OnboardMerchantHandler:
             user = User(id=0, name=f"Merchant: {cmd.name}", phone_email=f"system_merchant_{cmd.name}@paymenter.com")
             user_id = self._user_repo.add(user)
             
-            # 2. Provision settlement account via ACL (Dynamically fetch first active currency)
+            # 2. Provision settlement account via ACL
             active_currencies = self._currency_repo.get_active()
             if not active_currencies:
                 raise ValueError("No active currencies found. Please add a currency first.")
+            
             settlement_acc_id = self._account_port.create_default_account(user_id, active_currencies[0].id)
+
+            merchant = Merchant(
+                id=0,
+                name=cmd.name, 
+                api_key=ApiKey(generate_api_key()), 
+                is_active=True, 
+                settlement_account_id=settlement_acc_id
+            )
+            
+            # 3. Save and commit
+            self._merchant_repo.add(merchant)
+            self._uow.commit()
 
 class ToggleMerchantHandler:
     def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository):
@@ -32,7 +45,6 @@ class ToggleMerchantHandler:
 
     def handle(self, cmd: ToggleMerchantCommand) -> None:
         with self._uow:
-            # Note: For simplicity in this simulator, we fetch and update directly via SQL in the repo
             self._merchant_repo.toggle_status(cmd.merchant_id)
             self._uow.commit()
 

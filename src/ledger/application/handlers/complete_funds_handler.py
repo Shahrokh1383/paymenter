@@ -5,6 +5,7 @@ from src.ledger.domain.repositories import AccountRepository, TransactionReposit
 from src.ledger.domain.services.double_entry_ledger import DoubleEntryLedger
 from src.ledger.domain.events.transaction_events import TransactionCompletedEvent
 from src.ledger.application.commands.complete_funds_command import CompleteFundsCommand
+from src.ledger.application.ledger_config import SYSTEM_ESCROW_ACCOUNT_ID
 
 class CompleteFundsHandler:
     def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, event_bus: EventBus):
@@ -22,13 +23,16 @@ class CompleteFundsHandler:
                 raise InvalidTransactionStateError("Transaction not found.")
                 
             to_acc = self._account_repo.get_by_id(txn.to_account_id)
-            if not to_acc:
-                raise AccountNotFoundError("Destination account not found.")
+            escrow_acc = self._account_repo.get_by_id(SYSTEM_ESCROW_ACCOUNT_ID)
+            
+            if not to_acc or not escrow_acc:
+                raise AccountNotFoundError("Destination or System Escrow account not found.")
 
-            DoubleEntryLedger.complete_funds(txn, to_acc)
+            DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)
             
             self._txn_repo.update(txn)
             self._account_repo.update(to_acc)
+            self._account_repo.update(escrow_acc)
             self._uow.commit()
 
             event_to_publish = TransactionCompletedEvent(

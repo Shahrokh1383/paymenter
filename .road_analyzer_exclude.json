@@ -16,8 +16,9 @@
     "command.txt",
     "tests",
     "static\\css",
-    "src\\checkout"
+    "src\\checkout",
+    "src\\notifications"
   ],
-  "lastModified": "2026-06-30T01:07:43.643Z",
+  "lastModified": "2026-07-01T09:22:38.976Z",
   "version": 1
 }

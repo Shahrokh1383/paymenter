@@ -1,5 +1,5 @@
 # Transaction Domain Module — Single Source of Truth Documentation
-## Paymenter Project | Version 1.0.0
+## Paymenter Project | Version 1.1.0
 
 ---
 
@@ -22,63 +22,61 @@
 
 ## Overview
 
-The **Transaction Domain** module is the financial core of the Ledger bounded context. It defines the `Transaction` aggregate with its strict state machine, the `DoubleEntryLedger` domain service that orchestrates fund movements, and the domain events emitted for cross-context communication. This module is pure domain logic with zero external dependencies.
+The **Transaction Domain** module is the financial core of the Ledger bounded context. It defines the `Transaction` aggregate with its strict state machine, the `DoubleEntryLedger` domain service that orchestrates mathematically balanced fund movements via a System Escrow account, and the domain events emitted for cross-context communication. This module is pure domain logic with zero external dependencies.
 
 ### Core Responsibilities
 - **Transaction Lifecycle**: Enforcing the immutable state machine: `Pending` → `Success` / `Failed` / `Refunded`.
-- **Double-Entry Enforcement**: Ensuring every fund movement has a corresponding debit and credit (currently partially flawed — see TD-7).
-- **Currency Validation**: All fund movements between two accounts require identical currencies.
-- **Audit & Events**: Defining `TransactionCompletedEvent`, `TransactionFailedEvent`, `TransactionRefundedEvent` for downstream contexts.
+- **Double-Entry Enforcement**: Guaranteeing that every debit has an immediate, corresponding credit. The `Pending` state is balanced by routing funds through a dynamically resolved System Escrow account.
+- **State Transition Protection**: The aggregate exclusively controls its own status mutations, raising `InvalidTransactionStateError` on illegal transitions.
+- **Audit & Events**: Defining strictly isolated Domain Events (free of Identity leakage) for downstream contexts.
 
 ### Architectural Alignment
 | Constitution Rule | Implementation Status |
 |---|---|
-| Rule 1: Dependency Inward | ✅ Enforced. Domain has zero external imports. |
-| Rule 2: New Feature = New File | ✅ Enforced. Every entity/service/event is isolated. |
-| Rule 3: No Primitive Obsession | ⚠️ Violated — `status: str` with magic strings (see TD-1). |
-| Rule 4: Aggregates Protect Invariants | ✅ Transaction enforces its own state transitions. |
-| Rule 5: Cross-Context via Events | ✅ Events defined here; publishing orchestrated in Application layer. |
+| Rule 1: Dependency Inward | ✅ Enforced. Domain has zero external/framework imports. |
+| Rule 2: New Feature = New File | ✅ Enforced. Entity, service, events, and ports are strictly isolated. |
+| Rule 3: No Primitive Obsession | ⚠️ Partially Accepted — `status: str` uses controlled magic strings (see TD-1). Currency/Amount strictly use `Money` & `CurrencyCode` VOs. |
+| Rule 4: Aggregates Protect Invariants | ✅ Transaction enforces its own state transitions. Account protects balance invariants. |
+| Rule 5: Cross-Context via Events | ✅ Events defined here; publishing orchestrated in Application layer via Outbox. |
 
 ---
 
 ## Business Rules
 
 ### BR-2: Currency Homogeneity
-All operations involving two accounts (hold, complete, refund) require identical currencies. `CurrencyMismatchError` is raised if `from_acc.balance.currency != to_acc.balance.currency`.
+All operations involving two accounts require identical currencies. Enforced at the Application layer before invoking the Domain service, and re-validated inside `Account` methods during `withdraw()`/`deposit()`.
 
 ### BR-3: Transaction State Machine
 A `Transaction` has a strict, immutable state machine:
 - `Pending` → `Success` (via `mark_as_success()`)
 - `Pending` → `Failed` (via `mark_as_failed()`)
 - `Success` → `Refunded` (via `mark_as_refunded()`)
-Any other transition raises `InvalidTransactionStateError`.
+Any illegal transition raises `InvalidTransactionStateError`.
 
 ### BR-4: Double-Entry Accounting
-Every fund movement must balance. The `DoubleEntryLedger` domain service ensures:
-- **Hold**: Debit `from_acc`, Credit `to_acc` (currently **flawed** — see TD-7). Funds enter a "limbo" state.
-- **Complete**: Debit `Pending` liability, Credit `to_acc`.
-- **Refund (Pending)**: Credit `from_acc` (reverse the hold).
-- **Refund (Success)**: Credit `from_acc`, Debit `to_acc` (reverse the completion).
+Every fund movement must balance. The `DoubleEntryLedger` domain service guarantees mathematical equilibrium at every micro-step:
+- **Hold**: Debit `from_acc`, Credit `escrow_acc`. (Funds are safely held, never in "limbo").
+- **Complete**: Debit `escrow_acc`, Credit `to_acc`.
+- **Fail (Pending)**: Debit `escrow_acc`, Credit `from_acc`.
+- **Refund (Success)**: Credit `from_acc`, Force Debit `to_acc` (via system reversal).
 
 ### BR-7: Audit Trail
-All state changes (Transaction status changes, Account balance changes) must emit a `DomainEvent` for downstream audit and notification.
+All terminal state changes must emit a `DomainEvent` for downstream audit and notification. Events are constructed inside the Unit of Work but published strictly after `uow.commit()`.
 
 ---
 
 ## Backend Architecture — Domain Layer
 
 ### Directory
-```
+```text
 src/ledger/domain/
 ├── entities/
-│   └── transaction.py      # Transaction aggregate
+│   └── transaction.py          # Transaction aggregate
 ├── services/
-│   └── double_entry_ledger.py  # Domain service
+│   └── double_entry_ledger.py  # Pure domain service
 ├── events/
-│   ├── transaction_completed_event.py
-│   ├── transaction_failed_event.py
-│   └── transaction_refunded_event.py
-└── repositories.py         # TransactionRepository abstract port
+│   └── transaction_events.py   # Frozen dataclass events
+└── repositories.py             # TransactionRepository abstract port
 ```
 
 ### Transaction Entity
@@ -88,41 +86,45 @@ class Transaction:
     id: int
     from_account_id: int
     to_account_id: int
-    amount: Money
-    status: str                        # ⚠️ PRIMITIVE OBSESSION (see TD-1)
+    amount: Money                 # Strict Value Object (Decimal + CurrencyCode)
+    status: str                   # ⚠️ Controlled primitive (see TD-1)
     merchant_id: Optional[int]
-    user_email: Optional[str]
+    user_email: Optional[str]     # Retained strictly for legacy audit/display
+    version: int = 0
 ```
-**Methods:**
+**Domain Methods:**
 - `create_pending(...) -> Transaction`: Factory method. Initializes with `id=0` and `status='Pending'`.
-- `mark_as_success()`: Validates `status == 'Pending'`, then sets `'Success'`.
-- `mark_as_failed()`: Validates `status == 'Pending'`, then sets `'Failed'`.
-- `mark_as_refunded()`: Validates `status == 'Success'`, then sets `'Refunded'`.
+- `mark_as_success()`: Validates `status == 'Pending'`, transitions to `'Success'`.
+- `mark_as_failed()`: Validates `status == 'Pending'`, transitions to `'Failed'`.
+- `mark_as_refunded()`: Validates `status == 'Success'`, transitions to `'Refunded'`.
 
 ### DoubleEntryLedger (Domain Service)
-Pure domain service orchestrating fund movements. Contains **NO** infrastructure dependencies.
+Pure domain service orchestrating fund movements. Contains **zero** infrastructure dependencies. Relies on `Account` aggregates to enforce balance invariants.
 
-- `hold_funds(from_acc, to_acc, amount, merchant_id, user_email) -> Transaction`:
+- `hold_funds(from_acc, to_acc, amount, escrow_acc, merchant_id, user_email) -> Transaction`:
   - Calls `from_acc.withdraw(amount)`.
+  - Calls `escrow_acc.deposit(amount)`.
   - Returns a new `Pending` Transaction.
-  - ⚠️ **DOES NOT CREDIT `to_acc`** (see TD-7). Funds enter a "limbo" state.
+  - **Guarantees**: Global ledger remains balanced during the pending phase.
 
-- `complete_funds(txn, to_acc) -> None`:
+- `complete_funds(txn, to_acc, escrow_acc) -> None`:
   - Calls `txn.mark_as_success()`.
+  - Calls `escrow_acc.withdraw(txn.amount)`.
   - Calls `to_acc.deposit(txn.amount)`.
 
-- `fail_and_refund(txn, from_acc, to_acc) -> None`:
-  - If `Pending`: `mark_as_failed()`, then `from_acc.deposit(amount)` (refund sender).
-  - If `Success`: `mark_as_refunded()`, then `from_acc.deposit(amount)` AND `to_acc.withdraw(amount)` (reverse both legs).
-  - ⚠️ If `to_acc` is insolvent, `InsufficientFundsError` bubbles up unhandled (see TD-8).
+- `fail_and_refund(txn, from_acc, to_acc, escrow_acc) -> None`:
+  - If `Pending`: `txn.mark_as_failed()`, `escrow_acc.withdraw(amount)`, `from_acc.deposit(amount)`.
+  - If `Success`: `txn.mark_as_refunded()`, `from_acc.deposit(amount)`, `to_acc.apply_system_reversal(amount)`.
+  - **Guarantees**: Refunds never crash due to receiver insolvency (uses `apply_system_reversal` to bypass standard overdraft checks).
 
 ### Domain Events
-All frozen dataclasses:
-- `TransactionCompletedEvent`: `(transaction_id, user_email, amount: Decimal, currency_code, merchant_id)`
+All frozen dataclasses defined in `transaction_events.py`. **Identity concepts (`user_email`) are strictly excluded** to prevent bounded context leakage (TD-11 Resolved).
+
+- `TransactionCompletedEvent`: `(transaction_id: int, payer_account_id: int, amount: Money, merchant_id: Optional[int])`
 - `TransactionFailedEvent`: Same fields.
 - `TransactionRefundedEvent`: Same fields.
 
-**Event Publishing Rule**: Events are prepared **inside** the Unit of Work but published **outside** (after `uow.commit()`). This prevents "phantom events" from rolling back transactions.
+**Event Publishing Rule**: Events are prepared **inside** the Unit of Work but published **outside** (after `uow.commit()`). The `OutboxEventBusDecorator` intercepts publication, persists the event atomically, and delegates I/O to a background worker.
 
 ### Repository Port (Abstract)
 ```python
@@ -137,92 +139,72 @@ class TransactionRepository(ABC):
 ## Flows
 
 ### 1. Hold Funds (Domain Logic)
-```
-DoubleEntryLedger.hold_funds(from_acc, to_acc, amount, merchant_id, user_email)
+```text
+DoubleEntryLedger.hold_funds(from_acc, to_acc, amount, escrow_acc, ...)
   → from_acc.withdraw(amount)              [Debit Sender]
+  → escrow_acc.deposit(amount)             [Credit Escrow - Balances Ledger]
   → Transaction.create_pending(...)        [Create Pending Record]
-  → ⚠️ NO CREDIT TO to_acc (LIMBO — see TD-7)
-  → Returns Transaction with status='Pending'
+  → Returns Transaction (status='Pending')
 ```
 
 ### 2. Complete Funds (Domain Logic)
-```
-DoubleEntryLedger.complete_funds(txn, to_acc)
-  → txn.mark_as_success()                  [State Machine Check: must be Pending]
+```text
+DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)
+  → txn.mark_as_success()                  [State Machine: Pending → Success]
+  → escrow_acc.withdraw(txn.amount)        [Debit Escrow]
   → to_acc.deposit(txn.amount)             [Credit Receiver]
 ```
 
 ### 3. Fail & Refund (Domain Logic)
-```
-DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc)
+```text
+DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc, escrow_acc)
   → IF status == 'Pending':
-    → txn.mark_as_failed()
-    → from_acc.deposit(amount)             [Refund Sender]
+    → txn.mark_as_failed()                 [State Machine: Pending → Failed]
+    → escrow_acc.withdraw(amount)          [Debit Escrow]
+    → from_acc.deposit(amount)             [Credit Sender]
   → ELIF status == 'Success':
-    → txn.mark_as_refunded()
-    → from_acc.deposit(amount)             [Refund Sender]
-    → to_acc.withdraw(amount)              [Debit Receiver]
-    → ⚠️ May raise InsufficientFundsError if receiver spent funds (see TD-8)
+    → txn.mark_as_refunded()               [State Machine: Success → Refunded]
+    → from_acc.deposit(amount)             [Credit Sender]
+    → to_acc.apply_system_reversal(amount) [Force Debit Receiver - Bypasses Overdraft]
 ```
 
 ---
 
 ## Edge Cases & Known Issues
 
-### EC-2: Refund of Spent Funds (To Account Insolvency)
-**Scenario**: A transaction is `Success`. The receiver (`to_acc`) spends the funds. Later, the merchant/system requests a refund.
-**Current Behavior**: `DoubleEntryLedger.fail_and_refund()` calls `to_acc.withdraw(amount)`, which raises `InsufficientFundsError`. This bubbles up to the caller unhandled.
-**Impact**: **CRITICAL**. Refund operations can fail unpredictably. No domain policy exists for overdrafts or refund rejection workflows.
-**Status**: Unhandled. See TD-8.
+### EC-2: Refund of Spent Funds (Receiver Insolvency) — ✅ RESOLVED
+**Previous Scenario**: Refunding a `Success` transaction called `to_acc.withdraw()`. If the receiver spent the funds, `InsufficientFundsError` crashed the flow.
+**Resolution**: Introduced `Account.apply_system_reversal(amount)`. This dedicated domain method forces a debit, explicitly allowing negative balances for system-initiated chargebacks. The refund flow now completes deterministically regardless of the receiver's balance.
 
-### EC-7: Ghost Funds on Crash During Hold
-**Scenario**: System crashes after `from_acc.withdraw()` but before `TransactionRepository.add()` (in Application layer).
-**Current Behavior**: The sender's balance is decremented, but no transaction record exists. The money is unaccounted for.
-**Impact**: **CRITICAL**. Money disappears from the system.
-**Mitigation**: The entire operation is wrapped in `UnitOfWork` (at Application layer), so a crash before `commit()` results in a database rollback. However, the lack of an escrow account means the accounting equation is violated during the `Pending` state (see TD-7).
+### EC-7: Ghost Funds on Crash During Hold — ✅ RESOLVED
+**Previous Scenario**: Crash after `from_acc.withdraw()` but before persisting the transaction left funds in an unaccounted state.
+**Resolution**: 
+1. The entire operation is wrapped in `SqliteUnitOfWork`. Any crash before `commit()` triggers an automatic database rollback.
+2. The introduction of the Escrow account ensures that even in-memory, the accounting equation (`Assets = Liabilities + Equity`) is never violated. Funds are explicitly credited to Escrow before the transaction record is created.
 
 ---
 
 ## Notes & Technical Debt
 
+*(Resolved) TD-7: Missing Escrow Account in Double-Entry*
+**Previous Violation**: `hold_funds` debited the sender but never credited a destination, violating double-entry accounting and leaving funds in "limbo".
+**Resolution**: Refactored `DoubleEntryLedger` to accept an `escrow_acc: Account` parameter. `hold_funds` now explicitly credits the escrow account. `complete_funds` and `fail_and_refund` correctly debit/credit escrow to maintain perfect ledger equilibrium at every state transition.
+**Status**: ✅ Resolved
+
+*(Resolved) TD-8: Unhandled Refund Insolvency*
+**Previous Violation**: Business Rule Gap. Refunds crashed if the destination account lacked funds.
+**Resolution**: Implemented `Account.apply_system_reversal(amount)` in the Domain layer. The `fail_and_refund` service now routes successful refunds through this method, guaranteeing system-level reversals never fail due to user-side balance constraints.
+**Status**: ✅ Resolved
+
+*(Resolved) TD-11: Identity Leakage in Ledger Domain Events*
+**Previous Violation**: Constitution Rule 1 & 5. Events carried `user_email`, leaking Identity context into Ledger.
+**Resolution**: Replaced `user_email` with `payer_account_id: int` in all transaction events. The Notifications context resolves the email dynamically via an Anti-Corruption Layer.
+**Status**: ✅ Resolved
+
 ### TD-1: TransactionStatus as Primitive String
 **Violation**: Constitution Rule 3 (Primitive Obsession)
 **Location**: `src/ledger/domain/entities/transaction.py`
-**Current**: `status: str` with magic strings `'Pending'`, `'Success'`, `'Failed'`, `'Refunded'`.
-**Required Fix**: Introduce `TransactionStatus` as an Enum or sealed Value Object:
-```python
-class TransactionStatus(Enum):
-    PENDING = "Pending"
-    SUCCESS = "Success"
-    FAILED = "Failed"
-    REFUNDED = "Refunded"
-```
-The `Transaction` entity should expose `transition_to(new_status: TransactionStatus)` which validates allowed transitions internally.
-
-### TD-7: Missing Escrow Account in Double-Entry
-**Violation**: Double-Entry Accounting Integrity
-**Location**: `src/ledger/domain/services/double_entry_ledger.py` → `hold_funds()`
-**Current**: `hold_funds` debits `from_acc` but never credits `to_acc`. Funds are in "limbo." The global accounting equation is violated during the `Pending` state.
-**Required Fix**:
-1. Introduce a system-level `EscrowAccount` (or `PendingTransactions` liability account).
-2. `hold_funds` should:
-   - `from_acc.withdraw(amount)`
-   - `escrow_acc.deposit(amount)`
-3. `complete_funds` should:
-   - `escrow_acc.withdraw(amount)`
-   - `to_acc.deposit(amount)`
-4. `fail_and_refund` (Pending) should:
-   - `escrow_acc.withdraw(amount)`
-   - `from_acc.deposit(amount)`
-5. `fail_and_refund` (Success) should:
-   - `to_acc.withdraw(amount)`
-   - `from_acc.deposit(amount)`
-   (No escrow involved because funds already settled).
-
-### TD-8: Unhandled Refund Insolvency
-**Violation**: Business Rule Gap
-**Location**: `src/ledger/domain/services/double_entry_ledger.py` → `fail_and_refund()`
-**Current**: If `to_acc` lacks funds during a `Success` → `Refunded` transition, `InsufficientFundsError` propagates uncaught.
-**Required Fix**:
-**Option A (Overdraft Policy)**: Allow `to_acc` balance to go negative during refund reversals. Introduce `Account.withdraw(amount, allow_overdraft: bool = False)`.
-**Option B (Policy Rejection)**: Before calling `fail_and_refund`, check `to_acc.balance >= txn.amount`. If insufficient, emit `RefundRejectedEvent` and return a graceful failure to the caller instead of raising an exception.
+**Current**: `status: str` relies on controlled magic strings (`'Pending'`, `'Success'`, `'Failed'`, `'Refunded'`).
+**Impact**: Low. The aggregate strictly controls transitions via dedicated methods (`mark_as_success()`, etc.), preventing invalid states. No external code can mutate `status` directly without bypassing the domain API.
+**Recommended Future Fix**: Introduce a `TransactionStatus(Enum)` or sealed Value Object and expose a `transition_to(new_status)` method. Deferred to maintain KISS and avoid over-engineering until status-dependent business logic expands.
+**Status**: ⚠️ Accepted / Low Priority

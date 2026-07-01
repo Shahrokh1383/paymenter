@@ -2,17 +2,18 @@ from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.common.domain.ports.event_bus import EventBus
 from src.common.domain.exceptions import AccountNotFoundError, InvalidTransactionStateError
 from src.ledger.domain.repositories import AccountRepository, TransactionRepository
+from src.ledger.domain.ports.system_account_resolver_port import SystemAccountResolverPort
 from src.ledger.domain.services.double_entry_ledger import DoubleEntryLedger
 from src.ledger.domain.events.transaction_events import TransactionCompletedEvent
 from src.ledger.application.commands.complete_funds_command import CompleteFundsCommand
-from src.ledger.application.ledger_config import SYSTEM_ESCROW_ACCOUNT_ID
 
 class CompleteFundsHandler:
-    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, event_bus: EventBus):
+    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, event_bus: EventBus, system_account_resolver: SystemAccountResolverPort):
         self._uow = uow
         self._account_repo = account_repo
         self._txn_repo = txn_repo
         self._event_bus = event_bus
+        self._system_account_resolver = system_account_resolver
 
     def handle(self, command: CompleteFundsCommand) -> None:
         event_to_publish = None
@@ -23,11 +24,13 @@ class CompleteFundsHandler:
                 raise InvalidTransactionStateError("Transaction not found.")
                 
             to_acc = self._account_repo.get_by_id(txn.to_account_id)
-            escrow_acc = self._account_repo.get_by_id(SYSTEM_ESCROW_ACCOUNT_ID)
-            
-            if not to_acc or not escrow_acc:
-                raise AccountNotFoundError("Destination or System Escrow account not found.")
+            if not to_acc:
+                raise AccountNotFoundError("Destination account not found.")
 
+            # Dynamically resolve Escrow account for this specific currency
+            escrow_acc = self._system_account_resolver.get_escrow_account(txn.amount.currency)
+            
+            # Deduplicate in-memory references to prevent self-inflicted optimistic locking conflicts
             if to_acc.id == escrow_acc.id:
                 to_acc = escrow_acc
 

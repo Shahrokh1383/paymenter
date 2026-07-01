@@ -1,8 +1,6 @@
 {
   "excludedPaths": [
     "docs",
-    "src\\common",
-    "src\\identity",
     "todo1.md",
     "todo.md",
     "start.sh",
@@ -19,6 +17,6 @@
     "src\\checkout",
     "src\\notifications"
   ],
-  "lastModified": "2026-07-01T09:22:38.976Z",
+  "lastModified": "2026-07-01T12:13:30.079Z",
   "version": 1
 }

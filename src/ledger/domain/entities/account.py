@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from src.common.domain.value_objects.money import Money
 from src.common.domain.exceptions import InsufficientFundsError, CurrencyMismatchError
 from src.ledger.domain.value_objects.account_number import AccountNumber
@@ -6,7 +7,7 @@ from src.ledger.domain.value_objects.account_number import AccountNumber
 @dataclass
 class Account:
     id: int
-    user_id: int
+    user_id: Optional[int]
     account_number: AccountNumber
     balance: Money
     version: int = 0

@@ -3,8 +3,12 @@ from decimal import Decimal, InvalidOperation
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
 # Identity Imports
-from src.identity.application.commands.identity_commands import OnboardMerchantCommand, ToggleMerchantCommand, AddCurrencyCommand, ToggleCurrencyCommand
-from src.identity.application.handlers.identity_handlers import OnboardMerchantHandler, ToggleMerchantHandler, AddCurrencyHandler, ToggleCurrencyHandler
+from src.identity.application.commands.identity_commands import OnboardMerchantCommand, ToggleMerchantCommand, ToggleCurrencyCommand
+from src.identity.application.handlers.identity_handlers import OnboardMerchantHandler, ToggleMerchantHandler, ToggleCurrencyHandler
+
+# Ledger Imports (Cross-Context Boundary)
+from src.ledger.application.commands.create_currency_command import CreateCurrencyCommand
+
 from src.identity.application.queries.identity_queries import GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery, GetAllCurrenciesQuery
 from src.identity.application.handlers.identity_query_handlers import GetAllUsersHandler, SearchUsersHandler, GetAllMerchantsHandler, GetAllCurrenciesHandler
 from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository
@@ -34,8 +38,8 @@ def currencies():
 def add_currency():
     try:
         uow = SqliteUnitOfWork()
-        handler = AddCurrencyHandler(uow, SqliteCurrencyRepository(uow))
-        handler.handle(AddCurrencyCommand(name=request.form['name'], code=request.form['code']))
+        handler = current_app.di_container.get_create_currency_handler(uow)
+        handler.handle(CreateCurrencyCommand(name=request.form['name'], code=request.form['code']))
     except Exception as e: flash(str(e), 'error')
     return redirect(url_for('dashboard.currencies'))
 
@@ -118,7 +122,7 @@ def merchants():
 def add_merchant():
     try:
         uow = SqliteUnitOfWork()
-        handler = OnboardMerchantHandler(uow, SqliteUserRepository(uow), SqliteMerchantRepository(uow), LedgerAccountProvisioningAdapter(uow))
+        handler = OnboardMerchantHandler(uow, SqliteUserRepository(uow), SqliteMerchantRepository(uow), LedgerAccountProvisioningAdapter(uow), SqliteCurrencyRepository(uow))
         handler.handle(OnboardMerchantCommand(name=request.form['name']))
     except Exception as e: flash(str(e), 'error')
     return redirect(url_for('dashboard.merchants'))

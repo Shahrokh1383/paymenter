@@ -24,10 +24,11 @@ class Database:
         master_schema = IDENTITY_SCHEMA + LEDGER_SCHEMA + CHECKOUT_SCHEMA + EVENTING_SCHEMA
         cursor.executescript(master_schema)
         
-        # Seed default currency
-        cursor.execute("SELECT COUNT(*) FROM currencies")
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("INSERT INTO currencies (name, code, is_active) VALUES (?, ?, ?)", ('Toman', 'IRR', 1))
+        # Seed System User for System/Escrow Account Foreign Key Integrity
+        cursor.execute("""
+            INSERT OR IGNORE INTO users (id, name, phone_email) 
+            VALUES (0, 'System', 'system@paymenter.local')
+        """)
             
         conn.commit()
         conn.close()

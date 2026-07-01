@@ -11,8 +11,8 @@ from src.identity.application.commands.identity_commands import (
 )
 
 class OnboardMerchantHandler:
-    def __init__(self, uow: UnitOfWork, user_repo: UserRepository, merchant_repo: MerchantRepository, account_port: AccountProvisioningPort):
-        self._uow, self._user_repo, self._merchant_repo, self._account_port = uow, user_repo, merchant_repo, account_port
+    def __init__(self, uow: UnitOfWork, user_repo: UserRepository, merchant_repo: MerchantRepository, account_port: AccountProvisioningPort, currency_repo: CurrencyRepository):
+        self._uow, self._user_repo, self._merchant_repo, self._account_port, self._currency_repo = uow, user_repo, merchant_repo, account_port, currency_repo
 
     def handle(self, cmd: OnboardMerchantCommand) -> None:
         with self._uow:
@@ -20,13 +20,11 @@ class OnboardMerchantHandler:
             user = User(id=0, name=f"Merchant: {cmd.name}", phone_email=f"system_merchant_{cmd.name}@paymenter.com")
             user_id = self._user_repo.add(user)
             
-            # 2. Provision settlement account via ACL (Currency ID 1 = Toman)
-            settlement_acc_id = self._account_port.create_default_account(user_id, 1)
-            
-            # 3. Create Merchant Aggregate
-            merchant = Merchant(id=0, name=cmd.name, api_key=ApiKey(generate_api_key()), is_active=True, settlement_account_id=settlement_acc_id)
-            self._merchant_repo.add(merchant)
-            self._uow.commit()
+            # 2. Provision settlement account via ACL (Dynamically fetch first active currency)
+            active_currencies = self._currency_repo.get_active()
+            if not active_currencies:
+                raise ValueError("No active currencies found. Please add a currency first.")
+            settlement_acc_id = self._account_port.create_default_account(user_id, active_currencies[0].id)
 
 class ToggleMerchantHandler:
     def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository):

@@ -28,6 +28,7 @@ class SqliteAccountReadModel(AccountQueryPort):
             JOIN currencies c ON a.currency_id = c.id
             JOIN users u ON a.user_id = u.id
             LEFT JOIN user_cards uc ON a.id = uc.account_id
+            WHERE a.user_id IS NOT NULL
         """).fetchall()
 
         return [

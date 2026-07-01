@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>System Escrow Accounts</h1>
+<p><em>These accounts are managed by the system to maintain double-entry ledger balance during pending transactions.</em></p>
+
+<table>
+    <tr>
+        <th>ID</th><th>Currency</th><th>Account Num</th><th>Balance</th><th>Actions</th>
+    </tr>
+    {% for a in accounts %}
+    <tr>
+        <td>{{ a.id }}</td>
+        <td><strong>{{ a.currency_code }}</strong></td>
+        <td>{{ a.account_number }}</td>
+        <td class="balance">{{ a.balance }}</td>
+        <td>
+            <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">
+                <input type="hidden" name="account_id" value="{{ a.id }}">
+                <input type="number" name="amount" step="0.01" placeholder="Amount" required style="width:80px;">
+                <button type="submit">Inject Funds</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

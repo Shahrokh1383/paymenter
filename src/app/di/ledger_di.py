@@ -18,7 +18,8 @@ from src.ledger.application.handlers.topup_account_handler import TopupAccountHa
 from src.ledger.application.handlers.update_account_currency_handler import UpdateAccountCurrencyHandler
 from src.ledger.application.handlers.get_all_accounts_handler import GetAllAccountsHandler
 from src.ledger.application.handlers.create_currency_handler import CreateCurrencyHandler
-
+from src.ledger.infrastructure.persistence.sqlite_escrow_account_read_model import SqliteEscrowAccountReadModel
+from src.ledger.application.handlers.get_all_escrow_accounts_handler import GetAllEscrowAccountsHandler
 
 def register_ledger(container):
     """
@@ -81,6 +82,11 @@ def register_ledger(container):
             currency_repo=SqliteCurrencyCommandRepository(uow),
             account_repo=SqliteAccountRepository(uow)
         )
+    
+    def get_all_escrow_accounts_handler(uow: SqliteUnitOfWork) -> GetAllEscrowAccountsHandler:
+        return GetAllEscrowAccountsHandler(
+            query_port=SqliteEscrowAccountReadModel(uow)
+        )
 
     # Bind factories to the main container instance
     container.get_hold_funds_handler = get_hold_funds_handler
@@ -91,3 +97,4 @@ def register_ledger(container):
     container.get_update_account_currency_handler = get_update_account_currency_handler
     container.get_all_accounts_handler = get_all_accounts_handler
     container.get_create_currency_handler = get_create_currency_handler
+    container.get_all_escrow_accounts_handler = get_all_escrow_accounts_handler

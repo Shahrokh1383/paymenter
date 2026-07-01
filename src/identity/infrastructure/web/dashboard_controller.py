@@ -22,6 +22,7 @@ from src.identity.application.handlers.register_user_handler import RegisterUser
 from src.ledger.application.commands.topup_account_command import TopupAccountCommand
 from src.ledger.application.commands.update_account_currency_command import UpdateAccountCurrencyCommand
 from src.ledger.application.queries.get_all_accounts_query import GetAllAccountsQuery
+from src.ledger.application.queries.get_all_escrow_accounts_query import GetAllEscrowAccountsQuery
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -103,12 +104,20 @@ def topup_account():
         amount = Decimal(str(request.form['amount']))
         
         uow = SqliteUnitOfWork()
-        # FIX TD-9: Resolved via DI Container
         handler = current_app.di_container.get_topup_account_handler(uow)
         handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=amount))
         flash("Topup successful.", 'success')
     except Exception as e: flash(str(e), 'error')
     return redirect(request.referrer or url_for('dashboard.accounts'))
+
+# --- Escrow Accounts ---
+@dashboard_bp.route('/escrow', methods=['GET'])
+def escrow_accounts():
+    uow = SqliteUnitOfWork()
+    with uow:
+        handler = current_app.di_container.get_all_escrow_accounts_handler(uow)
+        escrow_list = handler.handle(GetAllEscrowAccountsQuery())
+    return render_template('escrow_accounts.html', accounts=escrow_list)
 
 # --- Merchants ---
 @dashboard_bp.route('/merchants', methods=['GET'])

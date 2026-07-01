@@ -26,16 +26,15 @@ class SqliteAccountReadModel(AccountQueryPort):
                 a.balance
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
-            JOIN users u ON a.user_id = u.id
+            LEFT JOIN users u ON a.user_id = u.id
             LEFT JOIN user_cards uc ON a.id = uc.account_id
-            WHERE a.user_id IS NOT NULL
         """).fetchall()
 
         return [
             AccountSummary(
                 id=row['id'],
                 user_id=row['user_id'],
-                user_name=row['user_name'],
+                user_name=row['user_name'] or 'System Escrow',
                 currency_id=row['currency_id'],
                 currency_code=row['currency_code'],
                 account_number=row['account_number'],

@@ -15,8 +15,10 @@
     "tests",
     "static\\css",
     "src\\checkout",
-    "src\\notifications"
+    "src\\notifications",
+    "src\\common",
+    "src\\identity"
   ],
-  "lastModified": "2026-07-01T12:13:30.079Z",
+  "lastModified": "2026-07-01T13:46:13.353Z",
   "version": 1
 }

@@ -2,6 +2,7 @@ import sqlite3
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.domain.entities.transaction import Transaction
 from src.common.domain.value_objects.money import Money
+from src.common.domain.value_objects.currency_code import CurrencyCode
 from src.ledger.domain.repositories import TransactionRepository
 from src.common.domain.exceptions import ConcurrencyException
 
@@ -14,7 +15,8 @@ class SqliteTransactionRepository(TransactionRepository):
             id=row['id'],
             from_account_id=row['from_account_id'],
             to_account_id=row['to_account_id'],
-            amount=Money(str(row['amount']), row['currency_code']),
+            # Hydrate with strict Value Object
+            amount=Money(str(row['amount']), CurrencyCode(row['currency_code'])),
             status=row['status'],
             merchant_id=row['merchant_id'],
             user_email=row['user_email'],
@@ -43,11 +45,12 @@ class SqliteTransactionRepository(TransactionRepository):
             transaction.from_account_id, 
             transaction.to_account_id, 
             str(transaction.amount.amount),
-            transaction.amount.currency,
+            transaction.amount.currency.value,
             transaction.status,
             transaction.user_email
         ))
         
+        # Synchronize in-memory aggregate identity
         transaction.id = cursor.lastrowid
         
         return transaction.id

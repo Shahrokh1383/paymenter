@@ -27,6 +27,11 @@ class HoldFundsHandler:
             # Translate primitive Decimal to Domain Value Object using auto-detected currency
             amount_vo = Money(command.amount, from_acc.balance.currency)
 
+            if from_acc.id == escrow_acc.id:
+                from_acc = escrow_acc
+            if to_acc.id == escrow_acc.id:
+                to_acc = escrow_acc
+
             txn = DoubleEntryLedger.hold_funds(
                 from_acc=from_acc, 
                 to_acc=to_acc, 
@@ -37,7 +42,10 @@ class HoldFundsHandler:
             )
             
             self._account_repo.update(from_acc)
-            self._account_repo.update(escrow_acc)
+            if to_acc is not from_acc:
+                self._account_repo.update(to_acc)
+            if escrow_acc is not from_acc and escrow_acc is not to_acc:
+                self._account_repo.update(escrow_acc)
             txn_id = self._txn_repo.add(txn)
             self._uow.commit()
             

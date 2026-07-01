@@ -28,11 +28,15 @@ class CompleteFundsHandler:
             if not to_acc or not escrow_acc:
                 raise AccountNotFoundError("Destination or System Escrow account not found.")
 
+            if to_acc.id == escrow_acc.id:
+                to_acc = escrow_acc
+
             DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)
             
             self._txn_repo.update(txn)
             self._account_repo.update(to_acc)
-            self._account_repo.update(escrow_acc)
+            if escrow_acc is not to_acc:
+                self._account_repo.update(escrow_acc)
             self._uow.commit()
 
             event_to_publish = TransactionCompletedEvent(

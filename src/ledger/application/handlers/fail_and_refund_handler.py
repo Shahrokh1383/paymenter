@@ -29,14 +29,21 @@ class FailAndRefundHandler:
             if not from_acc or not to_acc or not escrow_acc:
                 raise AccountNotFoundError("Associated accounts or System Escrow account not found.")
 
+            if from_acc.id == escrow_acc.id:
+                from_acc = escrow_acc
+            if to_acc.id == escrow_acc.id:
+                to_acc = escrow_acc
+
             DoubleEntryLedger.fail_and_refund(txn, from_acc, to_acc, escrow_acc)
             
             self._txn_repo.update(txn)
             self._account_repo.update(from_acc)
-            self._account_repo.update(to_acc)
+            if to_acc is not from_acc:
+                self._account_repo.update(to_acc)
             
             if txn.status == 'Failed':
-                self._account_repo.update(escrow_acc)
+                if escrow_acc is not from_acc and escrow_acc is not to_acc:
+                    self._account_repo.update(escrow_acc)
                 
             self._uow.commit()
 

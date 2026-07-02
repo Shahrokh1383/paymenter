@@ -14,9 +14,10 @@
     "command.txt",
     "tests",
     "static\\css",
-    "src\\checkout",
-    "src\\notifications"
+    "src\\notifications",
+    "find.py",
+    "src\\checkout"
   ],
-  "lastModified": "2026-07-01T15:29:57.849Z",
+  "lastModified": "2026-07-02T16:03:54.130Z",
   "version": 1
 }

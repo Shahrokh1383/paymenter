@@ -7,6 +7,25 @@
 <h1>All Accounts & Balances</h1>
 
 <div class="form-container">
+    <h2>Create New Account</h2>
+    <form action="{{ url_for('dashboard.create_account') }}" method="POST">
+        <select name="user_id" required>
+            <option value="" disabled selected>Select User</option>
+            {% for u in users %}
+            <option value="{{ u.user_id }}">{{ u.name }} ({{ u.phone_email }})</option>
+            {% endfor %}
+        </select>
+        <select name="currency_code" required>
+            <option value="" disabled selected>Select Currency</option>
+            {% for c in currencies %}
+            <option value="{{ c.code }}">{{ c.code }} ({{ c.name }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Create Account</button>
+    </form>
+</div>
+
+<div class="form-container">
     <h2>Set Account Currency</h2>
     <form action="{{ url_for('dashboard.update_account_currency') }}" method="POST">
         <select name="account_id" required>

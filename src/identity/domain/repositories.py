@@ -36,3 +36,5 @@ class CurrencyRepository(ABC):
     def get_active(self) -> List[Currency]: raise NotImplementedError
     @abstractmethod
     def exists_by_code(self, code: str) -> bool: raise NotImplementedError
+    def exists_by_id(self, user_id: int) -> bool: raise
+    NotImplementedError

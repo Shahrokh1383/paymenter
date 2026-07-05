@@ -8,6 +8,13 @@ from src.identity.application.handlers.identity_handlers import OnboardMerchantH
 
 # Ledger Imports (Cross-Context Boundary)
 from src.ledger.application.commands.create_currency_command import CreateCurrencyCommand
+from src.ledger.application.commands.create_account_command import CreateAccountCommand
+from src.ledger.application.handlers.create_account_handler import CreateAccountHandler
+from src.ledger.application.commands.topup_account_command import TopupAccountCommand
+from src.ledger.application.commands.update_account_currency_command import UpdateAccountCurrencyCommand
+from src.ledger.application.queries.get_all_accounts_query import GetAllAccountsQuery
+from src.ledger.application.queries.get_all_escrow_accounts_query import GetAllEscrowAccountsQuery
+from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
 
 from src.identity.application.queries.identity_queries import GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery, GetAllCurrenciesQuery
 from src.identity.application.handlers.identity_query_handlers import GetAllUsersHandler, SearchUsersHandler, GetAllMerchantsHandler, GetAllCurrenciesHandler
@@ -17,12 +24,6 @@ from src.identity.infrastructure.persistence.sqlite_currency_repository import S
 from src.identity.infrastructure.persistence.ledger_account_provisioning_adapter import LedgerAccountProvisioningAdapter
 from src.identity.application.commands.register_user_command import RegisterUserCommand
 from src.identity.application.handlers.register_user_handler import RegisterUserHandler
-
-# Ledger Imports
-from src.ledger.application.commands.topup_account_command import TopupAccountCommand
-from src.ledger.application.commands.update_account_currency_command import UpdateAccountCurrencyCommand
-from src.ledger.application.queries.get_all_accounts_query import GetAllAccountsQuery
-from src.ledger.application.queries.get_all_escrow_accounts_query import GetAllEscrowAccountsQuery
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -84,20 +85,53 @@ def accounts():
         handler = current_app.di_container.get_all_accounts_handler(uow)
         accounts_list = handler.handle(GetAllAccountsQuery())
         active_currencies = SqliteCurrencyRepository(uow).get_active()
-    return render_template('accounts.html', accounts=accounts_list, currencies=active_currencies)
+        # Fetch all users for the account creation form
+        users_list = GetAllUsersHandler(SqliteUserRepository(uow)).handle(GetAllUsersQuery())
+    return render_template('accounts.html',
+                           accounts=accounts_list,
+                           currencies=active_currencies,
+                           users=users_list)
+
+@dashboard_bp.route('/accounts/create', methods=['POST'])
+def create_account():
+    try:
+        user_id = int(request.form['user_id'])
+        currency_code = request.form['currency_code']
+        uow = SqliteUnitOfWork()
+        # Quick existence check
+        from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository
+        user_repo = SqliteUserRepository(uow)
+        with uow:
+            if not user_repo.exists_by_id(user_id):
+                flash("User does not exist.", 'error')
+                return redirect(url_for('dashboard.accounts'))
+
+        handler = CreateAccountHandler(
+            uow=uow,
+            account_repo=SqliteAccountRepository(uow),
+            event_bus=current_app.di_container.event_bus
+        )
+        account_id = handler.handle(CreateAccountCommand(
+            user_id=user_id,
+            currency_code=currency_code
+        ))
+        flash(f"Account created with ID {account_id}.", 'success')
+    except Exception as e:
+        flash(str(e), 'error')
+    return redirect(url_for('dashboard.accounts'))
 
 @dashboard_bp.route('/accounts/update-currency', methods=['POST'])
 def update_account_currency():
     try:
         uow = SqliteUnitOfWork()
         handler = current_app.di_container.get_update_account_currency_handler(uow)
-        
+
         handler.handle(UpdateAccountCurrencyCommand(
-            account_id=int(request.form['account_id']), 
+            account_id=int(request.form['account_id']),
             currency_code=request.form['currency_code']
         ))
         flash("Account currency updated successfully.", 'success')
-    except Exception as e: 
+    except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.accounts'))
 
@@ -105,7 +139,7 @@ def update_account_currency():
 def topup_account():
     try:
         amount = Decimal(str(request.form['amount']))
-        
+
         uow = SqliteUnitOfWork()
         handler = current_app.di_container.get_topup_account_handler(uow)
         handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=amount))

@@ -52,6 +52,18 @@ class SqliteAccountRepository(AccountRepository):
             
         account.version += 1
 
+    def get_by_account_number(self, account_number: str) -> Account:
+        cursor = self._uow.conn.execute("""
+            SELECT a.id, a.user_id, a.account_number, a.balance, a.version,c.code as currency_code
+            FROM accounts a
+            JOIN currencies c ON a.currency_id = c.id
+            WHERE a.account_number = ?
+        """, (account_number,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return self._map_row_to_account(row)
+
     def add(self, account: Account) -> int:
         # Extract primitive for SQL query
         currency_row = self._uow.conn.execute(

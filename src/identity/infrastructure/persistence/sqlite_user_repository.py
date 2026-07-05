@@ -43,6 +43,10 @@ class SqliteUserRepository(UserRepository):
             balance=str(r['balance']),
             currency_code=r['currency_code']
         ) for r in rows]
+    
+    def exists_by_id(self, user_id: int) -> bool:
+        cursor = self._uow.conn.execute("SELECT 1 FROM users WHERE id = ?",(user_id,))
+        return cursor.fetchone() is not None
 
     def search_summaries(self, query: str) -> List[UserSummaryDTO]:
         like = f"%{query}%"

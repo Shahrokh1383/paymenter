@@ -5,6 +5,9 @@ from src.ledger.domain.entities.transaction import Transaction
 class AccountRepository(ABC):
     @abstractmethod
     def get_by_id(self, account_id: int) -> Account: pass
+
+    @abstractmethod
+    def get_by_account_number(self, account_number: str) -> Account: pass
     
     @abstractmethod
     def update(self, account: Account) -> None: pass

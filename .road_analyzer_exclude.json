@@ -13,15 +13,13 @@
     "content.txt",
     "command.txt",
     "tests",
-    "src\\notifications",
     "find.py",
     "src\\checkout",
-    "static",
-    "templates",
-    "src\\identity",
-    "src\\common",
-    "src\\app"
+    "src\\notifications",
+    "src\\ledger",
+    "src\\app",
+    "static\\css"
   ],
-  "lastModified": "2026-07-05T17:21:34.354Z",
+  "lastModified": "2026-07-05T18:45:09.538Z",
   "version": 1
 }

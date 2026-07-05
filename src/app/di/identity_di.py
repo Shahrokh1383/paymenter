@@ -1,4 +1,3 @@
-from src.app.di_container import DIContainer
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
 # Identity Handlers (domain event subscribers)
@@ -9,15 +8,12 @@ from src.identity.application.handlers.read_model_handlers import (
     CardAssignedReadModelHandler
 )
 
-# Ledger Handlers (domain event subscribers)
-from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
-
 # Events
 from src.identity.domain.events.user_events import UserRegisteredEvent
 from src.ledger.domain.events.account_events import AccountCreatedEvent
 from src.identity.domain.events.card_events import CardAssignedEvent
 
-def register_identity(container: DIContainer):
+def register_identity(container):
     bus = container.event_bus
 
     def uow_factory():

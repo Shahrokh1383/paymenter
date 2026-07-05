@@ -5,10 +5,12 @@ from src.ledger.domain.repositories import AccountRepository, TransactionReposit
 from src.ledger.domain.ports.system_account_resolver_port import SystemAccountResolverPort
 from src.ledger.domain.services.double_entry_ledger import DoubleEntryLedger
 from src.ledger.domain.events.transaction_events import TransactionCompletedEvent
+from src.ledger.domain.events.account_balance_updated_event import AccountBalanceUpdatedEvent
 from src.ledger.application.commands.complete_funds_command import CompleteFundsCommand
 
 class CompleteFundsHandler:
-    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, event_bus: EventBus, system_account_resolver: SystemAccountResolverPort):
+    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository,
+                 event_bus: EventBus, system_account_resolver: SystemAccountResolverPort):
         self._uow = uow
         self._account_repo = account_repo
         self._txn_repo = txn_repo
@@ -17,6 +19,7 @@ class CompleteFundsHandler:
 
     def handle(self, command: CompleteFundsCommand) -> None:
         event_to_publish = None
+        changed_accounts = []
         
         with self._uow:
             txn = self._txn_repo.get_by_id(command.transaction_id)
@@ -27,10 +30,7 @@ class CompleteFundsHandler:
             if not to_acc:
                 raise AccountNotFoundError("Destination account not found.")
 
-            # Dynamically resolve Escrow account for this specific currency
             escrow_acc = self._system_account_resolver.get_escrow_account(txn.amount.currency)
-            
-            # Deduplicate in-memory references to prevent self-inflicted optimistic locking conflicts
             if to_acc.id == escrow_acc.id:
                 to_acc = escrow_acc
 
@@ -40,6 +40,11 @@ class CompleteFundsHandler:
             self._account_repo.update(to_acc)
             if escrow_acc is not to_acc:
                 self._account_repo.update(escrow_acc)
+            
+            changed_accounts.append(to_acc)
+            if escrow_acc is not to_acc:
+                changed_accounts.append(escrow_acc)
+                
             self._uow.commit()
 
             event_to_publish = TransactionCompletedEvent(
@@ -51,3 +56,11 @@ class CompleteFundsHandler:
             
         if event_to_publish:
             self._event_bus.publish(event_to_publish)
+        
+        for acc in changed_accounts:
+            if acc.user_id is not None:
+                self._event_bus.publish(AccountBalanceUpdatedEvent(
+                    account_id=acc.id,
+                    user_id=acc.user_id,
+                    new_balance=acc.balance
+                ))

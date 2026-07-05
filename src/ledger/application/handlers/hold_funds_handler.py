@@ -1,19 +1,25 @@
 from src.common.domain.ports.unit_of_work import UnitOfWork
+from src.common.domain.ports.event_bus import EventBus
 from src.common.domain.exceptions import AccountNotFoundError, CurrencyMismatchError
 from src.ledger.domain.repositories import AccountRepository, TransactionRepository
 from src.ledger.domain.ports.system_account_resolver_port import SystemAccountResolverPort
 from src.ledger.domain.services.double_entry_ledger import DoubleEntryLedger
 from src.common.domain.value_objects.money import Money 
 from src.ledger.application.commands.hold_funds_command import HoldFundsCommand
+from src.ledger.domain.events.account_balance_updated_event import AccountBalanceUpdatedEvent
 
 class HoldFundsHandler:
-    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, system_account_resolver: SystemAccountResolverPort):
+    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository,
+                 system_account_resolver: SystemAccountResolverPort, event_bus: EventBus):
         self._uow = uow
         self._account_repo = account_repo
         self._txn_repo = txn_repo
         self._system_account_resolver = system_account_resolver
+        self._event_bus = event_bus
 
     def handle(self, command: HoldFundsCommand) -> int:
+        changed_accounts = []
+        
         with self._uow:
             from_acc = self._account_repo.get_by_id(command.from_account_id)
             to_acc = self._account_repo.get_by_id(command.to_account_id)
@@ -24,10 +30,7 @@ class HoldFundsHandler:
             if from_acc.balance.currency != to_acc.balance.currency:
                 raise CurrencyMismatchError("Source and Destination accounts must have the same currency.")
 
-            # Translate primitive Decimal to Domain Value Object using auto-detected currency
             amount_vo = Money(command.amount, from_acc.balance.currency)
-            
-            # Dynamically resolve Escrow account for this specific currency
             escrow_acc = self._system_account_resolver.get_escrow_account(from_acc.balance.currency)
 
             if from_acc.id == escrow_acc.id:
@@ -44,6 +47,10 @@ class HoldFundsHandler:
                 user_email=command.user_email
             )
             
+            for acc in [from_acc, to_acc, escrow_acc]:
+                if acc not in changed_accounts:
+                    changed_accounts.append(acc)
+
             self._account_repo.update(from_acc)
             if to_acc is not from_acc:
                 self._account_repo.update(to_acc)
@@ -52,5 +59,13 @@ class HoldFundsHandler:
                 
             txn_id = self._txn_repo.add(txn)
             self._uow.commit()
-            
-            return txn_id
+        
+        for acc in changed_accounts:
+            if acc.user_id is not None:
+                self._event_bus.publish(AccountBalanceUpdatedEvent(
+                    account_id=acc.id,
+                    user_id=acc.user_id,
+                    new_balance=acc.balance
+                ))
+        
+        return txn_id

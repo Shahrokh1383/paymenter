@@ -74,6 +74,7 @@ def add_user():
             name=request.form['name'],
             phone_email=request.form['phone_email']
         ))
+        current_app.di_container.event_bus.flush()
     except Exception as e: flash(str(e), 'error')
     return redirect(url_for('dashboard.users'))
 
@@ -85,7 +86,6 @@ def accounts():
         handler = current_app.di_container.get_all_accounts_handler(uow)
         accounts_list = handler.handle(GetAllAccountsQuery())
         active_currencies = SqliteCurrencyRepository(uow).get_active()
-        # Fetch all users for the account creation form
         users_list = GetAllUsersHandler(SqliteUserRepository(uow)).handle(GetAllUsersQuery())
     return render_template('accounts.html',
                            accounts=accounts_list,
@@ -98,7 +98,6 @@ def create_account():
         user_id = int(request.form['user_id'])
         currency_code = request.form['currency_code']
         uow = SqliteUnitOfWork()
-        # Quick existence check
         from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository
         user_repo = SqliteUserRepository(uow)
         with uow:
@@ -115,6 +114,7 @@ def create_account():
             user_id=user_id,
             currency_code=currency_code
         ))
+        current_app.di_container.event_bus.flush()
         flash(f"Account created with ID {account_id}.", 'success')
     except Exception as e:
         flash(str(e), 'error')
@@ -125,7 +125,6 @@ def update_account_currency():
     try:
         uow = SqliteUnitOfWork()
         handler = current_app.di_container.get_update_account_currency_handler(uow)
-
         handler.handle(UpdateAccountCurrencyCommand(
             account_id=int(request.form['account_id']),
             currency_code=request.form['currency_code']
@@ -139,10 +138,10 @@ def update_account_currency():
 def topup_account():
     try:
         amount = Decimal(str(request.form['amount']))
-
         uow = SqliteUnitOfWork()
         handler = current_app.di_container.get_topup_account_handler(uow)
         handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=amount))
+        current_app.di_container.event_bus.flush()
         flash("Topup successful.", 'success')
     except Exception as e: flash(str(e), 'error')
     return redirect(request.referrer or url_for('dashboard.accounts'))
@@ -168,7 +167,8 @@ def merchants():
 def add_merchant():
     try:
         uow = SqliteUnitOfWork()
-        handler = OnboardMerchantHandler(uow, SqliteUserRepository(uow), SqliteMerchantRepository(uow), LedgerAccountProvisioningAdapter(uow), SqliteCurrencyRepository(uow))
+        handler = OnboardMerchantHandler(uow, SqliteUserRepository(uow), SqliteMerchantRepository(uow),
+        LedgerAccountProvisioningAdapter(uow), SqliteCurrencyRepository(uow))
         handler.handle(OnboardMerchantCommand(name=request.form['name']))
     except Exception as e: flash(str(e), 'error')
     return redirect(url_for('dashboard.merchants'))

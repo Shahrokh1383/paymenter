@@ -16,14 +16,9 @@
     "find.py",
     "src\\checkout",
     "src\\notifications",
-    "src\\app",
     "static\\css",
-    "src\\common",
-    "src\\identity",
-    "static",
-    "src\\ledger\\infrastructure",
-    "templates"
+    "src\\ledger\\infrastructure"
   ],
-  "lastModified": "2026-07-05T18:49:39.490Z",
+  "lastModified": "2026-07-05T20:53:51.353Z",
   "version": 1
 }

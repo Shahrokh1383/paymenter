@@ -51,3 +51,6 @@ class OutboxEventBusDecorator(EventBus):
 
         # 2. Notify background worker to process immediately (Non-blocking)
         self._worker.trigger_processing()
+
+    def flush(self) -> None:
+        self._worker._process_pending_messages()

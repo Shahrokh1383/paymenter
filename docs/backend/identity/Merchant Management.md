@@ -1,10 +1,12 @@
 # Module 2: Merchant Management
-## Paymenter Project | Version 1.0.0
+## Paymenter Project | Version 1.0.1 (SSOT Revised)
 
 ---
 
 ## 1. Overview
 This module governs **Merchants** – business entities that process payments through the platform. Each merchant receives a unique API key for authentication and possesses a settlement account for fund collection.
+
+**Current status:** Functional but with several architectural gaps and anti‑patterns that are documented below for future refactoring.
 
 ---
 
@@ -14,12 +16,12 @@ This module governs **Merchants** – business entities that process payments th
 - A `Merchant` must have a unique `api_key` (generated cryptographically, not set by clients).
 - A `Merchant` must have a `settlement_account_id` referencing a Ledger account at the time of onboarding.
 - A `Merchant` can be toggled between `active` and `inactive` states. This is a soft-toggle; no data is deleted.
-- The `Merchant` aggregate protects its own invariants via the `toggle()` domain method.
+- **The aggregate's `toggle()` method exists in the domain entity but is currently unused in the application flow.** The `ToggleMerchantHandler` bypasses the domain logic and directly executes SQL via `toggle_status()` on the concrete repository.
 
 ### 2.2 API Key Value Object
 - Immutable (`frozen=True` dataclass).
-- Format: `pay_{secrets.token_urlsafe(32)}`.
-- Currently lacks runtime validation (length, prefix, entropy). This is a known gap.
+- Value generated using `generate_api_key()`: format `pay_{secrets.token_urlsafe(32)}`.
+- **No runtime validation** (length, prefix, entropy) inside `ApiKey.__post_init__`.
 
 ---
 
@@ -41,7 +43,7 @@ class Merchant:
         self.is_active = not self.is_active
 ```
 - **Responsibility:** Represents a business entity authorized to process payments.
-- **Invariant:** State toggle is protected by the aggregate method `toggle()`.
+- **Note:** The `toggle()` method is defined but never called by the handler.
 
 **Value Object: `ApiKey`** (`src/identity/domain/value_objects/api_key.py`)
 ```python
@@ -49,8 +51,7 @@ class Merchant:
 class ApiKey:
     value: str
 ```
-- **Responsibility:** Immutable wrapper for merchant API keys.
-- **Gap:** No `__post_init__` validation (length, prefix, format).
+- **Gap:** No `__post_init__` validation of the key’s format.
 
 **Port: `MerchantRepository`** (`src/identity/domain/repositories.py`)
 ```python
@@ -64,53 +65,60 @@ class MerchantRepository(ABC):
     @abstractmethod
     def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]: ...
 ```
-- **⚠️ Gap:** `toggle_status(self, merchant_id: int)` is missing from the abstract interface but is called by `ToggleMerchantHandler`. This is a DIP violation; the handler implicitly depends on the concrete `SqliteMerchantRepository`.
+- **Missing method:** `toggle_status(merchant_id: int)` is **not** in the abstract interface but is called by `ToggleMerchantHandler`, forcing a dependency on the concrete `SqliteMerchantRepository`.
 
 ### 3.2 Application Layer
 
 **Commands:**
 | Command | Payload | Purpose |
 |---------|---------|---------|
-| `OnboardMerchantCommand` | `name: str` | Create a merchant, system user, and settlement account. |
+| `OnboardMerchantCommand` | `name: str` | Create a merchant, synthetic user, and settlement account. |
 | `ToggleMerchantCommand` | `merchant_id: int` | Toggle merchant active status. |
 
 **Handler: `OnboardMerchantHandler`** (`src/identity/application/handlers/identity_handlers.py`)
 - **Dependencies:** `UnitOfWork`, `UserRepository`, `MerchantRepository`, `AccountProvisioningPort`, `CurrencyRepository`
-- **Flow:**
-  1. Create a synthetic `User` with email `system_merchant_{name}@paymenter.com`.
-  2. Persist synthetic user → `user_id`.
-  3. Query `currency_repo.get_active()`; fail if empty.
-  4. Provision settlement account via `account_port.create_default_account(user_id, active_currencies[0].id)`.
-  5. Create `Merchant` with generated `ApiKey`.
+- **Actual flow:**
+  1. Create a synthetic `User` object with `id=0`, `name="Merchant: {name}"`, and `phone_email` set to a **plain string** `f"system_merchant_{cmd.name}@paymenter.com"`. This string is **not** a `PhoneEmail` Value Object, causing a type mismatch with the `User` entity’s field.
+  2. Persist the synthetic user via `user_repo.add(user)` → `user_id`.
+  3. Retrieve active currencies; if none, raise `ValueError`.
+  4. Provision a settlement account via `account_port.create_default_account(user_id, active_currencies[0].id)` – the first active currency is used blindly.
+  5. Create a `Merchant` with `id=0`, generated `ApiKey`, `is_active=True`, and the settlement account ID.
   6. Persist merchant via `merchant_repo.add(merchant)`.
   7. Commit UOW.
-- **⚠️ Domain Flaw:** Synthetic user creation is unnecessary (accounts.user_id is nullable). Merchants should not need a fake user.
+- **No domain events are published.**
 
 **Handler: `ToggleMerchantHandler`** (`src/identity/application/handlers/identity_handlers.py`)
 - **Dependencies:** `UnitOfWork`, `MerchantRepository`
-- **Flow:**
-  1. Call `merchant_repo.toggle_status(cmd.merchant_id)`.
+- **Actual flow:**
+  1. Call `self._merchant_repo.toggle_status(cmd.merchant_id)` – a method **not** on the abstract port.
   2. Commit UOW.
-- **⚠️ DIP Violation:** `toggle_status` is not declared on `MerchantRepository` interface.
-
-**Query: `GetAllMerchantsQuery`** (`src/identity/application/queries/identity_queries.py`)
-- **Payload:** *(empty)*
-- **Purpose:** Retrieve all merchant summaries.
+- **No domain event is emitted.**
 
 **Query Handler: `GetAllMerchantsHandler`** (`src/identity/application/handlers/identity_query_handlers.py`)
-- **Returns:** `List[Any]` merchant summaries.
-- **⚠️ Coupling:** Repository JOINs with `accounts` for `settlement_balance`.
+- **Returns:** `List[Any]` – raw `dict` objects from the repository.
+- The repository’s `get_all_summaries()` performs a **cross‑context LEFT JOIN** with `accounts` to fetch `settlement_balance`. No local read model is used.
 
 ### 3.3 Infrastructure Layer
 
 **Persistence Adapter: `SqliteMerchantRepository`** (`src/identity/infrastructure/persistence/sqlite_merchant_repository.py`)
 - **Implements:** `MerchantRepository`
 - **`add(merchant)`:** Inserts into `merchants` table.
-- **`update(merchant)`:** Updates `is_active`.
-- **`toggle_status(merchant_id)`:** Raw SQL `UPDATE merchants SET is_active = NOT is_active WHERE id = ?`.
-- **`get_all_summaries()`:** LEFT JOIN with `accounts` for `settlement_balance`.
-- **`get_by_api_key(api_key)`:** SELECT by `api_key` value; reconstructs `Merchant` entity.
-- **⚠️ Violation:** `toggle_status` is not on the abstract port. `get_all_summaries` JOINs with `accounts`.
+- **`update(merchant)`:** Updates `is_active` directly.
+- **`toggle_status(merchant_id)`:** Raw SQL `UPDATE merchants SET is_active = NOT is_active WHERE id = ?`. **No row‑count check** – silently succeeds for non‑existent IDs.
+- **`get_all_summaries()`:** Executes:
+  ```sql
+  SELECT m.*, a.balance as settlement_balance 
+  FROM merchants m LEFT JOIN accounts a ON m.settlement_account_id = a.id
+  ```
+  Returns list of `dict` – no DTO.
+- **`get_by_api_key(api_key)`:** SELECT by `api_key` value, reconstructs `Merchant` entity.
+
+**Database Schema** – table `merchants` defined in `identity.py` schema:
+- Columns: `id`, `name`, `api_key` (TEXT UNIQUE), `is_active` (BOOLEAN DEFAULT 1), `settlement_account_id` (INTEGER REFERENCES accounts(id)).
+
+**Web Template** (`templates/merchants.html`)
+- Displays columns: ID, Name, API Key (with copy button), Settlement Bal, Active, Action (toggle button).
+- Uses `{{ m.settlement_balance }}` from the raw dict.
 
 ---
 
@@ -118,19 +126,18 @@ class MerchantRepository(ABC):
 
 **GET /dashboard/merchants**
 - **Description:** List all merchants.
-- **Response:** HTML render (`merchants.html`) with `merchants_list`.
+- **Response:** HTML render (`merchants.html`) with `merchants` (list of dicts with keys: `id`, `name`, `api_key`, `settlement_balance`, `is_active`).
 - **Query Handler:** `GetAllMerchantsHandler`
 
 **POST /dashboard/merchants/add**
-- **Description:** Onboard a new merchant.
+- **Description:** Onboard a new merchant (creates synthetic user + settlement account).
 - **Form Data:** `name`
 - **Command:** `OnboardMerchantCommand`
 - **Success:** Redirect to `/dashboard/merchants`.
-- **Error:** Flash message (e.g., "No active currencies found").
+- **Error:** Flash message.
 
 **POST /dashboard/merchants/toggle/<int:id>/<int:is_active>**
-- **Description:** Toggle merchant active status.
-- **Path Params:** `id` (merchant ID), `is_active` (unused path param).
+- **Description:** Toggle merchant active status. The `is_active` path parameter is ignored; the toggle always flips the current state.
 - **Command:** `ToggleMerchantCommand`
 - **Success:** Redirect to `/dashboard/merchants`.
 
@@ -147,15 +154,15 @@ class MerchantRepository(ABC):
     |
     v
 [OnboardMerchantHandler]
-    |-- 1. Create synthetic User(name="Merchant: X", phone_email="system_merchant_X@paymenter.com")
-    |-- 2. UserRepository.add(synthetic_user) -> user_id
-    |-- 3. CurrencyRepository.get_active() -> [Currency, ...]
-    |-- 4. AccountProvisioningPort.create_default_account(user_id, active_currencies[0].id)
-    |-- 5. Create Merchant(id=0, name, api_key=ApiKey(...), is_active=True, settlement_account_id)
+    |-- 1. Create synthetic User(id=0, name, phone_email=plain string)  ⚠️ Type violation
+    |-- 2. UserRepository.add(user) -> user_id
+    |-- 3. CurrencyRepository.get_active() -> first active currency
+    |-- 4. AccountProvisioningPort.create_default_account(user_id, first_currency.id) -> settlement_acc_id
+    |-- 5. Create Merchant(id=0, name, api_key, is_active=True, settlement_account_id)
     |-- 6. MerchantRepository.add(merchant)
     |-- 7. UnitOfWork.commit()
 ```
-**⚠️ Issues:** Synthetic user pollution, blind selection of first active currency, direct SQL writes.
+**No domain events, no read model update.**
 
 ### 5.2 Toggle Merchant Status
 ```
@@ -163,10 +170,10 @@ class MerchantRepository(ABC):
     |
     v
 [ToggleMerchantHandler]
-    |-- 1. MerchantRepository.toggle_status(merchant_id)  (SQL UPDATE)
+    |-- 1. MerchantRepository.toggle_status(merchant_id)  ⚠️ Not on port
     |-- 2. UnitOfWork.commit()
 ```
-**⚠️ Issues:** No abstract method for `toggle_status`; no domain event emitted.
+**No domain event, no check if merchant exists.**
 
 ### 5.3 Query Merchants
 ```
@@ -174,10 +181,10 @@ class MerchantRepository(ABC):
     |
     v
 [GetAllMerchantsHandler]
-    |-- SQL JOIN: merchants LEFT JOIN accounts
-    |-- Returns: List of dicts with merchant + settlement_balance
+    |-- merchant_repo.get_all_summaries()
+    |-- SQL: merchants LEFT JOIN accounts
+    |-- Returns: List[dict]
 ```
-**⚠️ Issues:** Cross‑context JOIN with `accounts`.
 
 ---
 
@@ -185,24 +192,31 @@ class MerchantRepository(ABC):
 
 | Issue | Severity | Description |
 |-------|----------|-------------|
-| **Missing Abstract `toggle_status`** | High | Handler depends on concrete repository method not declared in port. |
-| **Synthetic User Creation** | Medium | Merchants create fake user entries; accounts table allows NULL user_id. |
-| **No Domain Events** | Medium | No `MerchantActivatedEvent`/`MerchantDeactivatedEvent` emitted. |
-| **Toggle non‑existing merchant** | – | UPDATE on missing ID silently succeeds. |
-| **ApiKey validation missing** | Low | `ApiKey` VO lacks format checks. |
+| **Missing abstract `toggle_status`** | High | `ToggleMerchantHandler` calls `toggle_status` which is not on `MerchantRepository` interface. Violates DIP. |
+| **Domain `toggle()` bypassed** | High | The aggregate’s `toggle()` method is never used; business logic is in SQL. |
+| **Synthetic user creation** | Medium | Unnecessary fake user created; `accounts.user_id` is nullable. Also passes plain string for `phone_email` instead of `PhoneEmail` VO – potential runtime error. |
+| **No domain events** | Medium | State changes (onboard, toggle) do not emit events, breaking audit trail and cross‑context communication. |
+| **Toggle on non‑existent merchant** | Low | UPDATE runs regardless of whether the merchant exists; no error thrown. |
+| **ApiKey validation missing** | Low | No format checks in `ApiKey` VO. |
+| **Cross‑context JOIN** | Medium | `get_all_summaries` joins directly with `accounts` table from Ledger context, violating bounded context boundaries. |
+| **Return type `Any`** | Medium | Repository and handlers return untyped `dict` instead of a DTO. |
 
 ---
 
 ## 7. Notes & Refactoring Roadmap
 
-### Immediate
-- Add `toggle_status(merchant_id: int)` to `MerchantRepository` abstract port.
+### Immediate (High Priority)
+- Add `toggle_status(merchant_id: int)` to the `MerchantRepository` abstract interface.
+- Use the domain `toggle()` method: fetch the entity, call `toggle()`, then `update()`.
 
 ### Medium Term
-- Remove synthetic user creation; add `merchant_id` to accounts or use polymorphic owner.
-- Emit domain events on merchant state changes.
-- Build local `merchant_summaries` read model.
+- Remove synthetic user creation; `accounts.user_id` is nullable. Associate settlement account directly with merchant.
+- Introduce a local `merchant_summaries` read model populated via domain events.
+- Emit `MerchantActivatedEvent` / `MerchantDeactivatedEvent` on toggle.
 
 ### Long Term
-- Add validation to `ApiKey`.
-- Move settlement account provisioning to an event‑driven flow.
+- Add `ApiKey` validation in `__post_init__`.
+- Replace raw dicts with proper `MerchantSummaryDTO`.
+- Decouple the read model from Ledger tables.
+
+---

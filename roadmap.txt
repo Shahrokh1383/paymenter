@@ -189,12 +189,6 @@ PROJECT STRUCTURE
 📁 templates/
 ├── 📄 accounts.html
 ├── 📄 base.html
-├── 📄 currencies.html
-├── 📄 escrow_accounts.html
-├── 📄 gateway_error.html
-├── 📄 gateway.html
-├── 📄 merchants.html
-├── 📄 transactions.html
 └── 📄 users.html
 
 ────────────────────────────────────────────────────────────

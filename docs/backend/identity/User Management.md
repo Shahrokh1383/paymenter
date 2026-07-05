@@ -1,5 +1,5 @@
 # Module 1: User Management
-## Paymenter Project | Version 1.1.0 (Post-Refactor)
+## Paymenter Project | Version 1.1.1 (SSOT Refined)
 
 ## 1. Overview
 This module manages **Users** – natural persons or system actors who hold financial accounts in the Paymenter platform.  
@@ -84,17 +84,26 @@ class UserRepository(ABC):
 **Query Handler: `GetAllUsersHandler`** (`src/identity/application/handlers/identity_query_handlers.py`)
 - **Returns:** `List[UserSummaryDTO]` from the `user_summaries` read model.
 - **Data source:** Pure Identity‑owned table; no cross‑context JOINs.
+- **Columns selected:** `user_id`, `name`, `phone_email`, `account_number`, `card_number`, `currency_code`.
+  - **Note:** The `user_summaries` table still contains `account_id` and `balance` columns, but they are intentionally **not queried** by this module to keep the user list focused on identity information.
 
 **Query Handler: `SearchUsersHandler`** (`src/identity/application/handlers/identity_query_handlers.py`)
 - **Returns:** `List[UserSummaryDTO]` filtered by `LIKE` on `name`, `account_number`, `card_number` columns of `user_summaries`.
 
 **DTO: `UserSummaryDTO`** (`src/identity/application/dto/user_summary.py`)
-- Flat read‑model object with fields: `user_id`, `name`, `phone_email`, `account_id`, `account_number`, `card_number`, `balance`, `currency_code`.
+- Flat read‑model object with fields:
+  - `user_id: int`
+  - `name: str`
+  - `phone_email: str`
+  - `account_number: Optional[str]`
+  - `card_number: Optional[str]`
+  - `currency_code: Optional[str]`
+- **Removed fields since v1.1.0:** `account_id`, `balance` – these were used only for the now‑removed top‑up actions on the user list page.
 
 **Read Model Handlers** (`src/identity/application/handlers/read_model_handlers.py`)
 - `UserRegisteredReadModelHandler` – inserts a new row into `user_summaries` on `UserRegisteredEvent`.
-- `AccountCreatedReadModelHandler` – updates the row with account details on `AccountCreatedEvent` (from Ledger).
-- `CardAssignedReadModelHandler` – updates the row with card number on `CardAssignedEvent`.
+- `AccountCreatedReadModelHandler` – updates the row with `account_id`, `account_number`, `currency_code` on `AccountCreatedEvent` (from Ledger).
+- `CardAssignedReadModelHandler` – updates the row with `card_number` on `CardAssignedEvent`.
 
 **Cross‑Context Event Handlers**
 - `OnAccountCreatedHandler` (Identity) – listens to `AccountCreatedEvent` (from Ledger) and assigns a new card to the user, inserting into `user_cards` and emitting `CardAssignedEvent`.
@@ -105,24 +114,27 @@ class UserRepository(ABC):
 - **Implements:** `UserRepository`
 - **`add(user)`:** Inserts into `users`; catches `IntegrityError` and translates to `UserAlreadyExistsError`. Returns `lastrowid`.
 - **`exists_by_phone_email(phone_email)`:** Simple `SELECT` on `users`.
-- **`get_all_summaries()`:** Queries local `user_summaries` table (Identity schema) – **no cross‑context JOINs**.
-- **`search_summaries(query)`:** Queries `user_summaries` with `LIKE` on name, account_number, card_number.
+- **`get_all_summaries()`:** Queries `user_summaries` for `user_id, name, phone_email, account_number, card_number, currency_code` – **no balance or account_id**.
+- **`search_summaries(query)`:** Same columns, with `LIKE` on name, account_number, card_number.
 - All methods return strongly typed `UserSummaryDTO` objects.
 
 **Database Schema** (`src/common/infrastructure/database/schemas/identity/identity.py`)
-- New table: `user_summaries` – read model owned by Identity context, synchronously updated via Domain Events.
+- `user_summaries` – read model owned by Identity context, synchronously updated via Domain Events.
+  - Columns: `user_id INTEGER PRIMARY KEY`, `name TEXT`, `phone_email TEXT`, `account_id INTEGER`, `account_number TEXT`, `card_number TEXT`, `balance TEXT DEFAULT '0.00'`, `currency_code TEXT`.
+  - The `account_id` and `balance` columns are **not used by the user list module** but are retained for potential future use by other read models or reporting.
 
 ---
 
 ## 4. API Contract
 
-All routes are served by the Identity Dashboard Web UI (server‑rendered MVC). The user-specific endpoints are:
+All routes are served by the Identity Dashboard Web UI (server‑rendered MVC).
 
 **GET /dashboard/users**
 - **Description:** List all users or search by query.
 - **Query Params:** `query` (optional search string).
 - **Response:** HTML render (`users.html`) with `users_list` (list of `UserSummaryDTO`), `query`, `currencies`.
-- **Query Handler:** `GetAllUsersHandler` (if no query) or `SearchUsersHandler`.
+- **Displayed columns:** ID, Name, Phone/Email, Account Num, Card Num, Currency.
+- **No balance or top‑up actions are shown.**
 
 **POST /dashboard/users/add**
 - **Description:** Register a new user. No account is created.
@@ -152,6 +164,9 @@ All routes are served by the Identity Dashboard Web UI (server‑rendered MVC). 
     |-- 6. EventBus.publish(UserRegisteredEvent)
     |
     v
+[OutboxEventBusDecorator]
+    |-- flush() called immediately after handler (ensures read model is up‑to‑date)
+    v
 [In-Memory EventBus]
     |-- UserRegisteredReadModelHandler inserts row into user_summaries
     |-- (Ledger context does NOT create account automatically)
@@ -166,7 +181,8 @@ All routes are served by the Identity Dashboard Web UI (server‑rendered MVC). 
     |
     v
 [GetAllUsersHandler] OR [SearchUsersHandler]
-    |-- SELECT from user_summaries (Identity table only, no JOINs)
+    |-- SELECT user_id, name, phone_email, account_number, card_number, currency_code FROM user_summaries
+    |-- No JOINs, no balance/account_id
     |-- Returns List[UserSummaryDTO]
 ```
 
@@ -176,12 +192,10 @@ All routes are served by the Identity Dashboard Web UI (server‑rendered MVC). 
 
 | Issue | Severity | Description |
 |-------|----------|-------------|
-| **No Automatic Account** | — (by design) | Users are registered without a default account. Account creation must be performed manually from the dashboard. |
-| **Balance Staleness** | Medium | The `user_summaries.balance` column is not automatically updated after ledger transactions (e.g., top‑up, payment). Currently remains at '0.00' unless an explicit account creation sets it. Future: listen to transaction events to update the read model. |
-| **Account/Card Creation not yet implemented in Dashboard** | Medium | `AccountCreatedEvent` and `CardAssignedEvent` are emitted only when an account is created via the Ledger API (not yet wired from the Dashboard UI). Once wired, the read model and card assignment will work automatically. |
 | **Search uses LIKE on account/card** | Low | Works correctly, but may be slow on huge datasets without full‑text indexing. Acceptable for current scale. |
 
-All previously documented **Critical** and **High** severity issues (hardcoded currency, primitive obsession, cross‑context JOINs, 500 errors, missing domain events, transient ID anti‑pattern) have been **fully resolved**.
+All previously documented issues (Critical/High) have been **fully resolved** in v1.1.0.  
+The balance display and top‑up actions were intentionally **removed from the user list in v1.1.1** to maintain separation of concerns; they are handled exclusively on the Accounts page.
 
 ---
 
@@ -198,3 +212,12 @@ All previously documented **Critical** and **High** severity issues (hardcoded c
 - ✅ `IntegrityError` caught and translated to domain exception; friendly 400‑class errors in UI.
 - ✅ Return types are now `List[UserSummaryDTO]` instead of raw DB rows.
 - ✅ Controller uses `EventBus` from DI container.
+
+### Completed (v1.1.1)
+- ✅ **User list page simplified** – balance and top‑up actions removed; all account operations now performed on `/dashboard/accounts`.
+- ✅ `UserSummaryDTO` cleaned to only expose identity‑related fields.
+- ✅ `SqliteUserRepository` queries no longer fetch `balance` or `account_id`.
+- ✅ **Account creation from Dashboard fully wired** – cross‑context event flow updates `user_summaries` and assigns cards correctly.
+- ✅ Documentation updated to reflect the true state of the module.
+
+---

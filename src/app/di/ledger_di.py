@@ -33,8 +33,7 @@ def register_ledger(container):
             uow=uow,
             account_repo=SqliteAccountRepository(uow),
             txn_repo=SqliteTransactionRepository(uow),
-            system_account_resolver=SqliteSystemAccountResolver(uow),
-            event_bus=container.event_bus
+            system_account_resolver=SqliteSystemAccountResolver(uow)
         )
 
     def get_complete_funds_handler(uow: SqliteUnitOfWork) -> CompleteFundsHandler:
@@ -63,8 +62,7 @@ def register_ledger(container):
     def get_topup_account_handler(uow: SqliteUnitOfWork) -> TopupAccountHandler:
         return TopupAccountHandler(
             uow=uow,
-            account_repo=SqliteAccountRepository(uow),
-            event_bus=container.event_bus
+            account_repo=SqliteAccountRepository(uow)
         )
 
     def get_update_account_currency_handler(uow: SqliteUnitOfWork) -> UpdateAccountCurrencyHandler:

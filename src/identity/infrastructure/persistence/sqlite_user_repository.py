@@ -31,19 +31,17 @@ class SqliteUserRepository(UserRepository):
 
     def get_all_summaries(self) -> List[UserSummaryDTO]:
         rows = self._uow.conn.execute(
-            "SELECT user_id, name, phone_email, account_id, account_number, card_number, balance, currency_code FROM user_summaries"
+            "SELECT user_id, name, phone_email, account_number, card_number, currency_code FROM user_summaries"
         ).fetchall()
         return [UserSummaryDTO(
             user_id=r['user_id'],
             name=r['name'],
             phone_email=r['phone_email'],
-            account_id=r['account_id'],
             account_number=r['account_number'],
             card_number=r['card_number'],
-            balance=str(r['balance']),
             currency_code=r['currency_code']
         ) for r in rows]
-    
+
     def exists_by_id(self, user_id: int) -> bool:
         cursor = self._uow.conn.execute("SELECT 1 FROM users WHERE id = ?",(user_id,))
         return cursor.fetchone() is not None
@@ -51,7 +49,7 @@ class SqliteUserRepository(UserRepository):
     def search_summaries(self, query: str) -> List[UserSummaryDTO]:
         like = f"%{query}%"
         rows = self._uow.conn.execute(
-            """SELECT user_id, name, phone_email, account_id, account_number, card_number, balance, currency_code
+            """SELECT user_id, name, phone_email, account_number, card_number, currency_code
                FROM user_summaries
                WHERE name LIKE ? OR account_number LIKE ? OR card_number LIKE ?""",
             (like, like, like)
@@ -60,9 +58,7 @@ class SqliteUserRepository(UserRepository):
             user_id=r['user_id'],
             name=r['name'],
             phone_email=r['phone_email'],
-            account_id=r['account_id'],
             account_number=r['account_number'],
             card_number=r['card_number'],
-            balance=str(r['balance']),
             currency_code=r['currency_code']
         ) for r in rows]

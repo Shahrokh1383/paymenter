@@ -7,13 +7,11 @@ from src.identity.application.handlers.read_model_handlers import (
     AccountCreatedReadModelHandler,
     CardAssignedReadModelHandler
 )
-from src.identity.application.handlers.on_account_balance_updated_handler import OnAccountBalanceUpdatedHandler
 
 # Events
 from src.identity.domain.events.user_events import UserRegisteredEvent
 from src.ledger.domain.events.account_events import AccountCreatedEvent
 from src.identity.domain.events.card_events import CardAssignedEvent
-from src.ledger.domain.events.account_balance_updated_event import AccountBalanceUpdatedEvent
 
 def register_identity(container):
     bus = container.event_bus
@@ -37,8 +35,4 @@ def register_identity(container):
     bus.subscribe(AccountCreatedEvent, lambda event: OnAccountCreatedHandler(
         SqliteUnitOfWork(),
         bus
-    ).handle(event))
-
-    bus.subscribe(AccountBalanceUpdatedEvent, lambda event: OnAccountBalanceUpdatedHandler(
-        SqliteUnitOfWork()
     ).handle(event))

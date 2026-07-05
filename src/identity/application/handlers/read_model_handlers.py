@@ -21,10 +21,9 @@ class AccountCreatedReadModelHandler:
 
     def handle(self, event: AccountCreatedEvent) -> None:
         with self._uow:
-            # Update user_summaries with account info
             self._uow.conn.execute(
                 """UPDATE user_summaries SET 
-                   account_id = ?, account_number = ?, currency_code = ?
+                   account_id = ?, account_number = ?, currency_code = ?, balance = '0.00'
                    WHERE user_id = ?""",
                 (event.account_id, str(event.account_number), str(event.currency_code), event.user_id)
             )

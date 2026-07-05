@@ -68,8 +68,11 @@ def users():
 def add_user():
     try:
         uow = SqliteUnitOfWork()
-        handler = RegisterUserHandler(uow, SqliteUserRepository(uow), LedgerAccountProvisioningAdapter(uow))
-        handler.handle(RegisterUserCommand(name=request.form['name'], phone_email=request.form['phone_email']))
+        handler = RegisterUserHandler(uow, SqliteUserRepository(uow), current_app.di_container.event_bus)
+        user_id = handler.handle(RegisterUserCommand(
+            name=request.form['name'],
+            phone_email=request.form['phone_email']
+        ))
     except Exception as e: flash(str(e), 'error')
     return redirect(url_for('dashboard.users'))
 

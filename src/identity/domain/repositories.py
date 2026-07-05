@@ -12,6 +12,8 @@ class UserRepository(ABC):
     def get_all_summaries(self) -> List[Any]: raise NotImplementedError
     @abstractmethod
     def search_summaries(self, query: str) -> List[Any]: raise NotImplementedError
+    @abstractmethod
+    def exists_by_phone_email(self, phone_email: str) -> bool: raise NotImplementedError
 
 class MerchantRepository(ABC):
     @abstractmethod

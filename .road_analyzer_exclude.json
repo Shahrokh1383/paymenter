@@ -15,8 +15,13 @@
     "tests",
     "src\\notifications",
     "find.py",
-    "src\\checkout"
+    "src\\checkout",
+    "static",
+    "templates",
+    "src\\identity",
+    "src\\common",
+    "src\\app"
   ],
-  "lastModified": "2026-07-04T18:34:00.265Z",
+  "lastModified": "2026-07-05T17:21:34.354Z",
   "version": 1
 }

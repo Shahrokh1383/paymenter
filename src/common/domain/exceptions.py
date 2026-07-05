@@ -1,5 +1,4 @@
 class DomainException(Exception):
-    """Base exception for domain rule violations."""
     pass
 
 class InsufficientFundsError(DomainException):
@@ -15,5 +14,6 @@ class AccountNotFoundError(DomainException):
     pass
 
 class ConcurrencyException(DomainException):
-    """Raised when an optimistic locking conflict occurs (Lost Update)."""
+    pass
+class UserAlreadyExistsError(DomainException):
     pass

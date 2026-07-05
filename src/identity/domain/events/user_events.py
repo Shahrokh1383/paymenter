@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional
 from src.identity.domain.value_objects.phone_email import PhoneEmail
 
-@dataclass
-class User:
-    id: Optional[int]
+@dataclass(frozen=True)
+class UserRegisteredEvent:
+    user_id: int
     name: str
     phone_email: PhoneEmail

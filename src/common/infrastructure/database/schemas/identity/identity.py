@@ -22,4 +22,16 @@ CREATE TABLE IF NOT EXISTS user_cards (
     FOREIGN KEY (user_id) REFERENCES users(id), 
     FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
+
+CREATE TABLE IF NOT EXISTS user_summaries (
+    user_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone_email TEXT NOT NULL,
+    account_id INTEGER,
+    account_number TEXT,
+    card_number TEXT,
+    balance TEXT DEFAULT '0.00',
+    currency_code TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 """

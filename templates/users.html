@@ -20,10 +20,13 @@
     <tr><th>ID</th><th>Name</th><th>Phone/Email</th><th>Account Num</th><th>Card Num</th><th>Currency</th><th>Balance</th><th>Actions (Topup)</th></tr>
     {% for u in users %}
     <tr>
-        <td>{{ u.id }}</td><td>{{ u.name }}</td><td>{{ u.phone_email }}</td>
-        <td>{{ u.account_number or 'N/A' }}</td><td>{{ u.card_number or 'N/A' }}</td>
+        <td>{{ u.user_id }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.phone_email }}</td>
+        <td>{{ u.account_number or 'N/A' }}</td>
+        <td>{{ u.card_number or 'N/A' }}</td>
         <td>{{ u.currency_code or 'N/A' }}</td>
-        <td>{{ u.balance or 0.0 }}</td>
+        <td>{{ u.balance or '0.00' }}</td>
         <td>
             {% if u.account_id %}
             <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">

@@ -1,20 +1,20 @@
 # Module 1: User Management
-## Paymenter Project | Version 1.0.0
+## Paymenter Project | Version 1.1.0 (Post-Refactor)
 
 ## 1. Overview
 This module manages **Users** – natural persons or system actors who hold financial accounts in the Paymenter platform.  
 It covers user registration, querying, and the invariants that protect the User aggregate.
 
-**Boundary note:** The User aggregate is owned entirely by the Identity context. Cross‑context concerns (like account creation) are described in *Module 4: Account Provisioning & Cross‑Context Integration*.
+**Boundary note:** The User aggregate is owned entirely by the Identity context. Cross‑context concerns (like account creation) are now fully event‑driven and handled in *Module 4: Account Provisioning & Cross‑Context Integration*.
 
 ---
 
 ## 2. Business Rules & Domain Invariants
 
 ### 2.1 User Aggregate
-- A `User` must have a unique `phone_email` (composite identifier treated as a single string field).
-- A `User` is created with `id=0` as a transient identifier; the infrastructure assigns the permanent `id` upon persistence.
-- Upon registration, a default Ledger account **must** be provisioned for the user (this is delegated to the `AccountProvisioningPort` – see Module 4).
+- A `User` must have a unique `phone_email`, modelled as a `PhoneEmail` Value Object (VO). The VO enforces format validation (E.164 for phone numbers, RFC 5322 for email) and normalises the value (lowercase email, stripped whitespace).
+- A `User` is created with `id=None` as a transient identifier; the infrastructure assigns the permanent `id` upon persistence.
+- **No default account is provisioned automatically.** Account creation for a user is a separate, explicit operation performed later from the dashboard.
 - A `User` may hold zero or more accounts (one-to-many via Ledger).
 - A `User` may have zero or more cards mapped via `user_cards`.
 
@@ -28,12 +28,20 @@ It covers user registration, querying, and the invariants that protect the User 
 ```python
 @dataclass
 class User:
-    id: int          # Transient (0) until persisted
+    id: Optional[int]          # None until persisted
     name: str
-    phone_email: str # Raw primitive; should be PhoneEmail VO (Technical Debt)
+    phone_email: PhoneEmail
 ```
 - **Responsibility:** Represents a system actor.
-- **Invariant:** None enforced in the entity itself; uniqueness is guaranteed by the repository's database constraint.
+- **Invariant:** `phone_email` uniqueness is enforced at the domain level through `UserRepository.exists_by_phone_email()` before persistence, and additionally protected by a database `UNIQUE` constraint.
+
+**Value Object: `PhoneEmail`** (`src/identity/domain/value_objects/phone_email.py`)
+- Encapsulates validation logic; raises `ValueError` for invalid formats.
+- Normalises emails to lowercase and trims whitespace.
+
+**Domain Event: `UserRegisteredEvent`** (`src/identity/domain/events/user_events.py`)
+- Emitted after a new user is successfully persisted.
+- Carries `user_id`, `name`, `phone_email` (as `PhoneEmail` VO).
 
 **Port: `UserRepository`** (`src/identity/domain/repositories.py`)
 ```python
@@ -41,69 +49,87 @@ class UserRepository(ABC):
     @abstractmethod
     def add(self, user: User) -> int: ...
     @abstractmethod
-    def get_all_summaries(self) -> List[Any]: ...
+    def get_all_summaries(self) -> List[UserSummaryDTO]: ...
     @abstractmethod
-    def search_summaries(self, query: str) -> List[Any]: ...
+    def search_summaries(self, query: str) -> List[UserSummaryDTO]: ...
+    @abstractmethod
+    def exists_by_phone_email(self, phone_email: str) -> bool: ...
 ```
 
 ### 3.2 Application Layer
 
 **Command: `RegisterUserCommand`** (`src/identity/application/commands/register_user_command.py`)
 - **Payload:** `name: str`, `phone_email: str`
-- **Purpose:** Register a new user and provision a default account.
+- **Purpose:** Register a new user (no account provisioning).
 
 **Query: `GetAllUsersQuery`** (`src/identity/application/queries/identity_queries.py`)
 - **Payload:** *(empty)*
-- **Purpose:** Retrieve all user summaries.
+- **Purpose:** Retrieve all user summaries from the local read model.
 
 **Query: `SearchUsersQuery`** (`src/identity/application/queries/identity_queries.py`)
 - **Payload:** `query: str`
-- **Purpose:** Search users by name, account number, or card number.
+- **Purpose:** Search users by name, account number, or card number on the local read model.
 
 **Command Handler: `RegisterUserHandler`** (`src/identity/application/handlers/register_user_handler.py`)
-- **Dependencies:** `UnitOfWork`, `UserRepository`, `AccountProvisioningPort`
+- **Dependencies:** `UnitOfWork`, `UserRepository`, `EventBus`
 - **Flow:**
-  1. Create transient `User(id=0, ...)`.
-  2. Persist via `user_repo.add(user)` → receive `user_id`.
-  3. Call `account_port.create_default_account(user_id=user_id, currency_id=1)`.
-  4. Commit UOW.
-- **⚠️ Fragility:** `currency_id=1` is hardcoded. This assumes the first currency always has ID 1 and is active.
+  1. Validate `phone_email` by constructing `PhoneEmail` VO.
+  2. Check uniqueness via `user_repo.exists_by_phone_email()` – raise `UserAlreadyExistsError` if duplicate.
+  3. Create transient `User(id=None, name, phone_email_vo)`.
+  4. Persist via `user_repo.add(user)` → receive `user_id`.
+  5. Commit UOW.
+  6. Publish `UserRegisteredEvent` to the EventBus.
+- **No direct call to any Ledger adapter.** All cross‑context communication is event‑driven.
 
 **Query Handler: `GetAllUsersHandler`** (`src/identity/application/handlers/identity_query_handlers.py`)
-- **Returns:** `List[Any]` (raw tuples/dicts from SQLite).
-- **⚠️ Coupling:** Repository JOINs with `accounts`, `user_cards`, and `currencies` (Ledger tables).
+- **Returns:** `List[UserSummaryDTO]` from the `user_summaries` read model.
+- **Data source:** Pure Identity‑owned table; no cross‑context JOINs.
 
 **Query Handler: `SearchUsersHandler`** (`src/identity/application/handlers/identity_query_handlers.py`)
-- **Returns:** `List[Any]` filtered by `LIKE` on `users.name`, `accounts.account_number`, `user_cards.card_number`.
-- **⚠️ Coupling:** Same cross‑context JOIN issue.
+- **Returns:** `List[UserSummaryDTO]` filtered by `LIKE` on `name`, `account_number`, `card_number` columns of `user_summaries`.
+
+**DTO: `UserSummaryDTO`** (`src/identity/application/dto/user_summary.py`)
+- Flat read‑model object with fields: `user_id`, `name`, `phone_email`, `account_id`, `account_number`, `card_number`, `balance`, `currency_code`.
+
+**Read Model Handlers** (`src/identity/application/handlers/read_model_handlers.py`)
+- `UserRegisteredReadModelHandler` – inserts a new row into `user_summaries` on `UserRegisteredEvent`.
+- `AccountCreatedReadModelHandler` – updates the row with account details on `AccountCreatedEvent` (from Ledger).
+- `CardAssignedReadModelHandler` – updates the row with card number on `CardAssignedEvent`.
+
+**Cross‑Context Event Handlers**
+- `OnAccountCreatedHandler` (Identity) – listens to `AccountCreatedEvent` (from Ledger) and assigns a new card to the user, inserting into `user_cards` and emitting `CardAssignedEvent`.
 
 ### 3.3 Infrastructure Layer
 
 **Persistence Adapter: `SqliteUserRepository`** (`src/identity/infrastructure/persistence/sqlite_user_repository.py`)
 - **Implements:** `UserRepository`
-- **`add(user)`:** Inserts into `users` table; returns `lastrowid`.
-- **`get_all_summaries()`:** LEFT JOINs `users` with `accounts`, `user_cards`, and `currencies`.
-- **`search_summaries(query)`:** Same JOINs with `WHERE ... LIKE ...` on name, account_number, card_number.
-- **⚠️ Violation:** Direct SQL access to Ledger tables (`accounts`, `currencies`) from an Identity repository.
+- **`add(user)`:** Inserts into `users`; catches `IntegrityError` and translates to `UserAlreadyExistsError`. Returns `lastrowid`.
+- **`exists_by_phone_email(phone_email)`:** Simple `SELECT` on `users`.
+- **`get_all_summaries()`:** Queries local `user_summaries` table (Identity schema) – **no cross‑context JOINs**.
+- **`search_summaries(query)`:** Queries `user_summaries` with `LIKE` on name, account_number, card_number.
+- All methods return strongly typed `UserSummaryDTO` objects.
+
+**Database Schema** (`src/common/infrastructure/database/schemas/identity/identity.py`)
+- New table: `user_summaries` – read model owned by Identity context, synchronously updated via Domain Events.
 
 ---
 
 ## 4. API Contract
 
-All routes are served by the Identity Dashboard Web API (see Module 6). The user-specific endpoints are:
+All routes are served by the Identity Dashboard Web UI (server‑rendered MVC). The user-specific endpoints are:
 
 **GET /dashboard/users**
 - **Description:** List all users or search by query.
 - **Query Params:** `query` (optional search string).
-- **Response:** HTML render (`users.html`) with `users_list`, `query`, `currencies`.
+- **Response:** HTML render (`users.html`) with `users_list` (list of `UserSummaryDTO`), `query`, `currencies`.
 - **Query Handler:** `GetAllUsersHandler` (if no query) or `SearchUsersHandler`.
 
 **POST /dashboard/users/add**
-- **Description:** Register a new user and provision a default account.
+- **Description:** Register a new user. No account is created.
 - **Form Data:** `name`, `phone_email`
 - **Command:** `RegisterUserCommand`
-- **Success:** Redirect to `/dashboard/users`.
-- **Error:** Flash message.
+- **Success:** Redirect to `/dashboard/users` with success flash.
+- **Error:** `UserAlreadyExistsError` → flash message; other errors → generic flash.
 
 ---
 
@@ -118,25 +144,18 @@ All routes are served by the Identity Dashboard Web API (see Module 6). The user
     |
     v
 [RegisterUserHandler]
-    |-- 1. Create User(id=0, name, phone_email)
-    |-- 2. UserRepository.add(user) -> user_id
-    |-- 3. AccountProvisioningPort.create_default_account(user_id, currency_id=1)
-    |       |
-    |       v
-    |   [LedgerAccountProvisioningAdapter]   (see Module 4)
-    |       |-- generate_account_number()
-    |       |-- generate_card_number()
-    |       |-- INSERT INTO accounts (...)
-    |       |-- INSERT INTO user_cards (...)
-    |       |-- return account_id
-    |-- 4. UnitOfWork.commit()
+    |-- 1. Validate phone_email (PhoneEmail VO)
+    |-- 2. Check uniqueness (user_repo.exists_by_phone_email)
+    |-- 3. Create User(id=None, name, phone_email)
+    |-- 4. UserRepository.add(user) -> user_id
+    |-- 5. UnitOfWork.commit()
+    |-- 6. EventBus.publish(UserRegisteredEvent)
     |
     v
-[SQLite DB]
+[In-Memory EventBus]
+    |-- UserRegisteredReadModelHandler inserts row into user_summaries
+    |-- (Ledger context does NOT create account automatically)
 ```
-**⚠️ Known Issues:**
-- `currency_id=1` is hardcoded.
-- No domain event is emitted.
 
 ### 5.2 Query Users
 ```
@@ -147,12 +166,9 @@ All routes are served by the Identity Dashboard Web API (see Module 6). The user
     |
     v
 [GetAllUsersHandler] OR [SearchUsersHandler]
-    |-- SQL JOIN: users LEFT JOIN accounts LEFT JOIN user_cards LEFT JOIN currencies
-    |-- Returns: List of tuples/dicts with user + account + card + currency data
+    |-- SELECT from user_summaries (Identity table only, no JOINs)
+    |-- Returns List[UserSummaryDTO]
 ```
-**⚠️ Known Issues:**
-- Cross‑context JOINs.
-- Returns raw database rows instead of DTOs.
 
 ---
 
@@ -160,25 +176,25 @@ All routes are served by the Identity Dashboard Web API (see Module 6). The user
 
 | Issue | Severity | Description |
 |-------|----------|-------------|
-| **Hardcoded Currency ID** | High | `RegisterUserHandler` uses `currency_id=1`. Fragile; breaks if database is re‑seeded. |
-| **Primitive Obsession** | Medium | `User.phone_email` uses a raw string instead of a Value Object. |
-| **Cross-Context SQL Reads** | Critical | `SqliteUserRepository` JOINs with Ledger tables. Implement CQRS read models. |
-| **No Domain Events** | Medium | `RegisterUserHandler` does not emit `UserRegisteredEvent`. |
-| **Duplicate `phone_email`** | – | SQLite UNIQUE constraint violation propagates as unhandled exception → 500 error; no domain-level validation. |
+| **No Automatic Account** | — (by design) | Users are registered without a default account. Account creation must be performed manually from the dashboard. |
+| **Balance Staleness** | Medium | The `user_summaries.balance` column is not automatically updated after ledger transactions (e.g., top‑up, payment). Currently remains at '0.00' unless an explicit account creation sets it. Future: listen to transaction events to update the read model. |
+| **Account/Card Creation not yet implemented in Dashboard** | Medium | `AccountCreatedEvent` and `CardAssignedEvent` are emitted only when an account is created via the Ledger API (not yet wired from the Dashboard UI). Once wired, the read model and card assignment will work automatically. |
+| **Search uses LIKE on account/card** | Low | Works correctly, but may be slow on huge datasets without full‑text indexing. Acceptable for current scale. |
+
+All previously documented **Critical** and **High** severity issues (hardcoded currency, primitive obsession, cross‑context JOINs, 500 errors, missing domain events, transient ID anti‑pattern) have been **fully resolved**.
 
 ---
 
 ## 7. Notes & Refactoring Roadmap
 
-### Immediate
-- Replace hardcoded `currency_id=1` with a resolved default currency (e.g., by `currency_code` in command).
-
-### Medium Term
-- Emit `UserRegisteredEvent` from the handler; remove direct account provisioning call once event‑driven flow is ready.
-- Build a local `user_summaries` read model to avoid cross‑context JOINs.
-
-### Long Term
-- Introduce `PhoneEmail` Value Object with validation.
-- Move `RegisterUserCommand` to accept a `CurrencyCode` value object.
-
----
+### Completed (v1.1.0)
+- ✅ Primitive Obsession eliminated – `PhoneEmail` VO with validation.
+- ✅ Transient identity fixed – `id` is `None` until persisted.
+- ✅ Domain uniqueness invariant enforced; `UserAlreadyExistsError` raised before DB insertion.
+- ✅ Cross‑context coupling removed – user registration only emits `UserRegisteredEvent`.
+- ✅ Hardcoded `currency_id=1` removed.
+- ✅ Domain Events introduced (`UserRegisteredEvent`, `AccountCreatedEvent`, `CardAssignedEvent`).
+- ✅ Cross‑context SQL JOINs eliminated – local `user_summaries` read model used.
+- ✅ `IntegrityError` caught and translated to domain exception; friendly 400‑class errors in UI.
+- ✅ Return types are now `List[UserSummaryDTO]` instead of raw DB rows.
+- ✅ Controller uses `EventBus` from DI container.

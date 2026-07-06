@@ -14,11 +14,17 @@
     "command.txt",
     "tests",
     "find.py",
-    "src\\checkout",
     "src\\notifications",
     "static\\css",
-    "src\\ledger\\infrastructure"
+    "src\\ledger\\infrastructure",
+    "src\\ledger",
+    "src\\checkout",
+    "templates",
+    "static"
   ],
-  "lastModified": "2026-07-05T20:53:51.353Z",
+  "globalPatterns": [
+    "__init__.py"
+  ],
+  "lastModified": "2026-07-06T14:38:06.193Z",
   "version": 1
 }

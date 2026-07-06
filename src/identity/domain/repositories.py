@@ -21,6 +21,8 @@ class MerchantRepository(ABC):
     @abstractmethod
     def update(self, merchant: Merchant) -> None: raise NotImplementedError
     @abstractmethod
+    def get_by_id(self, merchant_id: int) -> Optional[Merchant]: raise NotImplementedError
+    @abstractmethod
     def get_all_summaries(self) -> List[Any]: raise NotImplementedError
     @abstractmethod
     def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]: raise NotImplementedError

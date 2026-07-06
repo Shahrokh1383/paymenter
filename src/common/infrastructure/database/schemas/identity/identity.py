@@ -1,3 +1,5 @@
+from src.common.infrastructure.database.schemas.identity.merchant_summaries_schema import MERCHANT_SUMMARIES_SCHEMA
+
 IDENTITY_SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -34,4 +36,4 @@ CREATE TABLE IF NOT EXISTS user_summaries (
     currency_code TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-"""
+""" + MERCHANT_SUMMARIES_SCHEMA

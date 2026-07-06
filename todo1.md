@@ -1,8 +1,6 @@
 fixed all the bugs in identity module docs checklist :
 
 
-2 : Merchant Management.md
-
 3 : Currency Management (Deprecated).md
 
 4 : Account Provisioning & Cross-Context Integration.md

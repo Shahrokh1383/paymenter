@@ -1,17 +1,24 @@
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
-# Identity Handlers (domain event subscribers)
 from src.identity.application.handlers.on_account_created_handler import OnAccountCreatedHandler
 from src.identity.application.handlers.read_model_handlers import (
     UserRegisteredReadModelHandler,
     AccountCreatedReadModelHandler,
     CardAssignedReadModelHandler
 )
+from src.identity.application.handlers.merchant_read_model_handlers import (
+    MerchantOnboardedReadModelHandler,
+    MerchantToggledReadModelHandler
+)
 
-# Events
 from src.identity.domain.events.user_events import UserRegisteredEvent
 from src.ledger.domain.events.account_events import AccountCreatedEvent
 from src.identity.domain.events.card_events import CardAssignedEvent
+from src.identity.domain.events.merchant_events import (
+    MerchantOnboardedEvent,
+    MerchantActivatedEvent,
+    MerchantDeactivatedEvent
+)
 
 def register_identity(container):
     bus = container.event_bus
@@ -31,8 +38,15 @@ def register_identity(container):
         SqliteUnitOfWork()
     ).handle(event))
 
-    # Identity card assignment handler:
     bus.subscribe(AccountCreatedEvent, lambda event: OnAccountCreatedHandler(
         SqliteUnitOfWork(),
         bus
     ).handle(event))
+
+    bus.subscribe(MerchantOnboardedEvent, lambda event: MerchantOnboardedReadModelHandler(
+        SqliteUnitOfWork()
+    ).handle(event))
+
+    toggled_handler = MerchantToggledReadModelHandler(SqliteUnitOfWork())
+    bus.subscribe(MerchantActivatedEvent, lambda event: toggled_handler.handle_activated(event))
+    bus.subscribe(MerchantDeactivatedEvent, lambda event: toggled_handler.handle_deactivated(event))

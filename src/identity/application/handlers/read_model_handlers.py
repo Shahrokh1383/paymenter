@@ -20,6 +20,9 @@ class AccountCreatedReadModelHandler:
         self._uow = uow
 
     def handle(self, event: AccountCreatedEvent) -> None:
+        if event.user_id is None:
+            return
+            
         with self._uow:
             self._uow.conn.execute(
                 """UPDATE user_summaries SET 
@@ -34,6 +37,9 @@ class CardAssignedReadModelHandler:
         self._uow = uow
 
     def handle(self, event: CardAssignedEvent) -> None:
+        if event.user_id is None:
+            return
+            
         with self._uow:
             self._uow.conn.execute(
                 "UPDATE user_summaries SET card_number = ? WHERE account_id = ?",

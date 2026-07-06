@@ -16,10 +16,12 @@ CREATE TABLE IF NOT EXISTS merchants (
 
 CREATE TABLE IF NOT EXISTS user_cards (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    user_id INTEGER NOT NULL, 
+    user_id INTEGER, 
+    merchant_id INTEGER,
     account_id INTEGER NOT NULL, 
     card_number TEXT NOT NULL UNIQUE, 
     FOREIGN KEY (user_id) REFERENCES users(id), 
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id),
     FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 

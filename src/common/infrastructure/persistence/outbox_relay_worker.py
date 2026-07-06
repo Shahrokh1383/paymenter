@@ -44,29 +44,37 @@ class OutboxRelayWorker:
     def _process_pending_messages(self):
         messages_to_process = []
         
-        # 1. FETCH PHASE (Read Lock only)
         try:
             with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
                 conn.row_factory = sqlite3.Row
                 conn.execute("PRAGMA journal_mode=WAL;")
                 cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT * FROM outbox_messages WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10"
-                )
+                
+                cursor.execute("""
+                    UPDATE outbox_messages 
+                    SET status = 'PROCESSING' 
+                    WHERE status = 'PENDING' 
+                    AND id IN (
+                        SELECT id FROM outbox_messages 
+                        WHERE status = 'PENDING' 
+                        ORDER BY created_at ASC LIMIT 10
+                    )
+                """)
+                
+                cursor.execute("SELECT * FROM outbox_messages WHERE status = 'PROCESSING'")
                 messages_to_process = [dict(row) for row in cursor.fetchall()]
+                conn.commit()
         except Exception as e:
             print(f"[OUTBOX ERROR] Failed to fetch messages: {e}")
             return
 
-        # 2. PROCESSING PHASE (Locks Released - Safe to call Handlers/SMTP/UoW)
+        if not messages_to_process:
+            return
+
         results = []
         for msg in messages_to_process:
             success = self._attempt_dispatch(msg)
             results.append((msg['id'], success, msg['retry_count']))
-
-        # 3. UPDATE PHASE (Write Lock)
-        if not results:
-            return
 
         try:
             with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
@@ -86,7 +94,7 @@ class OutboxRelayWorker:
                             print(f"[OUTBOX DLQ] Message {msg_id} moved to Dead Letter Queue.")
                         else:
                             cursor.execute(
-                                "UPDATE outbox_messages SET retry_count = ? WHERE id = ?", 
+                                "UPDATE outbox_messages SET status = 'PENDING', retry_count = ? WHERE id = ?", 
                                 (new_retry_count, msg_id)
                             )
                 conn.commit()

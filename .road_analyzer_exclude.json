@@ -17,12 +17,11 @@
     "src\\notifications",
     "static\\css",
     "src\\ledger\\infrastructure",
-    "src\\common",
-    "src\\identity"
+    "src\\common"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-06T17:45:54.609Z",
+  "lastModified": "2026-07-06T18:16:46.569Z",
   "version": 1
 }

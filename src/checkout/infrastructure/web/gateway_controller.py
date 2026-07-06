@@ -25,7 +25,7 @@ def show_gateway_page(token):
                 'token': session.token.value,
                 'merchant_name': session.merchant_name,
                 'amount': float(session.amount.amount),
-                'currency_code': session.amount.currency,
+                'currency_code': session.amount.currency.value,
                 'user_email': session.user_email.value,
                 'status': session.status,
                 'otp_requested': session.otp_code is not None

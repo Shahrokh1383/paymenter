@@ -54,7 +54,7 @@ class RequestOtpHandler:
             otp_code=otp_vo.value,
             merchant_name=session.merchant_name,
             amount=str(session.amount.amount),
-            currency_code=session.amount.currency
+            currency_code=session.amount.currency.value
         ))
 
         return {"expires_in_seconds": 180}

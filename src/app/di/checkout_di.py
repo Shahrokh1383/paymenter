@@ -31,17 +31,21 @@ def register_checkout(container):
         )
 
     def get_authorize_payment_handler(uow: SqliteUnitOfWork) -> AuthorizePaymentHandler:
+        ledger_handler = container.get_hold_funds_handler(uow)
+        
         return AuthorizePaymentHandler(
             uow=uow,
             session_repo=SqliteSessionRepository(uow),
-            fund_port=LedgerFundReservationAdapter(uow),
+            fund_port=LedgerFundReservationAdapter(ledger_handler),
             lookup_port=IdentityAccountLookupAdapter(uow)
         )
     
     def get_refund_payment_handler(uow: SqliteUnitOfWork) -> RefundPaymentHandler:
+        ledger_refund_handler = container.get_fail_and_refund_handler(uow)
+
         return RefundPaymentHandler(
             uow=uow,
-            refund_port=LedgerRefundAdapter(uow, container.event_bus)
+            refund_port=LedgerRefundAdapter(ledger_refund_handler)
         )
 
     container.get_initiate_payment_handler = get_initiate_payment_handler

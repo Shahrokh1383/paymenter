@@ -14,13 +14,14 @@ class IdentityAccountLookupAdapter(AccountLookupPort):
 
     def get_settlement_account_id(self, merchant_id: int, currency_code: str) -> Optional[int]:
         row = self._uow.conn.execute("""
-            SELECT m.settlement_account_id 
-            FROM merchants m
-            JOIN accounts a ON m.settlement_account_id = a.id
+            SELECT a.id 
+            FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
-            WHERE m.id = ? AND c.code = ? AND m.is_active = 1
+            JOIN merchants m ON a.merchant_id = m.id
+            WHERE a.merchant_id = ? AND c.code = ? AND m.is_active = 1
         """, (merchant_id, currency_code)).fetchone()
-        return row['settlement_account_id'] if row else None
+        
+        return row['id'] if row else None
     
     def get_email_by_card_number(self, card_number: str) -> Optional[str]:
         row = self._uow.conn.execute("""

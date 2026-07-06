@@ -48,7 +48,7 @@ class InitiatePaymentHandler:
             user_email=email_vo.value,
             merchant_name=command.merchant_name,
             amount=str(money_vo.amount),
-            currency_code=money_vo.currency
+            currency_code=money_vo.currency.value
         ))
 
         return token_vo.value

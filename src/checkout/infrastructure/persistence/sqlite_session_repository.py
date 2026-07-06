@@ -22,7 +22,7 @@ class SqliteSessionRepository(PaymentSessionRepository):
             session.token.value,
             session.merchant_id,
             str(session.amount.amount),
-            session.amount.currency,
+            session.amount.currency.value,  # <--- FIX: Unwrap Value Object to primitive string
             session.user_email.value,
             session.callback_url.value,
             session.status

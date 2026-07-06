@@ -51,7 +51,9 @@ class OnboardMerchantHandler:
                 settlement_account_id=settlement_account_id
             )
 
-            self._merchant_repo.add(merchant)
+            merchant_id = self._merchant_repo.add(merchant)
+            merchant.id = merchant_id
+
             self._uow.commit()
 
             self._event_bus.publish(

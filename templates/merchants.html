@@ -21,9 +21,7 @@
         <td>{{ m.settlement_balance or 0.0 }}</td>
         <td>{{ m.is_active }}</td>
         <td>
-            <form action="{{ url_for('dashboard.toggle_merchant', id=m.id, is_active=m.is_active) }}" method="POST">
-                <button type="submit">{{ 'Deactivate' if m.is_active else 'Activate' }}</button>
-            </form>
+            <form action="{{ url_for('dashboard.toggle_merchant', id=m.id) }}" method="POST">
         </td>
     </tr>
     {% endfor %}

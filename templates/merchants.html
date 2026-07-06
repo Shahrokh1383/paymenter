@@ -10,7 +10,7 @@
     <button type="submit">Add Merchant</button>
 </form>
 <table>
-    <tr><th>ID</th><th>Name</th><th>API Key</th><th>Settlement Bal</th><th>Active</th><th>Action</th></tr>
+    <tr><th>ID</th><th>Name</th><th>API Key</th><th>Active</th><th>Action</th></tr>
     {% for m in merchants %}
     <tr>
         <td>{{ m.id }}</td><td>{{ m.name }}</td>
@@ -18,10 +18,11 @@
             <span id="api-key-{{ m.id }}">{{ m.api_key }}</span>
             <button class="copy-btn" data-target="api-key-{{ m.id }}">Copy</button>
         </td>
-        <td>{{ m.settlement_balance or 0.0 }}</td>
         <td>{{ m.is_active }}</td>
         <td>
             <form action="{{ url_for('dashboard.toggle_merchant', id=m.id) }}" method="POST">
+                <button type="submit">Toggle</button>
+            </form>
         </td>
     </tr>
     {% endfor %}

@@ -1,26 +1,6 @@
 # Transaction Application (Commands) Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Business Rules](#business-rules)
-3. [Backend Architecture — Application Layer](#backend-architecture--application-layer)
-   - [Commands](#commands)
-   - [Handlers](#handlers)
-4. [Backend Architecture — Domain Layer (Events)](#backend-architecture--domain-layer-events)
-   - [Domain Events](#domain-events)
-   - [Event Publishing Rule](#event-publishing-rule)
-5. [Flows](#flows)
-   - [Hold Funds](#1-hold-funds)
-   - [Complete Funds](#2-complete-funds)
-   - [Fail & Refund](#3-fail--refund)
-6. [Edge Cases & Known Issues](#edge-cases--known-issues)
-7. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Transaction Application (Commands)** module orchestrates the write-side lifecycle of financial transactions. It defines the three core commands (`HoldFundsCommand`, `CompleteFundsCommand`, `FailAndRefundCommand`) and their corresponding handlers, which coordinate the `Transaction` aggregate, `DoubleEntryLedger` domain service, `Account` aggregates (including dynamically resolved System Escrow accounts), and domain event publishing.

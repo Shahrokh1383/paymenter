@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
 # Identity Imports
@@ -29,7 +29,6 @@ from src.identity.application.handlers.identity_query_handlers import (
 from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository
 from src.identity.infrastructure.persistence.sqlite_merchant_repository import SqliteMerchantRepository
 from src.identity.infrastructure.persistence.sqlite_currency_repository import SqliteCurrencyRepository
-from src.identity.infrastructure.persistence.ledger_account_provisioning_adapter import LedgerAccountProvisioningAdapter
 from src.identity.application.commands.register_user_command import RegisterUserCommand
 from src.identity.application.handlers.register_user_handler import RegisterUserHandler
 
@@ -92,24 +91,26 @@ def accounts():
         accounts_list = handler.handle(GetAllAccountsQuery())
         active_currencies = SqliteCurrencyRepository(uow).get_active()
         users_list = GetAllUsersHandler(SqliteUserRepository(uow)).handle(GetAllUsersQuery())
+        
+        merchants_list = GetAllMerchantsHandler(SqliteMerchantRepository(uow)).handle(GetAllMerchantsQuery())
+        
     return render_template('accounts.html',
                            accounts=accounts_list,
                            currencies=active_currencies,
-                           users=users_list)
+                           users=users_list,
+                           merchants=merchants_list)
 
 @dashboard_bp.route('/accounts/create', methods=['POST'])
 def create_account():
     try:
-        user_id = int(request.form['user_id'])
+        owner_id_str = request.form['owner_id']
         currency_code = request.form['currency_code']
-        uow = SqliteUnitOfWork()
-        from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository
-        user_repo = SqliteUserRepository(uow)
-        with uow:
-            if not user_repo.exists_by_id(user_id):
-                flash("User does not exist.", 'error')
-                return redirect(url_for('dashboard.accounts'))
+        
+        owner_type, owner_id = owner_id_str.split('_')
+        user_id = int(owner_id) if owner_type == 'user' else None
+        merchant_id = int(owner_id) if owner_type == 'merchant' else None
 
+        uow = SqliteUnitOfWork()
         handler = CreateAccountHandler(
             uow=uow,
             account_repo=SqliteAccountRepository(uow),
@@ -117,6 +118,7 @@ def create_account():
         )
         account_id = handler.handle(CreateAccountCommand(
             user_id=user_id,
+            merchant_id=merchant_id,
             currency_code=currency_code
         ))
         current_app.di_container.event_bus.flush()
@@ -173,8 +175,6 @@ def add_merchant():
         handler = OnboardMerchantHandler(
             uow,
             SqliteMerchantRepository(uow),
-            LedgerAccountProvisioningAdapter(uow),
-            SqliteCurrencyRepository(uow),
             current_app.di_container.event_bus
         )
         handler.handle(OnboardMerchantCommand(name=request.form['name']))

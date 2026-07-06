@@ -8,6 +8,7 @@ from src.ledger.domain.value_objects.account_number import AccountNumber
 class Account:
     id: int
     user_id: Optional[int]
+    merchant_id: Optional[int]
     account_number: AccountNumber
     balance: Money
     version: int = 0

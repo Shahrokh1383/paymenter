@@ -1,29 +1,6 @@
 # Ledger Infrastructure & Persistence Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Backend Architecture — Infrastructure Layer](#backend-architecture--infrastructure-layer)
-   - [Database Orchestrator (Rule 7 Compliance)](#database-orchestrator-rule-7-compliance)
-   - [SQLite Repositories](#sqlite-repositories)
-   - [Unit of Work](#unit-of-work)
-   - [Event Bus & Outbox Pattern](#event-bus--outbox-pattern)
-3. [Database Schema Reference](#database-schema-reference)
-   - [users](#users)
-   - [merchants](#merchants)
-   - [user_cards](#user_cards)
-   - [currencies](#currencies)
-   - [accounts](#accounts)
-   - [transactions](#transactions)
-   - [gateway_sessions](#gateway_sessions)
-   - [outbox_messages](#outbox_messages)
-4. [Edge Cases & Known Issues](#edge-cases--known-issues)
-5. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Ledger Infrastructure & Persistence** module implements the repository ports defined in the Domain layer, provides the transactional Unit of Work, and orchestrates the database schema. It handles all SQLite database access, entity mapping, and the underlying schema that supports the Ledger, Identity, and Checkout bounded contexts.

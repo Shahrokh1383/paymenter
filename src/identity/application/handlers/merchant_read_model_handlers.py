@@ -12,8 +12,8 @@ class MerchantOnboardedReadModelHandler:
     def handle(self, event: MerchantOnboardedEvent) -> None:
         with self._uow:
             self._uow.conn.execute(
-                "INSERT INTO merchant_summaries (id, name, api_key, is_active, settlement_balance) "
-                "VALUES (?, ?, ?, 1, '0.00')",
+                "INSERT INTO merchant_summaries (id, name, api_key, is_active) "
+                "VALUES (?, ?, ?, 1)",
                 (event.merchant_id, event.name, event.api_key.value)
             )
             self._uow.commit()

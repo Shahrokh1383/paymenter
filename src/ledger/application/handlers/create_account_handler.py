@@ -17,7 +17,6 @@ class CreateAccountHandler:
 
     def handle(self, cmd: CreateAccountCommand) -> int:
         with self._uow:
-            # Generate unique account number
             acc_num_str = generate_account_number(
                 lambda num: self._account_repo.get_by_account_number(num) is not None
                 if hasattr(self._account_repo, 'get_by_account_number') else False
@@ -25,10 +24,10 @@ class CreateAccountHandler:
             account_number = AccountNumber(acc_num_str)
             currency_code = CurrencyCode(cmd.currency_code)
 
-            # Create zero‑balance account
             account = Account(
                 id=None,
                 user_id=cmd.user_id,
+                merchant_id=cmd.merchant_id,
                 account_number=account_number,
                 balance=Money('0.00', currency_code),
                 version=0
@@ -40,6 +39,7 @@ class CreateAccountHandler:
             self._event_bus.publish(AccountCreatedEvent(
                 account_id=account_id,
                 user_id=cmd.user_id,
+                merchant_id=cmd.merchant_id,
                 account_number=account_number,
                 currency_code=currency_code
             ))

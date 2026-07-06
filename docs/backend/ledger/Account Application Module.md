@@ -3,27 +3,6 @@
 
 ---
 
-## Table of Contents
-1. [Overview](#overview)
-2. [Business Rules](#business-rules)
-3. [Backend Architecture — Application Layer](#backend-architecture--application-layer)
-   - [Commands](#commands)
-   - [Queries](#queries)
-   - [Handlers](#handlers)
-   - [DTOs](#dtos)
-4. [Backend Architecture — Infrastructure Layer (Read Side)](#backend-architecture--infrastructure-layer-read-side)
-   - [CQRS Read Model Ports](#cqrs-read-model-ports)
-   - [SQLite Read Model Implementations](#sqlite-read-model-implementations)
-5. [Flows](#flows)
-   - [Topup Account](#1-topup-account)
-   - [Update Account Currency](#2-update-account-currency)
-   - [Query All User Accounts](#3-query-all-user-accounts)
-   - [Query All Escrow Accounts](#4-query-all-escrow-accounts)
-6. [Edge Cases & Known Issues](#edge-cases--known-issues)
-7. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Account Application** module orchestrates write and read operations on the `Account` aggregate. It defines commands, queries, handlers, and strictly separated CQRS read-side projections for account summaries. All write operations strictly go through the Domain layer for invariant validation.

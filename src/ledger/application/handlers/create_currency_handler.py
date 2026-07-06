@@ -26,7 +26,8 @@ class CreateCurrencyHandler:
             
             escrow_account = Account(
                 id=0,
-                user_id=None,  # System accounts are not bound to Identity users
+                user_id=None,
+                merchant_id=None,
                 account_number=AccountNumber(system_account_number),
                 balance=Money('0.00', command.code)
             )

@@ -1,22 +1,5 @@
 # Transaction Application (Queries) Module — Single Source of Truth Documentation
-## Paymenter Project | Version 1.1.0
-
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Backend Architecture — Application Layer](#backend-architecture--application-layer)
-   - [Query](#query)
-   - [Handler](#handler)
-   - [DTO](#dto)
-3. [Backend Architecture — Infrastructure Layer (Read Side)](#backend-architecture--infrastructure-layer-read-side)
-   - [CQRS Read Model Port](#cqrs-read-model-port)
-   - [SQLite Read Model Implementation](#sqlite-read-model-implementation)
-4. [Flows](#flows)
-   - [Query Transactions](#query-transactions)
-5. [Notes & Technical Debt](#notes--technical-debt)
-
----
+## Paymenter Project | Version 1.1.
 
 ## Overview
 

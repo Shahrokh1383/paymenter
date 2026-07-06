@@ -1,25 +1,6 @@
 # Transaction Domain Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Business Rules](#business-rules)
-3. [Backend Architecture — Domain Layer](#backend-architecture--domain-layer)
-   - [Transaction Entity](#transaction-entity)
-   - [DoubleEntryLedger (Domain Service)](#doubleentryledger-domain-service)
-   - [Domain Events](#domain-events)
-   - [Repository Port](#repository-port)
-4. [Flows](#flows)
-   - [Hold Funds](#1-hold-funds)
-   - [Complete Funds](#2-complete-funds)
-   - [Fail & Refund](#3-fail--refund)
-5. [Edge Cases & Known Issues](#edge-cases--known-issues)
-6. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Transaction Domain** module is the financial core of the Ledger bounded context. It defines the `Transaction` aggregate with its strict state machine, the `DoubleEntryLedger` domain service that orchestrates mathematically balanced fund movements via a System Escrow account, and the domain events emitted for cross-context communication. This module is pure domain logic with zero external dependencies.

@@ -7,6 +7,6 @@ class Merchant:
     name: str
     api_key: ApiKey
     is_active: bool
-    settlement_account_id: int
     
-    def toggle(self) -> None: self.is_active = not self.is_active
+    def toggle(self) -> None: 
+        self.is_active = not self.is_active

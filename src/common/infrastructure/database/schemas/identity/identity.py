@@ -8,12 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS merchants (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    name TEXT NOT NULL, 
-    api_key TEXT NOT NULL UNIQUE, 
-    is_active BOOLEAN NOT NULL DEFAULT 1, 
-    settlement_account_id INTEGER, 
-    FOREIGN KEY (settlement_account_id) REFERENCES accounts(id)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    api_key TEXT NOT NULL UNIQUE,
+    is_active BOOLEAN NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS user_cards (

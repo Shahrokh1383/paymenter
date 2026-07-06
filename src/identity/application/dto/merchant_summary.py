@@ -6,4 +6,3 @@ class MerchantSummaryDTO:
     name: str
     api_key: str
     is_active: bool
-    settlement_balance: str

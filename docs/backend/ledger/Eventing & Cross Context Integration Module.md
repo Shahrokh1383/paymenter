@@ -1,19 +1,6 @@
 ### 📜 Eventing & Cross-Context Integration Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Backend Architecture — Cross-Context Integration](#backend-architecture--cross-context-integration)
-   - [DI Container](#di-container)
-   - [Event Bus](#event-bus)
-3. [Domain Events Reference](#domain-events-reference)
-4. [Edge Cases & Known Issues](#edge-cases--known-issues)
-5. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Eventing & Cross-Context Integration** module defines how the Ledger bounded context communicates with other contexts (specifically Notifications) through domain events. It ensures guaranteed delivery, strict boundary encapsulation, and asynchronous side-effect execution.

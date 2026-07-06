@@ -1,20 +1,6 @@
 # Account Domain Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Business Rules](#business-rules)
-3. [Backend Architecture — Domain Layer](#backend-architecture--domain-layer)
-   - [Account Entity](#account-entity)
-   - [Value Objects](#value-objects)
-   - [Repository Port](#repository-port)
-4. [Edge Cases & Known Issues](#edge-cases--known-issues)
-5. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Account Domain** module defines the core financial account model within the Ledger bounded context. It encapsulates the `Account` aggregate, its associated value objects, and the abstract repository port. This module is pure domain logic with zero external framework dependencies, strictly enforcing all financial invariants.

@@ -1,30 +1,6 @@
 # Ledger HTTP API Module — Single Source of Truth Documentation
 ## Paymenter Project | Version 1.1.0
 
----
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Backend Architecture — Infrastructure Layer (Web)](#backend-architecture--infrastructure-layer-web)
-   - [SSR Controller (HTML/Forms)](#ssr-controller-htmlforms)
-   - [REST API Controller (JSON)](#rest-api-controller-json)
-   - [Transaction Read Model (CQRS)](#transaction-read-model-cqrs)
-   - [DI Container Integration](#di-container-integration)
-3. [API Contract](#api-contract)
-   - [Hold Funds (Create Transaction)](#hold-funds-create-transaction)
-   - [Complete Funds](#complete-funds)
-   - [Fail & Refund](#fail--refund)
-   - [List Transactions](#list-transactions)
-4. [Flows](#flows)
-   - [Hold Funds](#1-hold-funds)
-   - [Complete Funds](#2-complete-funds)
-   - [Fail & Refund](#3-fail--refund)
-   - [Query Transactions](#4-query-transactions)
-5. [Edge Cases & Known Issues](#edge-cases--known-issues)
-6. [Notes & Technical Debt](#notes--technical-debt)
-
----
-
 ## Overview
 
 The **Ledger HTTP API** module exposes the transaction lifecycle and query operations via Flask web controllers. To maintain architectural purity and adhere to the Single Responsibility Principle (SRP), this module is strictly divided into two distinct paradigms: Server-Side Rendering (SSR) for HTML views and a pure RESTful JSON API for programmatic clients. All endpoints strictly enforce input validation, secure error handling, and support idempotency for state-mutating actions.

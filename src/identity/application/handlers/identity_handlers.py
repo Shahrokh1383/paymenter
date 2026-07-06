@@ -17,38 +17,19 @@ from src.identity.application.commands.identity_commands import (
 
 
 class OnboardMerchantHandler:
-    def __init__(
-        self,
-        uow: UnitOfWork,
-        merchant_repo: MerchantRepository,
-        account_port: AccountProvisioningPort,
-        currency_repo: CurrencyRepository,
-        event_bus: EventBus
-    ):
+    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):
         self._uow = uow
         self._merchant_repo = merchant_repo
-        self._account_port = account_port
-        self._currency_repo = currency_repo
         self._event_bus = event_bus
 
     def handle(self, cmd: OnboardMerchantCommand) -> None:
         with self._uow:
-            active_currencies = self._currency_repo.get_active()
-            if not active_currencies:
-                raise ValueError("No active currencies found. Please add a currency first.")
-            settlement_currency = sorted(active_currencies, key=lambda c: c.id)[0]
-
-            settlement_account_id = self._account_port.create_default_account(
-                None, settlement_currency.id
-            )
-
             api_key = ApiKey(generate_api_key())
             merchant = Merchant(
                 id=0,
                 name=cmd.name,
                 api_key=api_key,
-                is_active=True,
-                settlement_account_id=settlement_account_id
+                is_active=True
             )
 
             merchant_id = self._merchant_repo.add(merchant)

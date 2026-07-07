@@ -25,7 +25,7 @@
         <select name="currency_code" required>
             <option value="" disabled selected>Select Currency</option>
             {% for c in currencies %}
-            <option value="{{ c.code }}">{{ c.code }} ({{ c.name }})</option>
+            <option value="{{ c.code.value }}">{{ c.code.value }} ({{ c.name }})</option>
             {% endfor %}
         </select>
         <button type="submit">Create Account</button>
@@ -44,7 +44,7 @@
         <select name="currency_code" required>
             <option value="" disabled selected>Select Currency</option>
             {% for c in currencies %}
-            <option value="{{ c.code }}">{{ c.code }} ({{ c.name }})</option>
+            <option value="{{ c.code.value }}">{{ c.code.value }} ({{ c.name }})</option>
             {% endfor %}
         </select>
         <button type="submit">Update Currency</button>
@@ -52,25 +52,35 @@
 </div>
 
 <table>
-    <tr>
-        <th>ID</th><th>User</th><th>Currency</th><th>Account Num</th><th>Card Num</th><th>Balance</th><th>Actions</th>
-    </tr>
-    {% for a in accounts %}
-    <tr>
-        <td>{{ a.id }}</td>
-        <td>{{ a.user_name }}</td>
-        <td><strong>{{ a.currency_code or 'Not Set' }}</strong></td>
-        <td>{{ a.account_number }}</td>
-        <td>{{ a.card_number }}</td>
-        <td class="balance">{{ a.balance }}</td>
-        <td>
-            <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">
-                <input type="hidden" name="account_id" value="{{ a.id }}">
-                <input type="number" name="amount" step="0.01" placeholder="Amount" required style="width:80px;">
-                <button type="submit">Topup</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Currency</th>
+            <th>Account Num</th>
+            <th>Card Num</th>
+            <th>Balance</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in accounts %}
+        <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.user_name }}</td>
+            <td><strong>{{ a.currency_code or 'Not Set' }}</strong></td>
+            <td>{{ a.account_number }}</td>
+            <td>{{ a.card_number }}</td>
+            <td class="balance">{{ a.balance }}</td>
+            <td>
+                <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="account_id" value="{{ a.id }}">
+                    <input type="number" name="amount" step="0.01" placeholder="Amount" required style="width:80px;">
+                    <button type="submit">Topup</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

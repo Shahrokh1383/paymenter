@@ -4,23 +4,49 @@
 {% endblock %}
 
 {% block body %}
-<h1>Currencies</h1>
-<form action="{{ url_for('dashboard.add_currency') }}" method="POST">
-    <input type="text" name="name" placeholder="Currency Name (e.g. Dollar)" required>
-    <input type="text" name="code" placeholder="Code (e.g. USD)" required>
-    <button type="submit">Add Currency</button>
-</form>
+<h1>Currencies Management</h1>
+
+<div class="form-container">
+    <h2>Add New Currency</h2>
+    <form action="{{ url_for('dashboard.add_currency') }}" method="POST">
+        <input type="text" name="name" placeholder="Currency Name (e.g. Dollar)" required>
+        <input type="text" name="code" placeholder="Code (e.g. USD)" required maxlength="3">
+        <button type="submit">Add Currency</button>
+    </form>
+</div>
+
 <table>
-    <tr><th>ID</th><th>Name</th><th>Code</th><th>Active</th><th>Action</th></tr>
-    {% for c in currencies %}
-    <tr>
-        <td>{{ c.id }}</td><td>{{ c.name }}</td><td>{{ c.code }}</td><td>{{ c.is_active }}</td>
-        <td>
-            <form action="{{ url_for('dashboard.toggle_currency', id=c.id, is_active=c.is_active) }}" method="POST">
-                <button type="submit">{{ 'Deactivate' if c.is_active else 'Activate' }}</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in currencies %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.name }}</td>
+            <td><strong>{{ c.code.value }}</strong></td>
+            <td>
+                {% if c.is_active %}
+                    <span class="status-active">Active</span>
+                {% else %}
+                    <span class="status-inactive">Inactive</span>
+                {% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for('dashboard.toggle_currency', id=c.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-toggle">
+                        {{ 'Deactivate' if c.is_active else 'Activate' }}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

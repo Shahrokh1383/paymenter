@@ -14,14 +14,15 @@
     "command.txt",
     "tests",
     "find.py",
-    "src\\notifications",
     "static\\css",
     "src\\ledger\\infrastructure",
-    "src\\common"
+    "static",
+    "templates",
+    "src\\checkout"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-06T18:16:46.569Z",
+  "lastModified": "2026-07-07T11:00:03.781Z",
   "version": 1
 }

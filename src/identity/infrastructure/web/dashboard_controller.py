@@ -37,7 +37,6 @@ def add_currency():
         with uow:
             handler = current_app.di_container.get_create_currency_handler(uow)
             handler.handle(CreateCurrencyCommand(name=request.form['name'], code=request.form['code']))
-            current_app.di_container.event_bus.flush()
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.currencies'))
@@ -49,7 +48,6 @@ def toggle_currency(id):
         with uow:
             handler = current_app.di_container.get_toggle_currency_handler(uow)
             handler.handle(ToggleCurrencyCommand(currency_id=id))
-            current_app.di_container.event_bus.flush()
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.currencies'))
@@ -73,7 +71,6 @@ def add_user():
         with uow:
             handler = current_app.di_container.get_register_user_handler(uow)
             handler.handle(RegisterUserCommand(name=request.form['name'], phone_email=request.form['phone_email']))
-            current_app.di_container.event_bus.flush()
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.users'))
@@ -102,7 +99,6 @@ def create_account():
         with uow:
             handler = current_app.di_container.get_create_account_handler(uow)
             account_id = handler.handle(CreateAccountCommand(user_id=user_id, merchant_id=merchant_id, currency_code=currency_code))
-            current_app.di_container.event_bus.flush()
         flash(f"Account created with ID {account_id}.", 'success')
     except Exception as e:
         flash(str(e), 'error')
@@ -128,7 +124,6 @@ def topup_account():
         with uow:
             handler = current_app.di_container.get_topup_account_handler(uow)
             handler.handle(TopupAccountCommand(account_id=int(request.form['account_id']), amount=amount))
-            current_app.di_container.event_bus.flush()
         flash("Topup successful.", 'success')
     except Exception as e:
         flash(str(e), 'error')
@@ -156,7 +151,6 @@ def add_merchant():
         with uow:
             handler = current_app.di_container.get_onboard_merchant_handler(uow)
             handler.handle(OnboardMerchantCommand(name=request.form['name']))
-            current_app.di_container.event_bus.flush()
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.merchants'))
@@ -168,7 +162,6 @@ def toggle_merchant(id):
         with uow:
             handler = current_app.di_container.get_toggle_merchant_handler(uow)
             handler.handle(ToggleMerchantCommand(merchant_id=id))
-            current_app.di_container.event_bus.flush()
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.merchants'))

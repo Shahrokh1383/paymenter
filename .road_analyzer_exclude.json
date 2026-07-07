@@ -18,11 +18,12 @@
     "src\\ledger\\infrastructure",
     "static",
     "templates",
-    "src\\checkout"
+    "src\\checkout",
+    "src\\notifications"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-07T11:00:03.781Z",
+  "lastModified": "2026-07-07T11:42:01.367Z",
   "version": 1
 }

@@ -1,7 +1,7 @@
 from typing import List, Any
-from src.identity.domain.repositories import UserRepository, MerchantRepository, CurrencyRepository
+from src.identity.domain.repositories import UserRepository, MerchantRepository
 from src.identity.application.queries.identity_queries import (
-    GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery, GetAllCurrenciesQuery
+    GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery
 )
 from src.identity.application.dto.user_summary import UserSummaryDTO
 from src.identity.application.dto.merchant_summary import MerchantSummaryDTO
@@ -19,10 +19,7 @@ class SearchUsersHandler:
         return self._repo.search_summaries(query.query)
 
 class GetAllMerchantsHandler:
-    def __init__(self, merchant_repo: MerchantRepository): self._repo = merchant_repo
+    def __init__(self, merchant_repo: MerchantRepository): 
+        self._repo = merchant_repo
     def handle(self, query: GetAllMerchantsQuery) -> List[MerchantSummaryDTO]:
         return self._repo.get_all_summaries()
-
-class GetAllCurrenciesHandler:
-    def __init__(self, currency_repo: CurrencyRepository): self._repo = currency_repo
-    def handle(self, query: GetAllCurrenciesQuery) -> List[Any]: return self._repo.get_all()

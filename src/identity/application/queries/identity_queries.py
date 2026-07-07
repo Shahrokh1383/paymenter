@@ -11,7 +11,3 @@ class SearchUsersQuery:
 @dataclass(frozen=True)
 class GetAllMerchantsQuery:
     pass
-
-@dataclass(frozen=True)
-class GetAllCurrenciesQuery:
-    pass

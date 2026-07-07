@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from src.notifications.domain.value_objects.account_owner_profile import AccountOwnerProfile
 
 class AccountOwnerResolverPort(ABC):
-    """
-    Anti-Corruption Layer (ACL) Port.
-    Resolves the registered Identity email for a given Ledger Account ID.
-    """
     @abstractmethod
     def get_email_by_account_id(self, account_id: int) -> Optional[str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def resolve_profile_by_account_id(self, account_id: int) -> Optional[AccountOwnerProfile]:
+        """Fetches email and current balance atomically."""
         raise NotImplementedError

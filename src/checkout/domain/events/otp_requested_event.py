@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from decimal import Decimal
+from src.common.domain.value_objects.email_address import EmailAddress
+from src.common.domain.value_objects.money import Money
+from src.checkout.domain.value_objects.session_token import SessionToken
+from src.checkout.domain.value_objects.otp_code import OtpCode
 
 @dataclass(frozen=True)
 class OtpRequestedEvent:
-    session_token: str
-    registered_email: str
-    otp_code: str
+    session_token: SessionToken
+    registered_email: EmailAddress
+    otp_code: OtpCode
     merchant_name: str
-    amount: Decimal
-    currency_code: str
+    amount: Money

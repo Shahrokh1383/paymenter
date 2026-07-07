@@ -9,6 +9,7 @@ from src.checkout.domain.ports.account_lookup_port import AccountLookupPort
 from src.checkout.domain.ports.otp_generator import OtpGenerator
 from src.checkout.domain.events.otp_requested_event import OtpRequestedEvent
 from src.checkout.application.commands.request_otp_command import RequestOtpCommand
+from src.common.domain.value_objects.email_address import EmailAddress
 
 class RequestOtpHandler:
     def __init__(
@@ -33,10 +34,12 @@ class RequestOtpHandler:
         with self._uow:
             session = self._session_repo.get_by_token(token_vo)
             
-            # 2. Resolve Registered Email via ACL (Ignores Laravel email)
-            registered_email = self._lookup_port.get_email_by_card_number(card_vo.value)
-            if not registered_email:
+            # 2. Resolve Registered Email via ACL
+            registered_email_str = self._lookup_port.get_email_by_card_number(card_vo.value)
+            if not registered_email_str:
                 raise DomainException("This card number is not registered in our system.")
+            
+            registered_email_vo = EmailAddress(registered_email_str)
                 
             # 3. Generate OTP and Expiration (3 Minutes)
             otp_vo = self._otp_gen.generate()
@@ -47,14 +50,13 @@ class RequestOtpHandler:
             self._session_repo.update(session)
             self._uow.commit()
 
-        # 5. Dispatch Event (OUTSIDE UoW)
+        # 5. Dispatch Event (OUTSIDE UoW) with strict Value Objects
         self._event_bus.publish(OtpRequestedEvent(
-            session_token=session.token.value,
-            registered_email=registered_email,
-            otp_code=otp_vo.value,
+            session_token=session.token,
+            registered_email=registered_email_vo,
+            otp_code=otp_vo,
             merchant_name=session.merchant_name,
-            amount=str(session.amount.amount),
-            currency_code=session.amount.currency.value
+            amount=session.amount
         ))
 
         return {"expires_in_seconds": 180}

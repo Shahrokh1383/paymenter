@@ -1,5 +1,4 @@
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.common.infrastructure.event_bus.outbox_event_bus_decorator import OutboxEventBusDecorator
 
 # Ledger Infrastructure Adapters
 from src.ledger.infrastructure.persistence.sqlite_account_repository import SqliteAccountRepository
@@ -25,9 +24,6 @@ def register_ledger(container):
     """
     Registers all Ledger bounded context handler factories.
     """
-    if not isinstance(container.event_bus, OutboxEventBusDecorator):
-        container.event_bus = OutboxEventBusDecorator(container.event_bus)
-
     def get_hold_funds_handler(uow: SqliteUnitOfWork) -> HoldFundsHandler:
         return HoldFundsHandler(
             uow=uow,

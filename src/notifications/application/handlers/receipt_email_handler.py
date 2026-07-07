@@ -2,11 +2,13 @@ from src.notifications.domain.ports.notification_dispatcher_port import Notifica
 from src.notifications.domain.ports.merchant_details_port import MerchantDetailsPort
 from src.notifications.domain.ports.idempotency_port import IdempotencyPort
 from src.notifications.domain.ports.account_owner_resolver_port import AccountOwnerResolverPort
+from src.common.domain.value_objects.email_address import EmailAddress
 
 # Ledger Events
 from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
+
 class ReceiptEmailHandler:
     """Listens to cross-context Domain events and orchestrates the notification dispatch."""
     
@@ -30,11 +32,13 @@ class ReceiptEmailHandler:
         self._dispatch_receipt_with_idempotency(event, "Refunded")
         
     def _dispatch_receipt_with_idempotency(self, event, status: str) -> None:
-        # 1. Resolve the ACTUAL account owner's email via ACL
-        to_email = self._account_resolver.get_email_by_account_id(event.payer_account_id)
-        if not to_email:
-            print(f"[NOTIFICATION WARNING] No email found for account {event.payer_account_id}")
+        # 1. Resolve the ACTUAL account owner's profile (Email + Balance) via ACL
+        profile = self._account_resolver.resolve_profile_by_account_id(event.payer_account_id)
+        if not profile:
+            print(f"[NOTIFICATION WARNING] No profile found for account {event.payer_account_id}")
             return 
+        
+        to_email_vo = EmailAddress(profile.email)
         
         idempotency_key = self._generate_idempotency_key(event)
         if self._idempotency_port.is_processed(idempotency_key):
@@ -47,11 +51,11 @@ class ReceiptEmailHandler:
                 merchant_name = name
 
         self._dispatcher.send_receipt(
-            to_email=to_email,
+            to_email=to_email_vo,
             status=status,
             amount=event.amount,
-            currency_code=event.amount.currency,
-            merchant_name=merchant_name
+            merchant_name=merchant_name,
+            remaining_balance=profile.balance
         )
         
         self._idempotency_port.mark_as_processed(idempotency_key)

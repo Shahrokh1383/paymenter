@@ -1,4 +1,4 @@
-# Module 2: Merchant Management  
+# Merchant Management Module
 ## Paymenter Project | Version 1.2.0 (SSOT Revised – Decoupled Account Provisioning)
 
 ---

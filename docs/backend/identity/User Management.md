@@ -1,4 +1,4 @@
-# Module 1: User Management
+# User Management Module
 ## Paymenter Project | Version 1.1.1 (SSOT Refined)
 
 ## 1. Overview

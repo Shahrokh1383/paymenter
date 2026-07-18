@@ -1,5 +1,7 @@
 # Transaction & Settlement Module
 
+**Version:** 1.0.0 (SSOT)  
+
 ## Table of Contents
 1. [Overview](#1-overview)
 2. [Business Rules & Invariants](#2-business-rules--invariants)

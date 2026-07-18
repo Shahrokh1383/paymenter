@@ -21,60 +21,6 @@
       "deleted": true
     },
     {
-      "id": "b367cebc-fa4a-424f-8d5e-c633c081ea3f",
-      "path": "docs/backend/identity/Account Provisioning & Cross-Context Integration.md",
-      "title": "Account Provisioning & Cross-Context Integration",
-      "lastModified": "2026-07-17T12:49:10.698Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "4ea49caf-19bd-4e72-afa4-b743da4f94c3",
-      "path": "docs/backend/identity/Identity Dashboard Web API.md",
-      "title": "Identity Dashboard Web API",
-      "lastModified": "2026-07-17T12:49:10.710Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "c4838bcc-e7b8-4a78-a8e1-448a49f9c096",
-      "path": "docs/backend/identity/Identity Infrastructure.md",
-      "title": "Identity Infrastructure",
-      "lastModified": "2026-07-17T12:49:10.721Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "684ac369-563d-437f-9d06-f87f30e3a722",
-      "path": "docs/backend/identity/Merchant Management.md",
-      "title": "Merchant Management",
-      "lastModified": "2026-07-17T12:49:10.731Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "ec93ad14-5651-4f9c-8be4-d318e202dbe4",
-      "path": "docs/backend/identity/README.md",
-      "title": "README",
-      "lastModified": "2026-07-17T12:49:10.742Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "8b1083df-a7d4-43d4-b843-7c82d5634449",
-      "path": "docs/backend/identity/User Management.md",
-      "title": "User Management",
-      "lastModified": "2026-07-17T12:49:10.753Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
       "id": "5e6a4532-ac69-4e30-acb8-13ea7cb4666c",
       "path": "docs/idea.md",
       "title": "Idea",
@@ -99,6 +45,51 @@
       "lastModified": "2026-07-18T10:59:09.066Z",
       "linkCount": 27,
       "isOrphaned": false,
+      "deleted": false
+    },
+    {
+      "id": "1dcc6ea2-5a62-48dc-9be2-b53e0b1f9e87",
+      "path": "docs/backend/identity/AdministraionDashboard.md",
+      "title": "AdministraionDashboard",
+      "lastModified": "2026-07-18T17:21:00.111Z",
+      "linkCount": 45,
+      "isOrphaned": false,
+      "deleted": false
+    },
+    {
+      "id": "af4e6fe2-fb6d-44c8-917d-6114a7469d6e",
+      "path": "docs/backend/identity/CardProvisioning.md",
+      "title": "CardProvisioning",
+      "lastModified": "2026-07-18T17:21:00.114Z",
+      "linkCount": 5,
+      "isOrphaned": false,
+      "deleted": false
+    },
+    {
+      "id": "3f5aaaf1-a4f2-455a-80ff-d84e6f061c90",
+      "path": "docs/backend/identity/MerchantManagement.md",
+      "title": "MerchantManagement",
+      "lastModified": "2026-07-18T17:21:00.123Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
+    },
+    {
+      "id": "ceebac48-3e3a-4429-8fe3-0a2ea1e31ee9",
+      "path": "docs/backend/identity/ReadModelProjections.md",
+      "title": "ReadModelProjections",
+      "lastModified": "2026-07-18T17:21:00.132Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
+    },
+    {
+      "id": "17c0d149-7d11-4bae-bf0b-67a7d53ec7ee",
+      "path": "docs/backend/identity/UserManagement.md",
+      "title": "UserManagement",
+      "lastModified": "2026-07-18T17:21:00.140Z",
+      "linkCount": 0,
+      "isOrphaned": true,
       "deleted": false
     }
   ]

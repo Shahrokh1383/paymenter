@@ -1,5 +1,6 @@
 # Account & Currency Module
----
+
+**Version:** 1.0.0 (SSOT)  
 
 ## Table of Contents
 1. [Overview](#1-overview)

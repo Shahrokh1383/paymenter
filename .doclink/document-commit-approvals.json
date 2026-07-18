@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "approvals": {
+    "ec93ad14-5651-4f9c-8be4-d318e202dbe4": [
+      {
+        "commitId": "a3b4ade1-d504-4c9d-b7b4-f9a9b993713f",
+        "approvedAt": "2026-07-18T10:02:45.124Z"
+      }
+    ],
+    "3c55b7ff-3053-4984-9b98-c971ace2ce2c": [
+      {
+        "commitId": "1144c2a8-0b35-40ab-9675-94a7ef9dc9ca",
+        "approvedAt": "2026-07-18T11:21:22.689Z"
+      }
+    ],
+    "eebfb945-32a5-4611-8b95-52bf7fae6f64": [
+      {
+        "commitId": "f1f4adc2-6ee4-4255-9abb-4eed3a340464",
+        "approvedAt": "2026-07-18T11:21:28.466Z"
+      }
+    ]
+  }
+}

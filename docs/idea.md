@@ -1,4 +1,3 @@
----
 *Paymenter Project*
 
 # Project Blueprint: Custom Payment Gateway Simulator
@@ -101,5 +100,3 @@ All endpoints require a valid `x-api-key` header. The system identifies the Merc
 8.  **Completion:** You click **[Complete]**. The 200,000 Toman is added to the "Laravel Shop" Settlement Account. Laravel polls `/api/verify`, sees `Success`, and confirms Ali's order.
 
 *(If you had clicked **[Fail]**, the 200,000 Toman would instantly be refunded back to Ali's account, restoring his balance to 1,000,000, and Laravel would receive the `Failed` status, canceling the order).*
-
----

@@ -1,0 +1,44 @@
+{
+  "workspaceId": "c:/Users/--------------------/Desktop/paymenter",
+  "docsFolderPath": "docs",
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.doclink/**",
+    "**/*.log",
+    ".vscode",
+    ".road_analyzer_exclude.json",
+    "command.txt",
+    "content.txt",
+    "requirements.txt",
+    "roadmap.txt",
+    "venv",
+    "static",
+    "templates",
+    "tests",
+    "todo.md",
+    "todo1.md",
+    ".gitignore",
+    ".git",
+    "start.sh",
+    "start.bat",
+    "README.md",
+    "fix2.txt",
+    "fix.txt",
+    "__pycache__"
+  ],
+  "schemaVersion": "1.0",
+  "docFolder": {
+    "id": "30c1efd9-357c-4154-a0ca-e1145616a119",
+    "path": "docs",
+    "signature": {
+      "fileCount": 23,
+      "topLevelFileNames": [
+        "idea.md"
+      ],
+      "directoryDepth": 3
+    },
+    "documentCount": 19
+  }
+}

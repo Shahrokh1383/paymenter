@@ -3,85 +3,85 @@
   "docsFolderPath": null,
   "documents": [
     {
-      "id": "6b8dd923-95fb-4f6d-ac00-8552c364d44d",
+      "id": "a80e163a-e584-4998-b5e3-8c9311ab1055",
       "path": "docs/backend/guideline/Constitution.md",
       "title": "Constitution",
-      "lastModified": "2026-07-17T12:49:10.683Z",
+      "lastModified": "2026-07-07T12:53:15.665Z",
       "linkCount": 0,
       "isOrphaned": true,
       "deleted": true
     },
     {
-      "id": "4fa7d8ad-3ea9-4536-ba21-ab802ef45c32",
+      "id": "0965e3a5-c456-4579-96bf-0bff64423b68",
       "path": "docs/backend/guideline/Laravel_Integration_Guide.md",
       "title": "Laravel_Integration_Guide",
-      "lastModified": "2026-07-17T12:49:10.689Z",
+      "lastModified": "2026-06-30T02:28:23.131Z",
       "linkCount": 0,
       "isOrphaned": true,
       "deleted": true
     },
     {
-      "id": "5e6a4532-ac69-4e30-acb8-13ea7cb4666c",
-      "path": "docs/idea.md",
-      "title": "Idea",
-      "lastModified": "2026-07-17T15:08:56.679Z",
+      "id": "c91c49cf-b08f-41e4-9e03-87f3a3400b22",
+      "path": "docs/backend/identity/AdministraionDashboard.md",
+      "title": "AdministraionDashboard",
+      "lastModified": "2026-07-19T00:41:21.350Z",
       "linkCount": 0,
       "isOrphaned": true,
-      "deleted": true
+      "deleted": false
     },
     {
-      "id": "3c55b7ff-3053-4984-9b98-c971ace2ce2c",
+      "id": "6f776c38-a593-45c6-9eaf-21c0abc18bed",
+      "path": "docs/backend/identity/CardProvisioning.md",
+      "title": "CardProvisioning",
+      "lastModified": "2026-07-19T00:41:21.350Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
+    },
+    {
+      "id": "95cf396b-7499-456b-b9b3-bb6fb079a068",
+      "path": "docs/backend/identity/MerchantManagement.md",
+      "title": "MerchantManagement",
+      "lastModified": "2026-07-19T00:41:21.351Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
+    },
+    {
+      "id": "ec3e9daf-1543-4f59-a89c-d149305a90aa",
+      "path": "docs/backend/identity/UserManagement.md",
+      "title": "UserManagement",
+      "lastModified": "2026-07-19T00:41:21.351Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
+    },
+    {
+      "id": "12cdc950-455d-42d7-b380-68aee169baee",
       "path": "docs/backend/ledger/LedgerKernel.md",
       "title": "LedgerKernel",
-      "lastModified": "2026-07-18T10:38:04.319Z",
+      "lastModified": "2026-07-19T00:41:21.352Z",
       "linkCount": 27,
       "isOrphaned": false,
       "deleted": false
     },
     {
-      "id": "eebfb945-32a5-4611-8b95-52bf7fae6f64",
+      "id": "3bbad49b-c1f2-49a5-9ba7-8f8eefb32dff",
       "path": "docs/backend/ledger/SettlementCore.md",
       "title": "SettlementCore",
-      "lastModified": "2026-07-18T10:59:09.066Z",
+      "lastModified": "2026-07-19T00:41:21.353Z",
       "linkCount": 26,
       "isOrphaned": false,
       "deleted": false
     },
     {
-      "id": "1dcc6ea2-5a62-48dc-9be2-b53e0b1f9e87",
-      "path": "docs/backend/identity/AdministraionDashboard.md",
-      "title": "AdministraionDashboard",
-      "lastModified": "2026-07-18T17:21:00.111Z",
-      "linkCount": 45,
-      "isOrphaned": false,
-      "deleted": false
-    },
-    {
-      "id": "af4e6fe2-fb6d-44c8-917d-6114a7469d6e",
-      "path": "docs/backend/identity/CardProvisioning.md",
-      "title": "CardProvisioning",
-      "lastModified": "2026-07-18T17:21:00.114Z",
-      "linkCount": 9,
-      "isOrphaned": false,
-      "deleted": false
-    },
-    {
-      "id": "3f5aaaf1-a4f2-455a-80ff-d84e6f061c90",
-      "path": "docs/backend/identity/MerchantManagement.md",
-      "title": "MerchantManagement",
-      "lastModified": "2026-07-18T17:21:00.123Z",
-      "linkCount": 15,
-      "isOrphaned": false,
-      "deleted": false
-    },
-    {
-      "id": "17c0d149-7d11-4bae-bf0b-67a7d53ec7ee",
-      "path": "docs/backend/identity/UserManagement.md",
-      "title": "UserManagement",
-      "lastModified": "2026-07-18T17:21:00.140Z",
-      "linkCount": 14,
-      "isOrphaned": false,
-      "deleted": false
+      "id": "d7e44e79-8814-40c5-bf2d-eb20a3c09257",
+      "path": "docs/idea.md",
+      "title": "Idea",
+      "lastModified": "2026-07-19T00:41:21.353Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": true
     }
   ]
 }

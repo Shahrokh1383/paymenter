@@ -1,6 +1,6 @@
 # MODULE DOCUMENTATION: USER MANAGEMENT
 
-**Version:** 1.0.0 (SSOT)  
+**Version:** 2.0.0 (SSOT)  
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -14,127 +14,108 @@
 ---
 
 ## Overview
-The User Management module is responsible for the entire lifecycle of `User` entities within the Identity bounded context. It enforces domain invariants related to contact uniqueness and normalization through the `PhoneEmail` Value Object. It operates as a purely internal domain, exposing no public API; its functionality is consumed exclusively by application-layer command handlers that react to administrative inputs. The module emits `UserRegisteredEvent` to signal user creation, enabling downstream read-model projection and cross-context coordination (notably virtual card provisioning).
-
----
+The User Management module manages the lifecycle of `User` entities within the Identity bounded context. It operates on a strict Hexagonal/DDD architecture with a CQRS-lite read-model projection. The write-side handles registration, enforcing domain invariants via the `PhoneEmail` Value Object. The read-side maintains a denormalized `user_summaries` table to serve the internal Administration Dashboard. The module is designed as a zero-ops local simulator, prioritizing immediate consistency and simplicity over production-grade fault isolation and horizontal scalability.
 
 ## Business Rules
 
 ### 1. Specification (WHAT)
-*   **User Uniqueness & Normalization:** 
-    *   Users are uniquely identified by a `PhoneEmail` Value Object.
-    *   **Emails:** Validated via regex, automatically stripped of whitespace, and normalized to lowercase.
-    *   **Phones:** Validated against E.164 format (`^\+?[1-9]\d{1,14}$`).
-    *   **Invariant:** A user cannot be registered if the `PhoneEmail` already exists in the `users` table.
-*   **User Entity Attributes:** A `User` consists of an immutable identifier, a display `name`, and the `PhoneEmail` contact. The identifier is generated upon persistence.
-*   **Domain Events:** Every successful user registration emits a `UserRegisteredEvent` containing the user’s id, name, and normalized contact.
+*   **User Uniqueness & Normalization:** Users are uniquely identified by a `PhoneEmail` Value Object. Emails are normalized to lowercase; phones are validated against E.164. A user cannot be registered if the `PhoneEmail` exists in the `users` table.
+*   **Entity Attributes:** A `User` consists of an auto-incrementing integer `id`, a `name`, and the `PhoneEmail` contact.
+*   **Domain Events:** Successful registration emits a `UserRegisteredEvent` containing the `user_id`, `name`, and normalized `PhoneEmail`.
 
-### 2. Rationale & Trade-offs (WHY)
-*   **Why `PhoneEmail` as a single Value Object?** To allow users to register with either a phone number or an email seamlessly while preventing primitive obsession at the domain boundary. Normalization (lowercase emails) prevents duplicate account creation due to casing differences.
-*   **Why enforce the invariant at the repository level?** The `exists_by_phone_email` check, combined with the `UNIQUE` constraint on the `phone_email` column, provides a defence-in-depth guarantee against duplicates, even in concurrent scenarios.
+### 2. Rationale (WHY)
+*   **Single String Value Object:** Combining phone and email into a single `PhoneEmail` string simplifies the UI and allows a single `UNIQUE` constraint in SQLite to prevent duplicate accounts across both mediums. Normalization prevents casing-based duplicates.
+*   **Surrogate Key:** Using an auto-incrementing integer ID decouples the user's internal identity from their mutable contact information, allowing future contact updates without breaking foreign keys.
 
 ### 3. Rejected Alternatives
-*   **Rejected:** *Separate `Phone` and `Email` Value Objects.*
-    *   **Reason:** The business requirement allows registration via *either* method in a single field. Combining them into `PhoneEmail` simplifies the UI and the unique constraint logic in the database.
-
----
+*   **Rejected:** *Separate `Phone` and `Email` Value Objects / Two Nullable Columns.*
+    *   **Reason:** Discarded because it complicates the database schema (requiring composite constraints or complex domain logic to ensure at least one is present) and makes the SQLite `UNIQUE` constraint implementation significantly harder. We sacrificed downstream type-ambiguity (forcing the Notifications context to re-parse the string to decide between SMS/Email routing) to achieve write-side simplicity.
 
 ## Backend Architecture
 
-### 1. Specification (WHAT)
-*   **Domain Layer:**
-    *   Entity: `User` (with `id`, `name`, `phone_email`).
-    *   Value Object: `PhoneEmail` – encapsulates validation, stripping, and normalization logic.
-    *   Domain Event: `UserRegisteredEvent`.
-    *   Repository Interface: `UserRepository` (abstraction) with methods `add(user)`, `exists_by_phone_email(value)`.
-*   **Application Layer:**
-    *   Command: `RegisterUserCommand(name, phone_email)`.
-    *   Handler: `RegisterUserHandler` – validates input, creates `User`, checks uniqueness via repository, persists, and publishes `UserRegisteredEvent`.
-*   **Infrastructure Layer:**
-    *   Repository Implementation: `SqliteUserRepository` persisting to the `users` table.
-    *   Database Schema:
-        ```sql
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            phone_email TEXT NOT NULL UNIQUE
-        );
-        ```
-    *   The `users` table is defined in an isolated schema file (`identity.py`) and aggregated into the master schema via `src/common/infrastructure/database/__init__.py`.
+### 1. Technical Details (WHAT)
+*   **Domain & Application:** Pure Python dataclasses (`User`, `PhoneEmail`, `RegisterUserCommand`). Handlers rely strictly on the `UnitOfWork` and `EventBus` ports.
+*   **Persistence:** `SqliteUserRepository` persists to SQLite. The `SqliteUnitOfWork` creates a fresh `sqlite3` connection per request, enforcing `PRAGMA foreign_keys = ON` and `PRAGMA journal_mode=WAL`.
+*   **CQRS Read Model:** A `user_summaries` table is populated synchronously via `UserRegisteredReadModelHandler` listening to `UserRegisteredEvent`.
 
-### 2. Rationale & Trade-offs (WHY)
-*   **Why a dedicated repository interface?** It strictly adheres to the Dependency Inversion Principle. The domain and application layers have zero knowledge of SQLite; the infrastructure layer becomes a plugin that can be swapped without touching business logic.
-*   **Why an autoincrement integer primary key?** For MVP simplicity, providing a sequential, lightweight identifier for internal references. The user’s external identity is carried by the `PhoneEmail`.
+### 2. Decisions (WHY)
+*   **SQLite with WAL Mode:** Chosen explicitly for a "zero-ops" local simulator environment. It requires no external database services, making the project instantly runnable on any developer machine.
+*   **Synchronous In-Memory Event Bus:** Ensures immediate consistency for the read model. When the HTTP request completes, the dashboard is guaranteed to show the new user.
+*   **Denormalized Read Model (`user_summaries`):** Pre-joins user data with future account/card data to prepare the Identity context for a future microservice split, strictly adhering to the architectural constitution that contexts must not share database schemas or perform cross-context JOINs.
 
 ### 3. Rejected Alternatives
-*   **Rejected:** *Using `PhoneEmail` as the primary key.*
-    *   **Reason:** A user may wish to change their contact in the future. Using a surrogate key decouples identity from the mutable contact attribute.
-
----
+*   **Rejected:** *PostgreSQL / MySQL with Connection Pooling.*
+    *   **Reason:** Discarded to maintain the zero-ops simulator mandate. We sacrificed concurrent write throughput, row-level locking, and advanced indexing to eliminate infrastructure dependencies.
+*   **Rejected:** *Out-of-Process Message Broker (Kafka/RabbitMQ) or Async Background Workers.*
+    *   **Reason:** Discarded to avoid infrastructure complexity and maintain immediate consistency in the local simulator. We sacrificed fault-isolation (a failing read-model handler crashes the write request) and horizontal scalability.
+*   **Rejected:** *SQL JOINs across `users`, `accounts`, and `user_cards` at query time.*
+    *   **Reason:** Discarded to enforce strict bounded-context isolation. We sacrificed DRY principles and short-term query simplicity to ensure the Identity context can be physically separated into a microservice later without breaking read capabilities.
 
 ## API Contract / Integration
 
-### 1. Specification (WHAT)
-*   **Contract Type:** This module exposes no direct HTTP or network API. It is an internal bounded-context component.
-*   **Public Interface:** The module’s functionality is accessible only through the `RegisterUserHandler` application service, which is invoked by the Administration Dashboard module (or potentially by other contexts in the future).
-*   **Input:** `RegisterUserCommand` Data Transfer Object (DTO).
-*   **Output:** On success, a `UserRegisteredEvent` is published; no return value is expected by the caller besides a success indication via exception handling.
+### 1. Exact Endpoints/Schemas (WHAT)
+*   **Delivery Mechanism:** Server-Side Rendered (SSR) HTML via Flask/Jinja2. No public JSON API exists.
+*   **Internal Routes:**
+    *   `GET /dashboard/users` -> Executes `GetAllUsersQuery` or `SearchUsersQuery`.
+    *   `POST /dashboard/users/add` -> Accepts form data, maps to `RegisterUserCommand`.
+*   **Integration:** Consumed exclusively by the Administration Dashboard module. Downstream contexts (Ledger, Checkout) integrate via the `InMemoryEventBus`.
 
-### 2. Rationale & Trade-offs (WHY)
-*   **Why no public API?** User management is an internal administrative function. All external interaction is channelled through the admin dashboard’s HTML forms. Exposing a raw API would widen the attack surface without business need.
-*   **Why communicate only through events?** The event is the contract that allows other modules (Read Model Projections, Card Provisioning) to react without knowing user registration internals.
+### 2. Contract Choices (WHY)
+*   **SSR via Flask:** Chosen for rapid MVP delivery. It eliminates the need for a frontend build pipeline (React/Next.js) and allows a single developer to ship a fully functional admin UI alongside the backend.
+*   **No CSRF Protection:** The simulator relies on a hardcoded `secret_key` and implicit trust, assuming it runs strictly on `localhost` accessed only by the developer.
 
 ### 3. Rejected Alternatives
-*   **Rejected:** *Direct method calls between modules for post-registration actions.*
-    *   **Reason:** Would create source-code coupling. The event-driven approach keeps the User module oblivious of downstream consumers.
-
----
+*   **Rejected:** *Decoupled SPA (React/Next.js) consuming a JSON API.*
+    *   **Reason:** Discarded to accelerate MVP delivery. We sacrificed API-first design, frontend/backend separation, and built-in web security (CSRF tokens) to deliver a functional local UI in the shortest possible time.
 
 ## Execution Flows
 
-### 1. Specification (WHAT)
-**Flow: User Registration (within User Management scope)**
-1.  **Command:** Admin submits form data, which is translated into `RegisterUserCommand(name, phone_email)`.
-2.  **Validation:** `RegisterUserHandler` instantiates `PhoneEmail` – the Value Object constructor validates format (email regex or E.164), strips whitespace, normalizes email to lowercase. If invalid, an exception is raised.
-3.  **Uniqueness Check:** Handler calls `UserRepository.exists_by_phone_email(phone_email_value)`. If `True`, registration is rejected with a domain error.
-4.  **Entity Creation:** A new `User` entity is instantiated with the provided `name` and the valid `PhoneEmail`.
-5.  **Persistence:** The repository’s `add(user)` is called, and the Unit of Work commits the transaction.
-6.  **Event Emission:** `UserRegisteredEvent` is published via the in-memory event bus. The handler then returns.
+### 1. Step-by-step Sequence (WHAT)
+1.  **Input:** Admin submits form to `POST /dashboard/users/add`.
+2.  **Translation:** `dashboard_controller` maps form data to `RegisterUserCommand`.
+3.  **Validation:** `RegisterUserHandler` instantiates `PhoneEmail` (validates regex, normalizes).
+4.  **Transaction Start:** `SqliteUnitOfWork` opens a connection and begins transaction.
+5.  **Invariant Check:** Handler calls `exists_by_phone_email`.
+6.  **Persistence:** Handler calls `repo.add(user)`, SQLite assigns `lastrowid`.
+7.  **Commit:** `uow.commit()` is called. The `users` row is permanently written.
+8.  **Event Emission:** Handler publishes `UserRegisteredEvent` to `InMemoryEventBus`.
+9.  **Read-Model Projection:** `UserRegisteredReadModelHandler` catches the event, opens a *new* UoW, inserts into `user_summaries`, and commits.
+10. **Response:** Controller redirects to `GET /dashboard/users`.
 
-### 2. Rationale & Trade-offs (WHY)
-*   **Why validate in the Value Object constructor?** Guarantees that any `PhoneEmail` instance in the system is always valid, making invalid states unrepresentable.
-*   **Why a separate existence check before `add`?** SQLite’s `UNIQUE` constraint acts as a final safeguard, but the explicit check enables a clear, user-friendly error message (e.g., “User already exists”) without relying on parsing a database exception.
+### 2. Sequence Justification (WHY)
+*   **Commit before Publish:** The write-side transaction must be committed before publishing events to ensure downstream handlers don't attempt to read uncommitted data (though in SQLite with a single connection pool, this is less risky, it is a strict DDD best practice).
+*   **New UoW in Read-Model Handler:** The read-model handler creates its own `SqliteUnitOfWork` to ensure its projection is committed independently, though in this synchronous setup, it executes in the same thread.
 
 ### 3. Rejected Alternatives
 *   **Rejected:** *Catching `IntegrityError` instead of an explicit existence check.*
-    *   **Reason:** Relying solely on database exceptions leaks infrastructure concerns into the application layer and makes it harder to distinguish “duplicate user” from other integrity violations.
-
----
+    *   **Reason:** Discarded because relying on database exceptions leaks infrastructure concerns into the application layer and makes it difficult to return clean, user-friendly flash messages to the SSR dashboard.
 
 ## Edge Cases & Known Issues
 
-### 1. Specification (WHAT)
-*   **Concurrent Duplicate Registration:** In a high-concurrency scenario, two requests could both pass the existence check before either commits, causing the second to fail on the `UNIQUE` constraint. This results in an unhandled `IntegrityError` that must be caught and translated into a domain error.
-*   **Normalization Bypass:** Any code that constructs a `User` entity without going through the `PhoneEmail` VO could bypass validation. The architecture mitigates this by making `PhoneEmail` the sole constructor parameter for the contact.
+### 1. Specific Scenario (WHAT)
+*   **The "Phantom User" Anomaly:** If `uow.commit()` succeeds, but the synchronous `UserRegisteredReadModelHandler` fails (e.g., disk full, or a bug in the projection SQL), the HTTP request crashes with a 500 error. However, the `users` table retains the new user, while the `user_summaries` table does not. The user exists in the domain but is invisible to the dashboard.
+*   **Downstream Ambiguity:** The `Notifications` context receives the `UserRegisteredEvent` containing a raw `PhoneEmail` string. It has no native way to know if it should dispatch an SMS or an Email without re-implementing the regex parsing logic.
 
-### 2. Rationale & Trade-offs (WHY)
-*   **Why accept a possible `IntegrityError`?** The probability is negligible for an admin-facing dashboard with human-speed inputs. Adding a pessimistic lock or advisory lock on SQLite would introduce complexity unjustified by the risk.
-*   **Why enforce construction strictly?** The domain layer is kept pure by ensuring all contact creation passes through the Value Object; no raw strings are ever assigned to the entity’s contact attribute.
+### 2. Root Cause & Impact (WHY)
+*   **Root Cause:** The decision to use a synchronous, in-process event bus without a distributed transaction (Saga/Outbox pattern) or a retry mechanism for read-model projections.
+*   **Impact:** Low for a local simulator, but catastrophic for a production payment system. Data inconsistency between the write-model and read-model.
 
 ### 3. Rejected Alternatives
-*   **Rejected:** *Application-level pessimistic lock before the existence check.*
-    *   **Reason:** SQLite’s write lock already serializes writers; an additional lock would be redundant and could introduce deadlocks in future multi-context scenarios.
+*   **Rejected:** *Implementing the Transactional Outbox Pattern or Distributed Sagas.*
+    *   **Reason:** Discarded as massive over-engineering for a local simulator. We accepted the risk of phantom users to maintain absolute architectural simplicity and zero external dependencies.
 
----
-
-## Architectural Notes & Rejected Decisions
+## Architectural Notes
 
 ### 1. Current Implementation (WHAT)
-*   **Schema Isolation:** The `users` table DDL is defined in a dedicated file and imported into the master database schema initializer, preserving separation of concerns.
-*   **Dependency Injection:** The `RegisterUserHandler` is never instantiated directly by controllers; it is obtained through `current_app.di_container.get_register_user_handler(uow)`. This ensures the handler depends only on abstractions (repository, event bus) and supports testability.
+*   **Centralized Generators:** Utility functions like `generate_card_number` (Luhn algorithm) and `generate_api_key` are housed in a generic `src/common/infrastructure/generators.py` file.
+*   **Connection-per-Request:** The `SqliteUnitOfWork` does not use connection pooling. It opens and closes a file handle on every single command/query execution.
 
-### 2. Discarded Alternatives & Reasons (WHY)
-*   **Rejected:** *Including user read-model updates directly in the registration handler.*
-    *   **Reason:** Would violate Single Responsibility Principle. The handler focuses on the write side; materialization is delegated to a dedicated Read Model Projections module through event handling.
-*   **Rejected:** *Storing `PhoneEmail` as two separate columns (phone, email) and deducing type.*
-    *   **Reason:** Overcomplicates the schema and does not reflect the business rule that the field is a single “contact” regardless of type.
+### 2. Discarded Alternatives (WHY)
+*   **Centralized Generators:** Kept in `common` for DRY (Don't Repeat Yourself) convenience across the simulator, even though card generation technically belongs to the Checkout/Card domain.
+*   **Connection-per-Request:** Kept because SQLite's file-system locking mechanism (even in WAL mode) means a connection pool would not significantly improve write throughput, and managing pool lifecycles in a simple Flask app adds unnecessary boilerplate.
+
+### 3. Rejected Alternatives
+*   **Rejected:** *Context-Specific Domain Factories (e.g., `CardNumberFactory` inside the Identity or Checkout context).*
+    *   **Reason:** Discarded to prioritize developer speed and DRY principles in the simulator. We sacrificed strict bounded-context purity (making generic infrastructure aware of domain-specific generation rules like Luhn) to maintain a single, easily accessible utility file.
+*   **Rejected:** *SQLAlchemy or an ORM for the Unit of Work.*
+    *   **Reason:** Discarded to maintain raw SQL transparency and avoid the "magic" and heavy dependency footprint of an ORM, keeping the simulator lightweight and the CQRS projections explicitly visible in the codebase.

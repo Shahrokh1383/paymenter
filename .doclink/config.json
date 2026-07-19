@@ -26,7 +26,8 @@
     "README.md",
     "fix2.txt",
     "fix.txt",
-    "__pycache__"
+    "__pycache__",
+    "__init__.py"
   ],
   "schemaVersion": "1.0",
   "docFolder": {

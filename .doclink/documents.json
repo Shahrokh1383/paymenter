@@ -34,7 +34,7 @@
       "path": "docs/backend/ledger/LedgerKernel.md",
       "title": "LedgerKernel",
       "lastModified": "2026-07-18T10:38:04.319Z",
-      "linkCount": 28,
+      "linkCount": 27,
       "isOrphaned": false,
       "deleted": false
     },
@@ -43,7 +43,7 @@
       "path": "docs/backend/ledger/SettlementCore.md",
       "title": "SettlementCore",
       "lastModified": "2026-07-18T10:59:09.066Z",
-      "linkCount": 27,
+      "linkCount": 26,
       "isOrphaned": false,
       "deleted": false
     },
@@ -61,7 +61,7 @@
       "path": "docs/backend/identity/CardProvisioning.md",
       "title": "CardProvisioning",
       "lastModified": "2026-07-18T17:21:00.114Z",
-      "linkCount": 5,
+      "linkCount": 9,
       "isOrphaned": false,
       "deleted": false
     },
@@ -70,17 +70,8 @@
       "path": "docs/backend/identity/MerchantManagement.md",
       "title": "MerchantManagement",
       "lastModified": "2026-07-18T17:21:00.123Z",
-      "linkCount": 0,
-      "isOrphaned": true,
-      "deleted": false
-    },
-    {
-      "id": "ceebac48-3e3a-4429-8fe3-0a2ea1e31ee9",
-      "path": "docs/backend/identity/ReadModelProjections.md",
-      "title": "ReadModelProjections",
-      "lastModified": "2026-07-18T17:21:00.132Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 15,
+      "isOrphaned": false,
       "deleted": false
     },
     {
@@ -88,8 +79,8 @@
       "path": "docs/backend/identity/UserManagement.md",
       "title": "UserManagement",
       "lastModified": "2026-07-18T17:21:00.140Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 14,
+      "isOrphaned": false,
       "deleted": false
     }
   ]

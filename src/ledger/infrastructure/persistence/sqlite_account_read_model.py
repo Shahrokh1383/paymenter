@@ -14,7 +14,7 @@ class SqliteAccountReadModel(AccountQueryPort):
                 a.id, a.user_id, 
                 COALESCE(u.name, m.name, 'System') AS user_name,
                 a.currency_id, c.code AS currency_code, 
-                a.account_number, a.balance
+                a.account_number, a.pending_holds, a.open_authorizations, a.balance
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             LEFT JOIN users u ON a.user_id = u.id
@@ -31,6 +31,8 @@ class SqliteAccountReadModel(AccountQueryPort):
                 currency_code=row['currency_code'],
                 account_number=row['account_number'], 
                 card_number=None,
+                pending_holds=Decimal(str(row['pending_holds'])),
+                open_authorizations=row['open_authorizations'],
                 balance=Decimal(str(row['balance']))
             ) for row in rows
         ]

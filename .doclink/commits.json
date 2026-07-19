@@ -288,6 +288,445 @@
         }
       ],
       "committedAt": "2026-07-19T13:29:02.498Z"
+    },
+    {
+      "id": "4c55bfa2-9682-4b3d-a8c0-a6deac3d9d60",
+      "fileHashes": [
+        {
+          "id": "a178e735-a0e0-4f5f-b8be-354ee4ebcbe8",
+          "filePath": "src/identity/infrastructure/web/dashboard_controller.py",
+          "hashValue": "765140e67129a59d2127e38722534abb4ef63d68b9e67397a7354693802b0fd7"
+        },
+        {
+          "id": "5accfe73-a829-4ba9-81da-c31e85f03ab7",
+          "filePath": "src/app/di/identity_di.py",
+          "hashValue": "96344e2c81146f1b190aef268732ba9956700752cb1f8f782d1ae33412024e05"
+        },
+        {
+          "id": "ee9d704c-35b1-4e23-b324-be71febe69cb",
+          "filePath": "src/identity/application/commands/register_user_command.py",
+          "hashValue": "939d4237731d9163aa2e64cb2f9b3fec3953ae2f130ce3bd3786f146da9d9b24"
+        },
+        {
+          "id": "a6034473-9e5b-44c8-bfda-52b55a722a34",
+          "filePath": "src/identity/application/handlers/register_user_handler.py",
+          "hashValue": "6d8202e235e0e08a8f593b51f3d7d541e3e058fad4cf97918b949a0c41cde669"
+        },
+        {
+          "id": "38a985b2-0d71-4051-bbac-2493a1a8b550",
+          "filePath": "src/identity/application/dto/user_summary.py",
+          "hashValue": "4cee064afe3071bf13ee18419c32a4f53625f01219061134b12163aed8a4bd4e"
+        },
+        {
+          "id": "6b56765a-33c9-474d-ace3-0449f972a846",
+          "filePath": "src/identity/domain/ports/account_provisioning_port.py",
+          "hashValue": "c343a3a5966066f71316128d0ff2822753a7239bb4a39f5817e85973cb2c53e0"
+        },
+        {
+          "id": "995bf1ab-9fd6-41b0-b41c-df312bed1b74",
+          "filePath": "src/identity/infrastructure/persistence/ledger_account_provisioning_adapter.py",
+          "hashValue": "8921f4084550a727a31573350726f7f7068de6a72b91d23acb3a46a9fa341e52"
+        },
+        {
+          "id": "ee98736e-969f-4b5f-837a-c0bfc5fae2cf",
+          "filePath": "src/ledger/domain/events/account_events.py",
+          "hashValue": "c88ec4f51b117ca028b1e4cfb91d9ec0930fd6d30315d053eaac9c46fcaf19ec"
+        },
+        {
+          "id": "2e0d39d8-10ab-436c-b320-ecfa77adeca8",
+          "filePath": "src/identity/application/commands/identity_commands.py",
+          "hashValue": "d332b7af2770ff6cc44c64366e12d8b02d6f21ae2ef768fc938828a0d37e5f60"
+        },
+        {
+          "id": "ed06442b-0e0a-4d83-acf5-6858cf5e1df8",
+          "filePath": "src/identity/application/queries/identity_queries.py",
+          "hashValue": "2840c8664d0efea0df76952a2a93c2c151f6e7bd2b71f1c00c5e61efdf2eda95"
+        },
+        {
+          "id": "2aa9e609-a6df-4dc2-9347-e46111bfcaca",
+          "filePath": "src/identity/application/handlers/identity_handlers.py",
+          "hashValue": "c065d3e9daa397b78a03322ab424de26b589722bbdfd783f891dde730b227f8f"
+        },
+        {
+          "id": "c10d23f3-4d2c-4db1-b32d-3bd6d023f210",
+          "filePath": "src/identity/application/handlers/identity_query_handlers.py",
+          "hashValue": "fd1e876aa1a0f866bb418beef9f6bd636a6a47dd52d731cb8c4c37479d78d80e"
+        },
+        {
+          "id": "5b14c2f3-0101-46ea-beef-2d05e287d401",
+          "filePath": "src/identity/application/handlers/read_model_handlers.py",
+          "hashValue": "7175390b92295805c14eaf5bf1547ad8e95b4c5d7dc4cbb4cec1157290e86f45"
+        },
+        {
+          "id": "4eefbe05-b065-410c-a1fb-2d0f25168472",
+          "filePath": "src/identity/application/handlers/merchant_read_model_handlers.py",
+          "hashValue": "b4a68c7576a03d46733a117bc0f81961e9e5d35684820322e170a42a14044888"
+        },
+        {
+          "id": "5c806ac0-e773-4cfb-9f7f-e125b8bcecee",
+          "filePath": "src/identity/application/handlers/on_account_created_handler.py",
+          "hashValue": "6aac4e2e225c5078dd5262d5d4e76704d36338fe9e44d5776ed819690964104d"
+        },
+        {
+          "id": "cb2e7065-2e6d-4246-a23e-b919dcb47eb7",
+          "filePath": "src/identity/application/dto/merchant_summary.py",
+          "hashValue": "bdddcb933adccb557030c8538de6a498ec74f0e909f8461b98e6120445134bc9"
+        },
+        {
+          "id": "2fdc116b-d0ab-490c-b9c7-a8923b065edf",
+          "filePath": "src/identity/domain/entities/user.py",
+          "hashValue": "cdeb23668a078cd3874a3e3544b05ec05cddd8abdf9199711837fb0d9ff5f6d9"
+        },
+        {
+          "id": "ecda814e-c5f2-4740-9e41-a844e71e7b09",
+          "filePath": "src/identity/domain/entities/merchant.py",
+          "hashValue": "e4f064b43ea14366e40576577450613211f2701ebf31c8512ea9d980ae870702"
+        },
+        {
+          "id": "2450590e-bc92-40d1-9793-78082ba747ee",
+          "filePath": "src/identity/domain/events/user_events.py",
+          "hashValue": "accef38eac06581101510de50427655f94438459ddf4f08c74d3630abe84835d"
+        },
+        {
+          "id": "22ea38f3-26fc-4fa5-88d7-9cd6d268c6d8",
+          "filePath": "src/identity/domain/events/merchant_events.py",
+          "hashValue": "30cc995437f8b3fe1cf8147b373084b902650194c4e2a35c3b4820bc92d4d51c"
+        },
+        {
+          "id": "6faa4dc0-6c91-44ca-b7b4-4e95c7e21d08",
+          "filePath": "src/identity/domain/events/card_events.py",
+          "hashValue": "e4280d2c7be3b6e462a88507c186bcf307b3676d9216b64aac9d01428a359afc"
+        },
+        {
+          "id": "9f3d984a-9b86-4427-a24b-1b76a2079f96",
+          "filePath": "src/identity/domain/value_objects/phone_email.py",
+          "hashValue": "750f885846094664e640f7159d142e2dc6e1eea0be44838bd09c6106db5f6ddb"
+        },
+        {
+          "id": "d207459f-2709-4ee2-b40c-83d390aca06d",
+          "filePath": "src/identity/domain/value_objects/api_key.py",
+          "hashValue": "331556d6d7dbbb6aaed2ee226bf0e0b2bcee67c86730b199471448804ce00714"
+        },
+        {
+          "id": "5d7df6dc-5871-47f7-9633-b2dd4e3f1f72",
+          "filePath": "src/identity/domain/repositories.py",
+          "hashValue": "3eddcdf5207bb3acccc9643e26b72b58a0bb0a5991fd3a0b13bc3b4087adb4b1"
+        },
+        {
+          "id": "e69e770c-d5f8-41d0-a9bb-f78d633d85db",
+          "filePath": "src/identity/infrastructure/persistence/sqlite_user_repository.py",
+          "hashValue": "de2768d1b320bccf700b0a98e1e8452b14a6a8bdcc742d2dc919efcf22574c79"
+        },
+        {
+          "id": "23fc303b-10f9-4252-891c-184df25050b2",
+          "filePath": "src/identity/infrastructure/persistence/sqlite_merchant_repository.py",
+          "hashValue": "10865d89d2560b570eedff22c7dc560fa7184bdd0068d689df2c5f79692fcd19"
+        },
+        {
+          "id": "4310a2a6-2ba7-4e6a-b222-a1d2f03f662c",
+          "filePath": "src/ledger/application/handlers/create_account_handler.py",
+          "hashValue": "b18d3c1d265609b0f3a7252d6f466f9a27cb451fffc2f305ebabfbec629fd9ac"
+        },
+        {
+          "id": "3bd262c1-f632-441a-aaa4-b78ee9b80186",
+          "filePath": "src/ledger/application/handlers/topup_account_handler.py",
+          "hashValue": "d301561717ed1dbb7af94fd41adacdc2c9e31735e5d7d3dd99cca9a55d40f951"
+        },
+        {
+          "id": "6d447034-fcda-4462-8527-dfc32ef97090",
+          "filePath": "src/ledger/application/handlers/update_account_currency_handler.py",
+          "hashValue": "15298d44b45cf665c41c2c2616851101e1248036272dc1e980cc8f0564661623"
+        },
+        {
+          "id": "e7bad193-42a1-4c94-8042-31d4d0d1c233",
+          "filePath": "src/ledger/application/handlers/create_currency_handler.py",
+          "hashValue": "ca61180162884315c7f0ece4606b3bd4d991aed5211f51d9e2f86af435e89fde"
+        },
+        {
+          "id": "7a50bb71-a4e0-4946-bbef-c758c599bcd6",
+          "filePath": "src/ledger/application/handlers/toggle_currency_handler.py",
+          "hashValue": "d4bd91b7d9a3f77c70ecdbc01d383f7c5f679aa0d8e9b9fdbe3cc8e3a34beda1"
+        },
+        {
+          "id": "c75df03f-96b0-40b3-a942-8bd0d8c43afb",
+          "filePath": "src/ledger/application/handlers/get_all_accounts_handler.py",
+          "hashValue": "4cd5196c7fa53dbd4581bc4d9f103d54b5c1125284cb28d44bec3be9dd4c2178"
+        },
+        {
+          "id": "35de9824-70b5-4cae-bb8d-23708cfe9097",
+          "filePath": "src/ledger/application/handlers/get_all_currencies_handler.py",
+          "hashValue": "63015ebc438692871c50ae189125c558d9a36dc0c444e71a3e95a60dd86d149e"
+        },
+        {
+          "id": "b577aea3-a45c-4625-84d7-94bdee2b770a",
+          "filePath": "src/ledger/application/handlers/get_active_currencies_handler.py",
+          "hashValue": "e2feddf4121f3a2f1257f28ab8022e98a1f29c6a818db244f97df7f5e8c0b832"
+        },
+        {
+          "id": "5f2df2de-b082-4f9e-8477-b39e98356298",
+          "filePath": "src/ledger/application/handlers/get_all_escrow_accounts_handler.py",
+          "hashValue": "023798810edbc2d04203f55d79449b6f77f7c31a8efd95ca71c0973aea6f7b2f"
+        },
+        {
+          "id": "d73c1846-8c2f-4e09-80b3-dee081541229",
+          "filePath": "src/ledger/domain/entities/account.py",
+          "hashValue": "e0ac2f016cecb318d039f3190f7d8a7dd1cf6f12d30fa1f925089dff42ea4d8b"
+        },
+        {
+          "id": "83bcbb64-9e2c-4c55-9e7b-93d6c1f9c84d",
+          "filePath": "src/ledger/domain/entities/currency.py",
+          "hashValue": "7d7694350e3f4013b982bed87e7382c25df0e8e125b905f1a233d0d5e3ebfed8"
+        },
+        {
+          "id": "9adb5d34-f364-4c91-8ea5-7be1aa09c17a",
+          "filePath": "src/ledger/domain/events/currency_events.py",
+          "hashValue": "57f17cda740e23a5cb0c95fd07a6b8f9dbd935ceff2e4da3061667a1722ca49b"
+        },
+        {
+          "id": "3ebc2723-26a3-41fe-ab97-8bad3ae063a4",
+          "filePath": "src/ledger/domain/value_objects/account_number.py",
+          "hashValue": "af27c3e572fd2d161d9e72b7e9f664b09790674dfe6353ef6aa53feca8e883f3"
+        },
+        {
+          "id": "45a3a4e9-cb72-4df4-afd2-083419c3848f",
+          "filePath": "src/ledger/domain/repositories.py",
+          "hashValue": "9f58b8cc4493417496d8fcfa4dfdbbe0cc8ad9a38cb5b717f5dfdb64ce18a093"
+        },
+        {
+          "id": "4b99d186-0509-411e-a038-91ed1bd74a33",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_account_repository.py",
+          "hashValue": "238b491fabee1e97d35f509603a2ecac13856205e589c679fe43ecd311048517"
+        },
+        {
+          "id": "a06bc699-65f1-420b-a88a-51fa0912190b",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_account_read_model.py",
+          "hashValue": "0897b2998c5f2ac57805fd5f279ba4c599bab8fffa239b00bc41bea56f306262"
+        },
+        {
+          "id": "9f8d5263-ee73-443a-b57f-d67d530cf808",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_currency_query_repository.py",
+          "hashValue": "147ecaca5b9cf0895fd4aa4d4d555ba3be5e0c42e054433d837fdbe888f2119b"
+        },
+        {
+          "id": "1e8b8704-6e29-445d-8a04-8f85d868ae57",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_escrow_account_read_model.py",
+          "hashValue": "721e87be6bb2bfd35acc2ed594dd7fe7beb6a2ee69fd1679aa04ba6bf5caf1f8"
+        },
+        {
+          "id": "23ca7ba4-7cd8-457e-8a2d-15df0c1f88c2",
+          "filePath": "src/app/di/ledger_di.py",
+          "hashValue": "fb2775aa27dc89058bf97cf77171d6883200a8afce6db4338502ef13002e82fb"
+        }
+      ],
+      "committedAt": "2026-07-19T13:36:04.380Z"
+    },
+    {
+      "id": "d402e4fc-3be0-4bca-98f9-47662d09aafa",
+      "fileHashes": [
+        {
+          "id": "db43649b-7385-4bb2-a8a4-69f53f899042",
+          "filePath": "src/identity/application/handlers/on_account_created_handler.py",
+          "hashValue": "6aac4e2e225c5078dd5262d5d4e76704d36338fe9e44d5776ed819690964104d"
+        },
+        {
+          "id": "78c7ed95-34fa-4283-8d42-3a6a44667f91",
+          "filePath": "src/identity/application/handlers/read_model_handlers.py",
+          "hashValue": "7175390b92295805c14eaf5bf1547ad8e95b4c5d7dc4cbb4cec1157290e86f45"
+        },
+        {
+          "id": "78e92ebb-1098-4172-af36-bca4862efd13",
+          "filePath": "src/identity/domain/events/card_events.py",
+          "hashValue": "e4280d2c7be3b6e462a88507c186bcf307b3676d9216b64aac9d01428a359afc"
+        },
+        {
+          "id": "dbb05037-b0bd-4cc3-bfa6-dd7ce64062dc",
+          "filePath": "src/ledger/domain/events/account_events.py",
+          "hashValue": "c88ec4f51b117ca028b1e4cfb91d9ec0930fd6d30315d053eaac9c46fcaf19ec"
+        },
+        {
+          "id": "810b1729-22f7-4384-9d08-b953f29fb6b0",
+          "filePath": "src/common/infrastructure/database/schemas/identity/identity.py",
+          "hashValue": "7eab29a406d6fe14a07f8b9f0e00415501619282e89cb0f019b3b45bf4b31d6c"
+        },
+        {
+          "id": "97397221-00f3-405b-9b85-3557b48264ca",
+          "filePath": "src/ledger/domain/value_objects/account_number.py",
+          "hashValue": "af27c3e572fd2d161d9e72b7e9f664b09790674dfe6353ef6aa53feca8e883f3"
+        },
+        {
+          "id": "ce826328-3e1b-4a58-a232-4c2494b6c05c",
+          "filePath": "src/common/domain/value_objects/currency_code.py",
+          "hashValue": "3c5b465b5f67d26e8ce798cc859754892b90e5d19bb4cbcb381822c9c3496d6d"
+        },
+        {
+          "id": "e211f0a9-9a16-430e-8971-3066d702683a",
+          "filePath": "src/common/infrastructure/database/schemas/identity/merchant_summaries_schema.py",
+          "hashValue": "3dcf0ad44bae9676d55515230fdce0f076882b634966256a85db4a266ea5eff5"
+        },
+        {
+          "id": "3e5d6206-d2d2-416c-a9e3-de754fd8bc87",
+          "filePath": "src/app/di/identity_di.py",
+          "hashValue": "96344e2c81146f1b190aef268732ba9956700752cb1f8f782d1ae33412024e05"
+        }
+      ],
+      "committedAt": "2026-07-19T13:38:46.981Z"
+    },
+    {
+      "id": "17296dd3-bccc-4a68-951a-56f4e10a8d20",
+      "fileHashes": [
+        {
+          "id": "b6a4b50f-7aa2-4e42-a19e-b058acf960bf",
+          "filePath": "src/identity/domain/entities/merchant.py",
+          "hashValue": "e4f064b43ea14366e40576577450613211f2701ebf31c8512ea9d980ae870702"
+        },
+        {
+          "id": "ff8067a2-5aa6-4c88-bf96-52c9ba11e0e6",
+          "filePath": "src/identity/domain/value_objects/api_key.py",
+          "hashValue": "331556d6d7dbbb6aaed2ee226bf0e0b2bcee67c86730b199471448804ce00714"
+        },
+        {
+          "id": "942ddbee-1054-4118-b652-600448e5db9c",
+          "filePath": "src/identity/domain/events/merchant_events.py",
+          "hashValue": "30cc995437f8b3fe1cf8147b373084b902650194c4e2a35c3b4820bc92d4d51c"
+        },
+        {
+          "id": "5d43fcc6-4edd-4844-9974-9219ebf54c47",
+          "filePath": "src/identity/domain/repositories.py",
+          "hashValue": "3eddcdf5207bb3acccc9643e26b72b58a0bb0a5991fd3a0b13bc3b4087adb4b1"
+        },
+        {
+          "id": "739c0a2d-68b7-4ba5-89a1-79ac3ab365c3",
+          "filePath": "src/identity/application/commands/identity_commands.py",
+          "hashValue": "d332b7af2770ff6cc44c64366e12d8b02d6f21ae2ef768fc938828a0d37e5f60"
+        },
+        {
+          "id": "00fbd2a1-c577-47ad-b043-dd14657aba3a",
+          "filePath": "src/identity/application/handlers/identity_handlers.py",
+          "hashValue": "c065d3e9daa397b78a03322ab424de26b589722bbdfd783f891dde730b227f8f"
+        },
+        {
+          "id": "c03bf032-2690-46a1-a928-49887ce80d02",
+          "filePath": "src/identity/application/queries/identity_queries.py",
+          "hashValue": "2840c8664d0efea0df76952a2a93c2c151f6e7bd2b71f1c00c5e61efdf2eda95"
+        },
+        {
+          "id": "123e03f0-6500-41bc-a87b-f75ecfaae4d6",
+          "filePath": "src/identity/application/handlers/identity_query_handlers.py",
+          "hashValue": "fd1e876aa1a0f866bb418beef9f6bd636a6a47dd52d731cb8c4c37479d78d80e"
+        },
+        {
+          "id": "825f10cb-1b5d-4b73-8cbe-a3e680590312",
+          "filePath": "src/identity/application/handlers/merchant_read_model_handlers.py",
+          "hashValue": "b4a68c7576a03d46733a117bc0f81961e9e5d35684820322e170a42a14044888"
+        },
+        {
+          "id": "5be04a90-91cb-4321-993b-a74b8556a79c",
+          "filePath": "src/identity/application/dto/merchant_summary.py",
+          "hashValue": "bdddcb933adccb557030c8538de6a498ec74f0e909f8461b98e6120445134bc9"
+        },
+        {
+          "id": "ed929555-a66e-4e9b-a3e2-f99f79ea7676",
+          "filePath": "src/identity/infrastructure/persistence/sqlite_merchant_repository.py",
+          "hashValue": "10865d89d2560b570eedff22c7dc560fa7184bdd0068d689df2c5f79692fcd19"
+        },
+        {
+          "id": "398f11fd-5fb2-43e4-964f-588a296e7fb0",
+          "filePath": "src/identity/infrastructure/web/dashboard_controller.py",
+          "hashValue": "765140e67129a59d2127e38722534abb4ef63d68b9e67397a7354693802b0fd7"
+        },
+        {
+          "id": "f6630214-d672-4c54-b223-c7b012c317de",
+          "filePath": "src/common/infrastructure/database/schemas/identity/identity.py",
+          "hashValue": "7eab29a406d6fe14a07f8b9f0e00415501619282e89cb0f019b3b45bf4b31d6c"
+        },
+        {
+          "id": "c41a7d3e-3abe-4153-a6ff-142ddcbd220b",
+          "filePath": "src/common/infrastructure/database/schemas/identity/merchant_summaries_schema.py",
+          "hashValue": "3dcf0ad44bae9676d55515230fdce0f076882b634966256a85db4a266ea5eff5"
+        },
+        {
+          "id": "e4180f69-c125-4c1b-924f-6d599df6ee75",
+          "filePath": "src/app/di/identity_di.py",
+          "hashValue": "96344e2c81146f1b190aef268732ba9956700752cb1f8f782d1ae33412024e05"
+        }
+      ],
+      "committedAt": "2026-07-19T13:44:56.236Z"
+    },
+    {
+      "id": "31cb7461-1be9-45ee-aa36-a911d14f9c42",
+      "fileHashes": [
+        {
+          "id": "a674a552-d64c-41c0-9515-4a5659653f84",
+          "filePath": "src/identity/domain/entities/user.py",
+          "hashValue": "cdeb23668a078cd3874a3e3544b05ec05cddd8abdf9199711837fb0d9ff5f6d9"
+        },
+        {
+          "id": "05614fd5-6247-4445-99bd-fb0363a50642",
+          "filePath": "src/identity/domain/value_objects/phone_email.py",
+          "hashValue": "750f885846094664e640f7159d142e2dc6e1eea0be44838bd09c6106db5f6ddb"
+        },
+        {
+          "id": "95ccbcca-d4d6-4546-bb35-84ce5c978bcd",
+          "filePath": "src/identity/domain/events/user_events.py",
+          "hashValue": "accef38eac06581101510de50427655f94438459ddf4f08c74d3630abe84835d"
+        },
+        {
+          "id": "b1241ea2-6d75-4feb-a5a6-7d2e0aa19673",
+          "filePath": "src/identity/domain/repositories.py",
+          "hashValue": "3eddcdf5207bb3acccc9643e26b72b58a0bb0a5991fd3a0b13bc3b4087adb4b1"
+        },
+        {
+          "id": "12a7edc5-7028-4e68-891b-9621b99620e7",
+          "filePath": "src/identity/application/commands/register_user_command.py",
+          "hashValue": "939d4237731d9163aa2e64cb2f9b3fec3953ae2f130ce3bd3786f146da9d9b24"
+        },
+        {
+          "id": "2110a294-cd78-477c-be82-24c87cfca484",
+          "filePath": "src/identity/application/handlers/register_user_handler.py",
+          "hashValue": "6d8202e235e0e08a8f593b51f3d7d541e3e058fad4cf97918b949a0c41cde669"
+        },
+        {
+          "id": "01bf9c06-a1bc-4711-97a9-2514b3d7a88a",
+          "filePath": "src/identity/application/handlers/read_model_handlers.py",
+          "hashValue": "7175390b92295805c14eaf5bf1547ad8e95b4c5d7dc4cbb4cec1157290e86f45"
+        },
+        {
+          "id": "cff970bc-5457-4c0c-8b2c-99815ae7f8cb",
+          "filePath": "src/identity/application/queries/identity_queries.py",
+          "hashValue": "2840c8664d0efea0df76952a2a93c2c151f6e7bd2b71f1c00c5e61efdf2eda95"
+        },
+        {
+          "id": "c191d21e-72d0-4f41-9e52-75011a0f231b",
+          "filePath": "src/identity/application/handlers/identity_query_handlers.py",
+          "hashValue": "fd1e876aa1a0f866bb418beef9f6bd636a6a47dd52d731cb8c4c37479d78d80e"
+        },
+        {
+          "id": "2fa1dcc0-d581-4398-ab0e-da234598dba2",
+          "filePath": "src/identity/application/dto/user_summary.py",
+          "hashValue": "4cee064afe3071bf13ee18419c32a4f53625f01219061134b12163aed8a4bd4e"
+        },
+        {
+          "id": "5b426e1a-ed96-4532-8fc7-ce7cac56ad22",
+          "filePath": "src/identity/infrastructure/persistence/sqlite_user_repository.py",
+          "hashValue": "de2768d1b320bccf700b0a98e1e8452b14a6a8bdcc742d2dc919efcf22574c79"
+        },
+        {
+          "id": "5d0c1663-9e6a-4874-a1a8-51679fa01bac",
+          "filePath": "src/identity/infrastructure/web/dashboard_controller.py",
+          "hashValue": "765140e67129a59d2127e38722534abb4ef63d68b9e67397a7354693802b0fd7"
+        },
+        {
+          "id": "07cbcf87-c0a8-4fed-8ab2-387deae4a038",
+          "filePath": "src/app/di/identity_di.py",
+          "hashValue": "96344e2c81146f1b190aef268732ba9956700752cb1f8f782d1ae33412024e05"
+        },
+        {
+          "id": "b09ececf-5acd-4ee1-9cad-9b100d7bb164",
+          "filePath": "src/common/infrastructure/database/schemas/identity/identity.py",
+          "hashValue": "7eab29a406d6fe14a07f8b9f0e00415501619282e89cb0f019b3b45bf4b31d6c"
+        }
+      ],
+      "committedAt": "2026-07-19T13:46:55.288Z"
     }
   ]
 }

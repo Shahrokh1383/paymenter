@@ -5,7 +5,8 @@ from src.common.domain.exceptions import (
     InsufficientFundsError, 
     CurrencyMismatchError, 
     NonZeroBalanceCurrencyChangeError, 
-    InvalidTopupAmountError
+    InvalidTopupAmountError,
+    PendingHoldsExistError
 )
 from src.ledger.domain.value_objects.account_number import AccountNumber
 
@@ -16,6 +17,8 @@ class Account:
     merchant_id: Optional[int]
     account_number: AccountNumber
     balance: Money
+    pending_holds: Money
+    open_authorizations: int
     version: int = 0
 
     def withdraw(self, amount: Money) -> None:
@@ -55,10 +58,20 @@ class Account:
         self.balance = self.balance - amount
 
     def can_change_currency(self) -> bool:
-        return self.balance.amount == 0
+        """Account can only change currency if balance, holds, and authorizations are all zero."""
+        return (
+            self.balance.amount == 0 
+            and self.pending_holds.amount == 0 
+            and self.open_authorizations == 0
+        )
 
     def change_currency(self, new_currency_code: str) -> None:
-        """Changes the account's currency. Enforces zero-balance invariant (BR-5)."""
-        if not self.can_change_currency():
+        """Changes the account's currency. Enforces zero-balance and zero-holds invariant (BR-3 Fix)."""
+        if self.balance.amount != 0:
             raise NonZeroBalanceCurrencyChangeError("Cannot change currency on an account with a balance > 0.")
+        
+        if self.pending_holds.amount != 0 or self.open_authorizations != 0:
+            raise PendingHoldsExistError("Cannot change currency on an account with pending holds or authorizations.")
+            
         self.balance = Money(self.balance.amount, new_currency_code)
+        self.pending_holds = Money(self.pending_holds.amount, new_currency_code)

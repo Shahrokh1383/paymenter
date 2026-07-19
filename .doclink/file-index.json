@@ -1667,6 +1667,265 @@
       "lastModified": "2026-07-19T13:29:32.452Z",
       "size": 0,
       "isDirectory": false
+    },
+    ".git/index.lock": {
+      "id": "07e5e29b-ec53-4730-be6c-7e250b384a00",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.009Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/3a/b86974ee3302936011a2552d108669956a687f": {
+      "id": "36ad4c51-3fac-4861-a37e-c1574600551f",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.072Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/fa/tmp_obj_1kG73Q": {
+      "id": "51842710-8920-4b1b-88f3-8a943b2795ea",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.104Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/fa/734b90eb56acb49fcfd097f78f1df97da58ce8": {
+      "id": "5a03f784-7110-461e-b339-8edbaddfcebb",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.150Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/43/0841260b71d51cb2d5edfa6edc831d6eed9fba": {
+      "id": "2ea661ee-df71-45be-a673-0d89487cb401",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.199Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d9/e4b55b8802ff23757baa620bf5991c6b48b106": {
+      "id": "6512973a-6802-4e1d-9aca-33c277c55265",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.277Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/8e/fe62e5abaa05e326c5d54d06fa042980759390": {
+      "id": "c257d8a5-9621-4dc4-ab30-c7d67f2d06d0",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.340Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/bf/20a99b3656e0a425fd78a0e4bfe57a16014c7f": {
+      "id": "cd65e0b7-1d0d-49e6-9777-44151ff928a4",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.407Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/bd/a8d7f0c19ca9a0550e61b360080587862e7be0": {
+      "id": "aefc5b20-0636-4d8c-8307-4623e2fcffb9",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.467Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/19/561b5ec548006aa9ef7cb8c0cd7bacccc75e80": {
+      "id": "d9241fb3-7961-4c5b-8573-df585a72e204",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.538Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/57/ee1295ea2fec5b43c86bd3c8771f1351885b65": {
+      "id": "dacde2ed-c001-417d-a2e1-049f13141d3f",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.596Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/73/ff3262198c6a7dac3dffcd50cea4d82b4fd7e4": {
+      "id": "0d0b8952-d63b-4d36-b113-e67105fb0cef",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:36.662Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a2/454b9bb0998e29175e624a35882c2a3b62d023": {
+      "id": "eb737cb8-3d1a-4c8e-a4a3-ce481b5b88d5",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.285Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/COMMIT_EDITMSG": {
+      "id": "06cb423b-8c53-4ed8-8fe7-0df6950e3df9",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.486Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/02/5a573ea3513cb1d87ec89146b6cd436fa87984": {
+      "id": "392df55e-faa9-47f4-a672-992d60102d04",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.598Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/logs/HEAD": {
+      "id": "8d098203-cc2c-48b2-92e8-d6565acaaea5",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.706Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/logs/refs/heads/dev": {
+      "id": "4f260701-bd8d-4b4f-8a09-5bd776b42103",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.779Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/refs/heads/dev": {
+      "id": "ab52147e-5d27-4ca7-893c-4f1458f009d4",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:41.840Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/4b/19b73cc52ad070e94a89cdafe213782af14f58": {
+      "id": "8b0fc3c1-6e4d-4fee-bf3c-2709a221e4ee",
+      "hash": null,
+      "lastModified": "2026-07-19T13:29:42.006Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "fix.txt": {
+      "id": "55fbe7ab-7ee1-49d6-8950-a497e7caae32",
+      "hash": null,
+      "lastModified": "2026-07-19T13:46:52.854Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "todo1.md": {
+      "id": "03146355-6b96-4673-b7de-e303825df7ad",
+      "hash": null,
+      "lastModified": "2026-07-19T13:50:44.358Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "content.txt": {
+      "id": "5cc4e622-f027-4306-8f3c-fac198e8b101",
+      "hash": null,
+      "lastModified": "2026-07-19T13:53:20.401Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/infrastructure/database/schemas/ledger/__pycache__/ledger.cpython-313.pyc": {
+      "id": "23f23a80-1b76-480e-86a0-79947c811322",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.659Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/domain/__pycache__/exceptions.cpython-313.pyc": {
+      "id": "518c00b4-ebb3-48ba-a9de-eebf44b22192",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.723Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/app/di/__pycache__/ledger_di.cpython-313.pyc": {
+      "id": "14b804e7-ea6c-45f4-8b6b-acae914413a1",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.779Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/identity/application/handlers/__pycache__/on_account_created_handler.cpython-313.pyc": {
+      "id": "b7dcbd52-a3a0-4abf-9eca-f1cecd1096c1",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.818Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/infrastructure/persistence/__pycache__/sqlite_account_repository.cpython-313.pyc": {
+      "id": "8ccf3d97-ca64-4311-b988-ac8a86850b29",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.860Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/domain/entities/__pycache__/account.cpython-313.pyc": {
+      "id": "e8660757-3eea-4b37-aa5d-41833c433724",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:52.962Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/domain/entities/__pycache__/transaction.cpython-313.pyc": {
+      "id": "91e627cd-6019-4a63-bff6-57136cc8240a",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:53.081Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/application/handlers/__pycache__/create_currency_handler.cpython-313.pyc": {
+      "id": "b8eaec50-0eda-44b6-8d2f-ced2bdf2d20d",
+      "hash": null,
+      "lastModified": "2026-07-19T14:31:53.119Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/infrastructure/database/storage/paymenter.db-shm": {
+      "id": "c301ada7-ef46-46ef-a5ba-6a41b2d5c593",
+      "hash": null,
+      "lastModified": "2026-07-19T14:32:03.719Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/infrastructure/database/storage/paymenter.db-wal": {
+      "id": "04c946ac-32de-4eca-ac6a-179dfe4783ce",
+      "hash": null,
+      "lastModified": "2026-07-19T14:32:03.755Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "fix2.txt": {
+      "id": "8ed35476-9831-4aa8-9552-a314e9106f45",
+      "hash": null,
+      "lastModified": "2026-07-19T14:44:50.071Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/application/dto/__pycache__/account_summary.cpython-313.pyc": {
+      "id": "9ff44f58-fd2c-445e-9f1e-0f5b87978bb8",
+      "hash": null,
+      "lastModified": "2026-07-19T14:55:54.504Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/ledger/infrastructure/persistence/__pycache__/sqlite_account_read_model.cpython-313.pyc": {
+      "id": "e411a835-2496-4241-ae50-72ed80e1d61d",
+      "hash": null,
+      "lastModified": "2026-07-19T14:56:18.799Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "templates/accounts.html": {
+      "id": "9fee0a24-20b1-42ed-89d7-3877a07ac8dd",
+      "hash": null,
+      "lastModified": "2026-07-19T14:56:54.511Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/infrastructure/database/storage/paymenter.db-journal": {
+      "id": "2a114a85-8962-49bb-b12e-8225318d55e5",
+      "hash": null,
+      "lastModified": "2026-07-19T14:58:41.182Z",
+      "size": 0,
+      "isDirectory": false
     }
   }
 }

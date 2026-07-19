@@ -25,8 +25,8 @@
       "path": "docs/backend/identity/AdministraionDashboard.md",
       "title": "AdministraionDashboard",
       "lastModified": "2026-07-19T00:41:21.350Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 45,
+      "isOrphaned": false,
       "deleted": false
     },
     {
@@ -34,8 +34,8 @@
       "path": "docs/backend/identity/CardProvisioning.md",
       "title": "CardProvisioning",
       "lastModified": "2026-07-19T00:41:21.350Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 9,
+      "isOrphaned": false,
       "deleted": false
     },
     {
@@ -43,8 +43,8 @@
       "path": "docs/backend/identity/MerchantManagement.md",
       "title": "MerchantManagement",
       "lastModified": "2026-07-19T00:41:21.351Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 15,
+      "isOrphaned": false,
       "deleted": false
     },
     {
@@ -52,8 +52,8 @@
       "path": "docs/backend/identity/UserManagement.md",
       "title": "UserManagement",
       "lastModified": "2026-07-19T00:41:21.351Z",
-      "linkCount": 0,
-      "isOrphaned": true,
+      "linkCount": 14,
+      "isOrphaned": false,
       "deleted": false
     },
     {

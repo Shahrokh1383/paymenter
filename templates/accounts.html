@@ -59,6 +59,8 @@
             <th>Currency</th>
             <th>Account Num</th>
             <th>Balance</th>
+            <th>Pending Holds</th>
+            <th>Open Auths</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -70,6 +72,8 @@
             <td><strong>{{ a.currency_code or 'Not Set' }}</strong></td>
             <td>{{ a.account_number }}</td>
             <td class="balance">{{ a.balance }}</td>
+            <td class="balance">{{ a.pending_holds }}</td>
+            <td>{{ a.open_authorizations }}</td>
             <td>
                 <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">
                     <input type="hidden" name="account_id" value="{{ a.id }}">

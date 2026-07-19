@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     currency_id INTEGER NOT NULL, 
     account_number TEXT NOT NULL UNIQUE, 
     balance TEXT NOT NULL DEFAULT '0.00', 
+    pending_holds TEXT NOT NULL DEFAULT '0.00',
+    open_authorizations INTEGER NOT NULL DEFAULT 0,
     version INTEGER NOT NULL DEFAULT 0, 
     FOREIGN KEY (user_id) REFERENCES users(id), 
     FOREIGN KEY (merchant_id) REFERENCES merchants(id),

@@ -1,19 +1,6 @@
 LedgerKernel.md :
 
 
-2. Business Logic & Invariant Bugs
-
-    [Critical Bug] Business Key Dependency on Database Auto-Increment:
-        Issue: The formula 9000000000 + currency_id (in BR-6 and Issue 2) heavily relies on the database's ID generation strategy.
-        Rejection Reason: Business Keys must never depend on physical database sequences. If you ever migrate to PostgreSQL, switch to UUIDs, or shard the data, this formula completely falls apart. Furthermore, a 10-digit limit (9 billion accounts) is highly restrictive for a scalable Ledger.
-        Solution: AccountNumber generation should utilize a database-independent deterministic algorithm (e.g., hashing the currency's UUID + Salt) or an independent Sequence Generator (like Redis INCR or Snowflake IDs).
-    [Logical Bug] Ignoring Holds/Authorizations in Currency Mutation (BR-3):
-        Issue: Rule BR-3 states that if the balance is zero, the currency can be changed.
-        Rejection Reason: In financial systems, a "zero balance" does not mean "no pending transactions." An account might have a zero available balance but still have an active Hold or Authorization. Changing the currency in this state leaves the hold in the old currency while the settlement occurs in the new one, which is catastrophic.
-        Solution: The change_currency method must verify pending_holds == 0 and open_authorizations == 0 in addition to balance == 0.
-    [Logical Bug] Lack of Idempotency in Escrow Account Bootstrapping:
-        Issue: If the CreateCurrencyHandler in Flow 1 crashes due to a network drop or UoW error after creating the Currency but before creating the Escrow Account, what happens on a retry?
-        Solution: An Idempotency mechanism must be implemented to prevent the creation of duplicate Escrow accounts.
 
 3. Data, Persistence & Execution Flow Issues
 

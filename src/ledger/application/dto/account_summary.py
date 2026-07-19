@@ -11,4 +11,6 @@ class AccountSummary:
     currency_code: str
     account_number: str
     balance: Decimal
+    pending_holds: Decimal
+    open_authorizations: int
     card_number: Optional[str] = None

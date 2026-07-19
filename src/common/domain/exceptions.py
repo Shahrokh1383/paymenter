@@ -33,3 +33,7 @@ class NonZeroBalanceCurrencyChangeError(DomainException):
 class InvalidTopupAmountError(DomainException):
     """Raised when a topup amount is less than or equal to zero."""
     pass
+
+class PendingHoldsExistError(DomainException):
+    """Raised when attempting to change currency on an account with pending holds or authorizations."""
+    pass

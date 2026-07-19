@@ -1,3 +1,4 @@
+import hashlib
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.common.domain.ports.event_bus import EventBus
 from src.common.domain.value_objects.currency_code import CurrencyCode
@@ -13,7 +14,7 @@ from src.common.domain.exceptions import CurrencyAlreadyExistsError
 class CreateCurrencyHandler:
     """
     Handles creation of a new currency.
-    Strictly publishes an event. Does not instantiate other aggregates (Bug #1 Fix).
+    Strictly publishes an event. Does not instantiate other aggregates.
     """
     def __init__(self, uow: UnitOfWork, currency_repo: CurrencyRepository, event_bus: EventBus):
         self._uow = uow
@@ -43,22 +44,36 @@ class CreateCurrencyHandler:
 class EscrowBootstrapperEventHandler:
     """
     Listens to CurrencyCreatedEvent to provision the System Escrow account.
-    Placed in this file to strictly adhere to the 'no new files' architectural constraint.
+    Uses a deterministic, DB-independent algorithm for AccountNumber generation (Bug #1 Fix).
+    Implements Idempotency to prevent duplicate accounts on retry (Bug #3 Fix).
     """
     def __init__(self, uow: UnitOfWork, account_repo: AccountRepository):
         self._uow = uow
         self._account_repo = account_repo
 
+    def _generate_deterministic_account_number(self, currency_code: str) -> str:
+        """Generates a 10-digit account number using SHA-256, independent of DB sequences."""
+        hash_obj = hashlib.sha256(currency_code.encode('utf-8'))
+        hash_int = int(hash_obj.hexdigest(), 16)
+        # Modulo 10 billion ensures max 10 digits, zfill ensures exactly 10 digits
+        return str(hash_int % 10000000000).zfill(10)
+
     def handle(self, event: CurrencyCreatedEvent) -> None:
         with self._uow:
-            system_account_number = str(9000000000 + event.currency_id)
+            system_account_number_str = self._generate_deterministic_account_number(event.code.value)
+            
+            existing_account = self._account_repo.get_by_account_number(system_account_number_str)
+            if existing_account:
+                return
             
             escrow_account = Account(
                 id=0,
                 user_id=None,
                 merchant_id=None,
-                account_number=AccountNumber(system_account_number),
-                balance=Money('0.00', event.code)
+                account_number=AccountNumber(system_account_number_str),
+                balance=Money('0.00', event.code),
+                pending_holds=Money('0.00', event.code),
+                open_authorizations=0
             )
             self._account_repo.add(escrow_account)
             self._uow.commit()

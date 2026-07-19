@@ -18,12 +18,14 @@ class SqliteAccountRepository(AccountRepository):
             merchant_id=row['merchant_id'],
             account_number=AccountNumber(row['account_number']),
             balance=Money(str(row['balance']), CurrencyCode(row['currency_code'])),
+            pending_holds=Money(str(row['pending_holds']), CurrencyCode(row['currency_code'])),
+            open_authorizations=row['open_authorizations'],
             version=row['version']
         )
 
     def get_by_id(self, account_id: int) -> Account:
         cursor = self._uow.conn.execute("""
-            SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.version, c.code as currency_code
+            SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.pending_holds, a.open_authorizations, a.version, c.code as currency_code
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             WHERE a.id = ?
@@ -40,8 +42,17 @@ class SqliteAccountRepository(AccountRepository):
             raise CurrencyNotFoundError(f"Currency code {account.balance.currency.value} not found.")
             
         cursor = self._uow.conn.execute(
-            "UPDATE accounts SET balance = ?, currency_id = ?, version = version + 1 WHERE id = ? AND version = ?",
-            (str(account.balance.amount), currency_row['id'], account.id, account.version)
+            """UPDATE accounts 
+               SET balance = ?, pending_holds = ?, open_authorizations = ?, currency_id = ?, version = version + 1 
+               WHERE id = ? AND version = ?""",
+            (
+                str(account.balance.amount), 
+                str(account.pending_holds.amount), 
+                account.open_authorizations, 
+                currency_row['id'], 
+                account.id, 
+                account.version
+            )
         )
         if cursor.rowcount == 0: 
             raise ConcurrencyException(f"Optimistic locking conflict while updating account {account.id}.")
@@ -49,7 +60,7 @@ class SqliteAccountRepository(AccountRepository):
 
     def get_by_account_number(self, account_number: str) -> Account:
         cursor = self._uow.conn.execute("""
-            SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.version, c.code as currency_code
+            SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.pending_holds, a.open_authorizations, a.version, c.code as currency_code
             FROM accounts a
             JOIN currencies c ON a.currency_id = c.id
             WHERE a.account_number = ?
@@ -62,14 +73,23 @@ class SqliteAccountRepository(AccountRepository):
         currency_row = self._uow.conn.execute(
             "SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)
         ).fetchone()
-
+        
         if not currency_row:
             raise CurrencyNotFoundError(f"Currency code {account.balance.currency.value} not found.")
         
         currency_id = currency_row['id']
         
         cursor = self._uow.conn.execute(
-            "INSERT INTO accounts (user_id, merchant_id, currency_id, account_number, balance) VALUES (?, ?, ?, ?, ?)",
-            (account.user_id, account.merchant_id, currency_id, account.account_number.value, str(account.balance.amount))
+            """INSERT INTO accounts (user_id, merchant_id, currency_id, account_number, balance, pending_holds, open_authorizations) 
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (
+                account.user_id, 
+                account.merchant_id, 
+                currency_id, 
+                account.account_number.value, 
+                str(account.balance.amount),
+                str(account.pending_holds.amount),
+                account.open_authorizations
+            )
         )
         return cursor.lastrowid

@@ -727,6 +727,283 @@
         }
       ],
       "committedAt": "2026-07-19T13:46:55.288Z"
+    },
+    {
+      "id": "e2794163-b778-4afd-9f2e-23c8bf597559",
+      "fileHashes": [
+        {
+          "id": "12202706-6fdf-471e-8eff-074365bdc848",
+          "filePath": "src/ledger/domain/entities/account.py",
+          "hashValue": "9e93828d9580c73036dd48220aefcc05fecb5d8b9e79924d74aba4d7e4ef26bc"
+        },
+        {
+          "id": "543f937a-142d-4db7-8b17-6e46b4c6e550",
+          "filePath": "src/ledger/domain/entities/currency.py",
+          "hashValue": "7d7694350e3f4013b982bed87e7382c25df0e8e125b905f1a233d0d5e3ebfed8"
+        },
+        {
+          "id": "bd430d39-b9c1-4048-9bff-0fdae5d29d2e",
+          "filePath": "src/ledger/domain/entities/transaction.py",
+          "hashValue": "79e90f578ac80d5939fb26cd41d12145a54f4394af81dd1be9e09c5e661b0152"
+        },
+        {
+          "id": "16cdaff1-d0ec-4bd6-9b74-9af648da8c84",
+          "filePath": "src/ledger/domain/value_objects/account_number.py",
+          "hashValue": "af27c3e572fd2d161d9e72b7e9f664b09790674dfe6353ef6aa53feca8e883f3"
+        },
+        {
+          "id": "a516625b-130a-43b3-8560-0a790b813700",
+          "filePath": "src/ledger/domain/ports/system_account_resolver_port.py",
+          "hashValue": "48a776a6638bb334c1a0454229d7b9c29ba67fce27a35694100f5f63ebccdde3"
+        },
+        {
+          "id": "50e28f4c-dd7c-4263-b75c-84c40a76d47b",
+          "filePath": "src/ledger/domain/events/account_events.py",
+          "hashValue": "c88ec4f51b117ca028b1e4cfb91d9ec0930fd6d30315d053eaac9c46fcaf19ec"
+        },
+        {
+          "id": "67c22bc5-b7a1-4a58-be9d-935762150aac",
+          "filePath": "src/ledger/domain/events/currency_events.py",
+          "hashValue": "57f17cda740e23a5cb0c95fd07a6b8f9dbd935ceff2e4da3061667a1722ca49b"
+        },
+        {
+          "id": "589ce5b7-757d-4ba3-a444-43a80180241e",
+          "filePath": "src/ledger/domain/repositories.py",
+          "hashValue": "9f58b8cc4493417496d8fcfa4dfdbbe0cc8ad9a38cb5b717f5dfdb64ce18a093"
+        },
+        {
+          "id": "297aa58b-8f1c-47a6-bdc3-b72c110bb963",
+          "filePath": "src/common/domain/value_objects/money.py",
+          "hashValue": "20eab52dddb2bfac10acff762d51a3cf39131e6fde18b76d5192b5f79766d333"
+        },
+        {
+          "id": "db7b6800-997c-4900-bc4b-0bbd6a0ea3ed",
+          "filePath": "src/common/domain/value_objects/currency_code.py",
+          "hashValue": "3c5b465b5f67d26e8ce798cc859754892b90e5d19bb4cbcb381822c9c3496d6d"
+        },
+        {
+          "id": "bc0136f5-aaa2-4947-af79-bcea3b7469b8",
+          "filePath": "src/ledger/application/commands/create_currency_command.py",
+          "hashValue": "a5c3377e67db96ddb7fa0484063cb2a0b00848f0fd9c719c74b0f24f4ad0b37a"
+        },
+        {
+          "id": "237de179-6677-47a5-9c16-3302f42c736d",
+          "filePath": "src/ledger/application/commands/update_account_currency_command.py",
+          "hashValue": "f0b90563a9b5823cbbec2b81b7a393402afdbf4a5a3d81181773a2e831d1ee04"
+        },
+        {
+          "id": "0a0cb73b-850c-49d2-b5db-30eea2efdad6",
+          "filePath": "src/ledger/application/handlers/create_currency_handler.py",
+          "hashValue": "02c6b237b7160695ee50d8460c20e621843339a369a1af6d3e1ac4f4f78b4e72"
+        },
+        {
+          "id": "a0434e7d-ce1c-4677-95b1-dcab1c968317",
+          "filePath": "src/ledger/application/handlers/update_account_currency_handler.py",
+          "hashValue": "15298d44b45cf665c41c2c2616851101e1248036272dc1e980cc8f0564661623"
+        },
+        {
+          "id": "1ae49ced-d598-42e2-a104-3ddd99a8055f",
+          "filePath": "src/ledger/application/queries/get_all_accounts_query.py",
+          "hashValue": "fbab136977b4828fdf108e154ad0d3cd8ba7a05a4153772a18234a72e709a8a7"
+        },
+        {
+          "id": "f21e12b0-aa1b-41a1-9a3d-ba691dd2e5de",
+          "filePath": "src/ledger/application/handlers/get_all_accounts_handler.py",
+          "hashValue": "4cd5196c7fa53dbd4581bc4d9f103d54b5c1125284cb28d44bec3be9dd4c2178"
+        },
+        {
+          "id": "13049bf2-d902-46ef-b1ff-da1f64dc8fea",
+          "filePath": "src/ledger/application/queries/get_all_escrow_accounts_query.py",
+          "hashValue": "ec2ebdaf5520ac1faa01eab7b1d4717f4bb933f70367b3e511dce471da28a00f"
+        },
+        {
+          "id": "0721d99b-435d-44ae-93d7-299750ac2525",
+          "filePath": "src/ledger/application/handlers/get_all_escrow_accounts_handler.py",
+          "hashValue": "023798810edbc2d04203f55d79449b6f77f7c31a8efd95ca71c0973aea6f7b2f"
+        },
+        {
+          "id": "d393cf75-21bd-4acb-ab0e-1157be7bb3ee",
+          "filePath": "src/ledger/application/ports/account_query_port.py",
+          "hashValue": "81a20a0b7181c3434ad7df5ea8f0f20ab70b5ebf901d471de45a11de7d9bcae5"
+        },
+        {
+          "id": "278719e7-66bb-4f2f-b862-2534faddd84e",
+          "filePath": "src/ledger/application/ports/escrow_account_query_port.py",
+          "hashValue": "9d74d5175ab6a16bf2d23e7abd26a078b85526eb2ea6a1244929c31d7ec420d0"
+        },
+        {
+          "id": "64b228a6-5235-48c1-b2d2-32ff2df6279c",
+          "filePath": "src/ledger/application/dto/account_summary.py",
+          "hashValue": "7405122d7e4dcdb5a26d54baa5fb98d0fd474af21ca6b72b8e757b7713f28a05"
+        },
+        {
+          "id": "1e999cc3-01b1-4937-9597-084d37f7cfea",
+          "filePath": "src/ledger/application/dto/escrow_account_summary.py",
+          "hashValue": "d24e2aae6de91606b159af5d8473d6b9dc2cded737b01610681cc013b2e80215"
+        },
+        {
+          "id": "7e6c649a-e55a-447f-853d-78bb23b21211",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_account_repository.py",
+          "hashValue": "ea5faea89a7a4cae16f3e75545ba5588ffc93562622c71e8bf3c1c8144c1bb49"
+        },
+        {
+          "id": "2a2487f4-9952-44a5-8888-2251902b5d54",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_currency_repository.py",
+          "hashValue": "14bfd308cffde3ee17b3d67cef746e4137370ae2cd52a362906c5f1d0b9d436f"
+        },
+        {
+          "id": "78b93bf2-5924-452b-a779-4cbb34d3823a",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_account_read_model.py",
+          "hashValue": "29f2842b3032f7714f444dd4e43485bd16c976e80545ae5e863c6ccbfd974688"
+        },
+        {
+          "id": "30dee8f5-0ebe-4f65-8c3e-120f4d31e08d",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_escrow_account_read_model.py",
+          "hashValue": "721e87be6bb2bfd35acc2ed594dd7fe7beb6a2ee69fd1679aa04ba6bf5caf1f8"
+        },
+        {
+          "id": "e7eb1a9b-c42a-4efd-8539-49dfcb9896d9",
+          "filePath": "src/common/infrastructure/database/schemas/ledger/ledger.py",
+          "hashValue": "b631ed8a396f094c66d05607a858dd2095a8e1da8dd150a5a8b5a1c092a1fe73"
+        }
+      ],
+      "committedAt": "2026-07-19T15:48:35.017Z"
+    },
+    {
+      "id": "8d5c26ff-650f-41ed-97e5-22ae435cf7e4",
+      "fileHashes": [
+        {
+          "id": "f63be21d-62b6-47ae-beea-80abb66bfb85",
+          "filePath": "src/ledger/domain/entities/transaction.py",
+          "hashValue": "79e90f578ac80d5939fb26cd41d12145a54f4394af81dd1be9e09c5e661b0152"
+        },
+        {
+          "id": "884d778e-ac4c-4f1b-b656-44662b5390fe",
+          "filePath": "src/ledger/domain/entities/account.py",
+          "hashValue": "9e93828d9580c73036dd48220aefcc05fecb5d8b9e79924d74aba4d7e4ef26bc"
+        },
+        {
+          "id": "8eba9ee7-cacd-49e0-bd15-197d8d048277",
+          "filePath": "src/ledger/domain/services/double_entry_ledger.py",
+          "hashValue": "4d56e87a1b24bcb388452378f515c61f12fefcd25b1e764b93caa115d3419799"
+        },
+        {
+          "id": "95c0fa46-890e-478b-a530-d2f92b4d0c72",
+          "filePath": "src/ledger/domain/events/transaction_events.py",
+          "hashValue": "7101f2f67967f951b048389549907260d81f3cc9fb3c4d92a03b98c419f7c608"
+        },
+        {
+          "id": "087f89a2-e7ba-4833-85fe-3dfecf562507",
+          "filePath": "src/ledger/domain/repositories.py",
+          "hashValue": "9f58b8cc4493417496d8fcfa4dfdbbe0cc8ad9a38cb5b717f5dfdb64ce18a093"
+        },
+        {
+          "id": "560cc0f7-37c2-45c7-a72b-927dbb638125",
+          "filePath": "src/ledger/domain/ports/system_account_resolver_port.py",
+          "hashValue": "48a776a6638bb334c1a0454229d7b9c29ba67fce27a35694100f5f63ebccdde3"
+        },
+        {
+          "id": "7a4d6921-82cb-4e08-8363-51a749212b03",
+          "filePath": "src/ledger/application/commands/hold_funds_command.py",
+          "hashValue": "3dc462d42fdb363ad0a37d46ba182c037e15623a3db437005b5f7a394f03f39c"
+        },
+        {
+          "id": "0554d15e-f3bd-4369-9fcd-c57ac11b0565",
+          "filePath": "src/ledger/application/commands/complete_funds_command.py",
+          "hashValue": "1d811ea7ce2c63f20e8e410b2680ce697249cc350eabaff78b466eddf6c18c25"
+        },
+        {
+          "id": "29d10f0f-909a-458f-bb49-7195a1c3c64e",
+          "filePath": "src/ledger/application/commands/fail_and_refund_command.py",
+          "hashValue": "aacea9a8b683d33421733361d442c71f981517d238f0175434b6599610379448"
+        },
+        {
+          "id": "910b6551-3357-43bb-ac65-48123a93a9d7",
+          "filePath": "src/ledger/application/handlers/hold_funds_handler.py",
+          "hashValue": "24cfbb1701ec6db16395b9454d14076d70fe438332561aef2a1a464a046fa617"
+        },
+        {
+          "id": "04f4d72c-d69d-413d-a15f-e22a6ecb1122",
+          "filePath": "src/ledger/application/handlers/complete_funds_handler.py",
+          "hashValue": "29f448b92539b4709f495cb750727f9e253fc5ecb945dd6f215db90f44cb8b80"
+        },
+        {
+          "id": "9be067ac-7a56-427e-a0ff-7eaf25566517",
+          "filePath": "src/ledger/application/handlers/fail_and_refund_handler.py",
+          "hashValue": "b7ace25c0d90b46f3d58a1143fd032e1c14f140d0b423f93aee9fd727769b57e"
+        },
+        {
+          "id": "811af12f-6e44-4ab0-9320-515ba0f65123",
+          "filePath": "src/ledger/application/queries/get_transactions_query.py",
+          "hashValue": "bb16dc00e1e601224c63e1601372dc69227b8ffe473d9d590b83f171c9df409d"
+        },
+        {
+          "id": "b1197c80-0d59-4e56-9c51-ca92ec338a73",
+          "filePath": "src/ledger/application/handlers/get_transactions_handler.py",
+          "hashValue": "828085133f0ae50902bbf299b202ef2cbce4191fcc115f509e26f58033559d68"
+        },
+        {
+          "id": "461ee86f-1495-40dc-9c61-05a8376da193",
+          "filePath": "src/ledger/application/ports/transaction_query_port.py",
+          "hashValue": "e1fb87b7f138a62c567987a32b1f19ffba9fe967c39095d2faac3f8714d90564"
+        },
+        {
+          "id": "5fc5c206-7c75-43c6-b8dc-ddb17c2e2c91",
+          "filePath": "src/ledger/application/dto/transaction_list_item.py",
+          "hashValue": "024feb14ecad1d618326796734a3a519effb9be8941b5d54601fb38d75367556"
+        },
+        {
+          "id": "1c6c409a-17fa-478e-b39c-f7c43e03c454",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_transaction_repository.py",
+          "hashValue": "5965ed5b833d2234dd2ec1efd25b8dd2b313f418d1ed74f04baa257b125ab0ea"
+        },
+        {
+          "id": "3c8eda82-b735-48e9-8993-f6132cc1d9b7",
+          "filePath": "src/ledger/infrastructure/persistence/sqlite_transaction_read_model.py",
+          "hashValue": "6657b0c038661f97d55a2fe9e23bb4f134a4e351e322c83024fb3a55ec300d3c"
+        },
+        {
+          "id": "233f0d67-be3f-49e7-9b70-469457da5057",
+          "filePath": "src/ledger/infrastructure/adapters/sqlite_system_account_resolver.py",
+          "hashValue": "4c927bd21c1e9263caa6199c3b5ffff7d826bdfee8fe1c38405771a245f5ca85"
+        },
+        {
+          "id": "0273083f-882d-466f-91b6-a8afb3ab7653",
+          "filePath": "src/ledger/infrastructure/web/transaction_controller.py",
+          "hashValue": "972b967f554f16c17141e5899ce7181315a23db9b32db1649eb12a83600d75d5"
+        },
+        {
+          "id": "befac8bd-115b-402d-82c7-cf5699ebc249",
+          "filePath": "src/ledger/infrastructure/web/transaction_api_controller.py",
+          "hashValue": "01a51c8bf7658801a426061db1e384bb24f5f63b8ab80f3bc1485ca5de7a0f42"
+        },
+        {
+          "id": "c3914dc8-d852-40d3-b88c-ec11bd2f435f",
+          "filePath": "src/ledger/infrastructure/web/schemas/hold_funds_request.py",
+          "hashValue": "83615c985ffa7e884f9644e267c8e419befe4529e905cf7c24da2c98d77e09ee"
+        },
+        {
+          "id": "334624ad-78bf-481a-a9c4-6c7dfbf60735",
+          "filePath": "src/common/domain/value_objects/money.py",
+          "hashValue": "20eab52dddb2bfac10acff762d51a3cf39131e6fde18b76d5192b5f79766d333"
+        },
+        {
+          "id": "e0802461-6874-46b0-9783-6110b5067204",
+          "filePath": "src/common/domain/value_objects/currency_code.py",
+          "hashValue": "3c5b465b5f67d26e8ce798cc859754892b90e5d19bb4cbcb381822c9c3496d6d"
+        },
+        {
+          "id": "88943dd4-62b2-4b79-a462-6dd8ca4ce051",
+          "filePath": "src/common/infrastructure/database/schemas/ledger/ledger.py",
+          "hashValue": "b631ed8a396f094c66d05607a858dd2095a8e1da8dd150a5a8b5a1c092a1fe73"
+        },
+        {
+          "id": "2b6de805-53e0-4574-9afe-fdce61dbf0a3",
+          "filePath": "src/app/di/ledger_di.py",
+          "hashValue": "fb2775aa27dc89058bf97cf77171d6883200a8afce6db4338502ef13002e82fb"
+        }
+      ],
+      "committedAt": "2026-07-19T16:26:51.245Z"
     }
   ]
 }

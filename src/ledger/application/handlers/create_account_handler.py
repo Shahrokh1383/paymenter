@@ -24,12 +24,16 @@ class CreateAccountHandler:
             account_number = AccountNumber(acc_num_str)
             currency_code = CurrencyCode(cmd.currency_code)
 
+            # Fix: Added pending_holds and open_authorizations to satisfy Aggregate invariants.
+            # Changed id=None to id=0 for codebase consistency.
             account = Account(
-                id=None,
+                id=0,
                 user_id=cmd.user_id,
                 merchant_id=cmd.merchant_id,
                 account_number=account_number,
                 balance=Money('0.00', currency_code),
+                pending_holds=Money('0.00', currency_code),
+                open_authorizations=0,
                 version=0
             )
 

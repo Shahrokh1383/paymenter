@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
+from decimal import Decimal
 from src.common.domain.value_objects.money import Money
 from src.common.domain.exceptions import (
     InsufficientFundsError, 
@@ -56,6 +57,24 @@ class Account:
             raise CurrencyMismatchError("Account currency does not match transaction amount currency.")
             
         self.balance = self.balance - amount
+
+    def increase_holds(self, amount: Money) -> None:
+        """Increases the pending holds balance."""
+        if self.balance.currency != amount.currency:
+            raise CurrencyMismatchError("Account currency does not match hold amount currency.")
+        self.pending_holds = self.pending_holds + amount
+
+    def decrease_holds(self, amount: Money) -> None:
+        """
+        Decreases the pending holds balance.
+        Clamps at zero to gracefully handle legacy transactions created before holds were tracked.
+        """
+        if self.balance.currency != amount.currency:
+            raise CurrencyMismatchError("Account currency does not match hold amount currency.")
+            
+        # Calculate new holds amount, preventing negative values for legacy data compatibility
+        new_holds_amount = max(Decimal('0.00'), self.pending_holds.amount - amount.amount)
+        self.pending_holds = Money(new_holds_amount, self.balance.currency)
 
     def can_change_currency(self) -> bool:
         """Account can only change currency if balance, holds, and authorizations are all zero."""

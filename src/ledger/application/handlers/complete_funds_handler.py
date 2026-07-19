@@ -23,20 +23,25 @@ class CompleteFundsHandler:
             if not txn:
                 raise InvalidTransactionStateError("Transaction not found.")
                 
+            from_acc = self._account_repo.get_by_id(txn.from_account_id)
             to_acc = self._account_repo.get_by_id(txn.to_account_id)
-            if not to_acc:
-                raise AccountNotFoundError("Destination account not found.")
+            if not from_acc or not to_acc:
+                raise AccountNotFoundError("Associated accounts not found.")
 
             escrow_acc = self._system_account_resolver.get_escrow_account(txn.amount.currency)
             
+            if from_acc.id == escrow_acc.id:
+                from_acc = escrow_acc
             if to_acc.id == escrow_acc.id:
                 to_acc = escrow_acc
 
-            DoubleEntryLedger.complete_funds(txn, to_acc, escrow_acc)
+            DoubleEntryLedger.complete_funds(txn, from_acc, to_acc, escrow_acc)
             
             self._txn_repo.update(txn)
-            self._account_repo.update(to_acc)
-            if escrow_acc is not to_acc:
+            self._account_repo.update(from_acc)
+            if to_acc is not from_acc:
+                self._account_repo.update(to_acc)
+            if escrow_acc is not from_acc and escrow_acc is not to_acc:
                 self._account_repo.update(escrow_acc)
             self._uow.commit()
 

@@ -1,39 +1,39 @@
 {
   "version": "1.0",
-  "lastScan": "2026-07-19T00:14:44.697Z",
+  "lastScan": "2026-07-19T12:05:19.923Z",
   "files": {
     ".": {
       "id": "bbcacbb8-924f-421f-8b44-e6f35d29bd8b",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src": {
       "id": "4d9391e2-2cfd-4cfb-8d46-fc34482fb4dd",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications": {
       "id": "35c10347-df40-4fac-9fc0-bdd147d29c6a",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/infrastructure": {
       "id": "54d6789a-5286-4a1d-ad27-be9ef39a4f74",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/infrastructure/smtp": {
       "id": "bf6af7d6-ff21-47c1-88c5-ba3d6f720b19",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -47,7 +47,7 @@
     "src/notifications/infrastructure/persistence": {
       "id": "c176e95e-fafe-46f4-890c-7c7cafea33da",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -75,14 +75,14 @@
     "src/notifications/domain": {
       "id": "e15fefbb-ab30-432f-9fe5-81f51aee8689",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/domain/value_objects": {
       "id": "c52ad0c8-dfa7-4c1f-99ae-a97acc565fe5",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -96,7 +96,7 @@
     "src/notifications/domain/ports": {
       "id": "532ce624-5065-4d17-9833-13aca06fcfce",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -131,14 +131,14 @@
     "src/notifications/application": {
       "id": "eeb5b98d-20ef-4a30-b222-a551e5284fdb",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/application/handlers": {
       "id": "0a63061f-f7b7-483f-9f5f-7411aedb118e",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -159,21 +159,21 @@
     "src/ledger": {
       "id": "042d5c42-bfb1-4af8-9903-1de867fc9041",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/infrastructure": {
       "id": "a11c7d2f-87d9-4f3d-8418-f67a7dc57807",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/infrastructure/web": {
       "id": "bd51acb8-2881-4689-99ac-ffceb399b4fb",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -194,7 +194,7 @@
     "src/ledger/infrastructure/web/schemas": {
       "id": "450c438b-3f63-4d0d-8240-9cebc51dd25f",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -208,7 +208,7 @@
     "src/ledger/infrastructure/persistence": {
       "id": "dcd334c1-1f4c-46fc-9c12-81ef6e40b4b1",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -264,7 +264,7 @@
     "src/ledger/infrastructure/adapters": {
       "id": "501050fe-f39e-4fa1-a9a2-33bbbd23dc07",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -278,14 +278,14 @@
     "src/ledger/domain": {
       "id": "6058c276-a02b-4734-83ce-09db4eeafa46",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/domain/value_objects": {
       "id": "5bc0ffe1-46c0-4afb-8f6c-45bda6a9d21b",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -306,7 +306,7 @@
     "src/ledger/domain/services": {
       "id": "070930b9-3b38-41e5-82aa-b34b07a87ffa",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -327,7 +327,7 @@
     "src/ledger/domain/ports": {
       "id": "eaf1a9f4-1f95-45a3-b46b-869707b821c0",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -341,7 +341,7 @@
     "src/ledger/domain/events": {
       "id": "8dd21f1c-6086-4076-984f-0daf23642f09",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -369,7 +369,7 @@
     "src/ledger/domain/entities": {
       "id": "2affe29b-0204-40ce-a89f-11d7bca92a7d",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -397,14 +397,14 @@
     "src/ledger/application": {
       "id": "661cd42a-44a1-4b73-8e48-c1ba27ca1893",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/application/queries": {
       "id": "7ca4534c-7dee-48d2-9f92-80253a84076c",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -446,7 +446,7 @@
     "src/ledger/application/ports": {
       "id": "39099fba-ac9d-4ec2-9e1e-05e6967fcdfb",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -488,7 +488,7 @@
     "src/ledger/application/handlers": {
       "id": "bb99be14-620d-4062-8f3b-d2aa6f43961e",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -586,7 +586,7 @@
     "src/ledger/application/dto": {
       "id": "a09514a7-d746-4b0f-bcdb-9efd7869ee72",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.696Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -621,7 +621,7 @@
     "src/ledger/application/commands": {
       "id": "a544c5b1-0a3b-48e6-9ab1-1cc828906653",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -684,21 +684,21 @@
     "src/identity": {
       "id": "8590647c-dce6-49be-ad57-e1e73d47ddba",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/infrastructure": {
       "id": "d20e5072-390d-4146-bc64-5e6a2a0ee446",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/infrastructure/web": {
       "id": "06707dd7-82a3-488c-a79f-91cd065d43e8",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -712,7 +712,7 @@
     "src/identity/infrastructure/persistence": {
       "id": "3eb839ca-fecc-4447-b361-e96d968ec6c8",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -740,14 +740,14 @@
     "src/identity/domain": {
       "id": "adc10e5d-5a27-4636-b072-c745025eb2fd",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/domain/value_objects": {
       "id": "fb445261-f558-4302-b608-bed0762ebfcf",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -775,7 +775,7 @@
     "src/identity/domain/ports": {
       "id": "a9a2b862-52e1-4a7e-a6ea-a216b3f97fba",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.922Z",
       "size": 0,
       "isDirectory": true
     },
@@ -789,7 +789,7 @@
     "src/identity/domain/events": {
       "id": "48ae5f42-283f-4d0a-9e31-4a8baaa367b1",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -817,7 +817,7 @@
     "src/identity/domain/entities": {
       "id": "f6da2037-129d-4396-879d-b8f9b66c7f33",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -838,14 +838,14 @@
     "src/identity/application": {
       "id": "99e15081-d0fb-4510-be8f-d14c3cd0dfab",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/application/queries": {
       "id": "33571b0b-493b-4672-a8f8-14dfb809f395",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -859,7 +859,7 @@
     "src/identity/application/handlers": {
       "id": "f19c9a40-5e52-4070-b888-525c1680e727",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -908,7 +908,7 @@
     "src/identity/application/dto": {
       "id": "61af9b5e-8e86-4ed4-93ef-059d7eb0df8e",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -929,7 +929,7 @@
     "src/identity/application/commands": {
       "id": "509f4087-73f6-4058-8f77-a3059936f5b7",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -950,21 +950,21 @@
     "src/common": {
       "id": "086ab88a-aa0a-4c34-8b2d-70e674a96cf7",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure": {
       "id": "c3d8f357-b748-42f5-a91c-b330274f0fbe",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/web": {
       "id": "4e16b5d5-db6b-46df-aaab-1f58ec3ed3cd",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -978,7 +978,7 @@
     "src/common/infrastructure/persistence": {
       "id": "fadbe757-32f1-4887-91db-5b17f9156fb3",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1006,21 +1006,21 @@
     "src/common/infrastructure/event_bus": {
       "id": "2bffb1eb-506f-4b5f-94bd-6822b65428c9",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/database": {
       "id": "0de0f4fd-8299-4a2e-9cd1-5f77bb3de687",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/database/storage": {
       "id": "b4db6b94-7871-482e-921d-d54084196983",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1034,14 +1034,14 @@
     "src/common/infrastructure/database/schemas": {
       "id": "cbba94f3-c1f9-49a2-8705-820e3be4fa27",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/database/schemas/notifications": {
       "id": "04f057bf-46a6-4cb7-8ebb-a461f59154f3",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1055,7 +1055,7 @@
     "src/common/infrastructure/database/schemas/ledger": {
       "id": "9b827d36-e565-41b5-a127-c444f137295d",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1069,7 +1069,7 @@
     "src/common/infrastructure/database/schemas/identity": {
       "id": "6357b20d-5c93-44de-9d68-dbd8c3f7466c",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1090,14 +1090,14 @@
     "src/common/infrastructure/database/schemas/eventing": {
       "id": "51802b82-d939-4aaa-a4ff-8498d3d0b0cf",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/database/schemas/checkout": {
       "id": "d296602f-295d-4a12-b75e-c8fd802f7ccb",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1111,14 +1111,14 @@
     "src/common/domain": {
       "id": "ec0ccc66-71d4-47fe-b321-eaf9dd518403",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/domain/value_objects": {
       "id": "52e34400-c213-4868-848c-82308d24cf6f",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1146,7 +1146,7 @@
     "src/common/domain/ports": {
       "id": "d1d99ffa-f0e5-471f-a967-9e3774bb9626",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1174,21 +1174,21 @@
     "src/checkout": {
       "id": "8e40a7ae-7ce7-4ddf-a9cd-1b7b7fe31f65",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/infrastructure": {
       "id": "bd10898d-26f8-436d-90e3-065ccd05b386",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/infrastructure/web": {
       "id": "bed3cae2-69d5-4b07-aed5-1b239f2282e8",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1209,7 +1209,7 @@
     "src/checkout/infrastructure/services": {
       "id": "7d28bf3b-b5db-4aaa-b5fc-138c36839579",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1230,7 +1230,7 @@
     "src/checkout/infrastructure/persistence": {
       "id": "c2e00070-1c77-45ea-ad28-768f31f9e588",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1272,14 +1272,14 @@
     "src/checkout/domain": {
       "id": "62e59185-fd52-4478-8f6c-5a522ff9a4e0",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/domain/value_objects": {
       "id": "51901449-9b0d-41c6-af3a-a96b1cc52b82",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1321,7 +1321,7 @@
     "src/checkout/domain/ports": {
       "id": "12b6fe95-da74-4d61-ae23-cf2f921969f0",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1370,7 +1370,7 @@
     "src/checkout/domain/events": {
       "id": "495c41a6-9873-4b3c-821b-3437a4b4bfa5",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1391,7 +1391,7 @@
     "src/checkout/domain/entities": {
       "id": "6693f9d3-809f-4402-8fa7-1222e7af2053",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1405,14 +1405,14 @@
     "src/checkout/application": {
       "id": "1e346a10-7f51-4735-b390-73e12023bf33",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/application/handlers": {
       "id": "32496a1d-9d54-4274-baa2-dd0c9e28655c",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1447,7 +1447,7 @@
     "src/checkout/application/commands": {
       "id": "1aafcc8a-5c87-41c8-8446-1d554167a039",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1482,7 +1482,7 @@
     "src/app": {
       "id": "99a2f429-6558-4c27-904b-e98c468bdd7b",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1510,7 +1510,7 @@
     "src/app/di": {
       "id": "2801b164-324d-4251-b594-30eefaebe9be",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1545,91 +1545,84 @@
     "docs": {
       "id": "15ca1757-7046-4119-a361-8bb2f7e69678",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/idea.md": {
       "id": "b7c74998-bd3f-41c6-867e-183bb9c1f118",
       "hash": null,
-      "lastModified": "2026-07-17T14:44:39.820Z",
+      "lastModified": "2026-07-19T00:41:21.353Z",
       "size": 7368,
       "isDirectory": false
     },
     "docs/backend": {
       "id": "8fc6a234-9177-4601-b2ee-84c35a66d6e2",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/backend/ledger": {
       "id": "2ba956d5-5a81-4c4d-873e-a3891e09c9a4",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/backend/ledger/SettlementCore.md": {
       "id": "128d1368-f881-4246-8829-79f829a3ab2a",
       "hash": null,
-      "lastModified": "2026-07-18T16:28:15.459Z",
+      "lastModified": "2026-07-19T00:41:21.353Z",
       "size": 12649,
       "isDirectory": false
     },
     "docs/backend/ledger/LedgerKernel.md": {
       "id": "820d268f-bd37-4416-8426-7b9acf12e462",
       "hash": null,
-      "lastModified": "2026-07-18T16:28:05.428Z",
+      "lastModified": "2026-07-19T00:41:21.352Z",
       "size": 11055,
       "isDirectory": false
     },
     "docs/backend/identity": {
       "id": "47e2d1e5-9d69-4916-acd6-501646a5d23e",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/backend/identity/UserManagement.md": {
       "id": "7b18ca81-739a-499d-a970-65431216e446",
       "hash": null,
-      "lastModified": "2026-07-18T16:28:24.493Z",
-      "size": 10381,
-      "isDirectory": false
-    },
-    "docs/backend/identity/ReadModelProjections.md": {
-      "id": "d40ea09b-54cb-4a0d-a7be-ec45c7138b6c",
-      "hash": null,
-      "lastModified": "2026-07-18T16:31:55.242Z",
-      "size": 11010,
+      "lastModified": "2026-07-19T00:41:21.351Z",
+      "size": 11034,
       "isDirectory": false
     },
     "docs/backend/identity/MerchantManagement.md": {
       "id": "fe5f0132-bc18-4fa2-8a66-1aa2e87bb04a",
       "hash": null,
-      "lastModified": "2026-07-18T23:59:16.284Z",
-      "size": 10943,
+      "lastModified": "2026-07-19T00:41:21.351Z",
+      "size": 10962,
       "isDirectory": false
     },
     "docs/backend/identity/CardProvisioning.md": {
       "id": "1e6e0818-4d9e-4eb4-a118-df5e3d81c25a",
       "hash": null,
-      "lastModified": "2026-07-18T20:55:25.173Z",
+      "lastModified": "2026-07-19T00:41:21.350Z",
       "size": 14911,
       "isDirectory": false
     },
     "docs/backend/identity/AdministraionDashboard.md": {
       "id": "91b5fc24-9f9b-4c3d-8880-39e8f6df0e61",
       "hash": null,
-      "lastModified": "2026-07-18T20:51:30.687Z",
+      "lastModified": "2026-07-19T00:41:21.350Z",
       "size": 30379,
       "isDirectory": false
     },
     "docs/backend/guideline": {
       "id": "9d3fe576-c5ad-4889-ad92-d9433cac530a",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1650,7 +1643,7 @@
     ".doclink": {
       "id": "1b557904-73fa-4507-a888-7bc9849f11e8",
       "hash": null,
-      "lastModified": "2026-07-19T00:14:44.697Z",
+      "lastModified": "2026-07-19T12:05:19.923Z",
       "size": 0,
       "isDirectory": true
     }

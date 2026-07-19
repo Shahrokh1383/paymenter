@@ -15,14 +15,12 @@
     "tests",
     "find.py",
     "static\\css",
-    "src\\checkout",
-    "templates",
-    "static",
-    "src\\ledger"
+    "src\\ledger",
+    "src\\identity"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-18T16:44:38.556Z",
+  "lastModified": "2026-07-19T12:37:31.785Z",
   "version": 1
 }

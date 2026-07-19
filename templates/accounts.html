@@ -58,7 +58,6 @@
             <th>User</th>
             <th>Currency</th>
             <th>Account Num</th>
-            <th>Card Num</th>
             <th>Balance</th>
             <th>Actions</th>
         </tr>
@@ -70,7 +69,6 @@
             <td>{{ a.user_name }}</td>
             <td><strong>{{ a.currency_code or 'Not Set' }}</strong></td>
             <td>{{ a.account_number }}</td>
-            <td>{{ a.card_number }}</td>
             <td class="balance">{{ a.balance }}</td>
             <td>
                 <form action="{{ url_for('dashboard.topup_account') }}" method="POST" style="display:inline;">

@@ -18,12 +18,15 @@ from src.ledger.application.handlers.get_transactions_handler import GetTransact
 from src.ledger.application.handlers.topup_account_handler import TopupAccountHandler
 from src.ledger.application.handlers.update_account_currency_handler import UpdateAccountCurrencyHandler
 from src.ledger.application.handlers.get_all_accounts_handler import GetAllAccountsHandler
-from src.ledger.application.handlers.create_currency_handler import CreateCurrencyHandler
+from src.ledger.application.handlers.create_currency_handler import CreateCurrencyHandler, EscrowBootstrapperEventHandler
 from src.ledger.application.handlers.toggle_currency_handler import ToggleCurrencyHandler
 from src.ledger.application.handlers.get_all_currencies_handler import GetAllCurrenciesHandler
 from src.ledger.application.handlers.get_active_currencies_handler import GetActiveCurrenciesHandler
 from src.ledger.application.handlers.get_all_escrow_accounts_handler import GetAllEscrowAccountsHandler
 from src.ledger.application.handlers.create_account_handler import CreateAccountHandler
+
+# Events
+from src.ledger.domain.events.currency_events import CurrencyCreatedEvent
 
 def register_ledger(container):
 
@@ -52,7 +55,11 @@ def register_ledger(container):
         return GetAllAccountsHandler(query_port=SqliteAccountReadModel(uow))
 
     def get_create_currency_handler(uow: SqliteUnitOfWork) -> CreateCurrencyHandler:
-        return CreateCurrencyHandler(uow=uow, currency_repo=SqliteCurrencyRepository(uow), account_repo=SqliteAccountRepository(uow), event_bus=container.event_bus)
+        # Bug #1 Fix: Removed account_repo injection. Handler is now pure.
+        return CreateCurrencyHandler(uow=uow, currency_repo=SqliteCurrencyRepository(uow), event_bus=container.event_bus)
+    
+    def get_escrow_bootstrapper_event_handler(uow: SqliteUnitOfWork) -> EscrowBootstrapperEventHandler:
+        return EscrowBootstrapperEventHandler(uow=uow, account_repo=SqliteAccountRepository(uow))
         
     def get_toggle_currency_handler(uow: SqliteUnitOfWork) -> ToggleCurrencyHandler:
         return ToggleCurrencyHandler(uow=uow, currency_repo=SqliteCurrencyRepository(uow), event_bus=container.event_bus)
@@ -80,3 +87,5 @@ def register_ledger(container):
     container.get_all_currencies_handler = get_all_currencies_handler
     container.get_active_currencies_handler = get_active_currencies_handler
     container.get_all_escrow_accounts_handler = get_all_escrow_accounts_handler
+    bootstrapper_handler = get_escrow_bootstrapper_event_handler(SqliteUnitOfWork())
+    container.event_bus.subscribe(CurrencyCreatedEvent, bootstrapper_handler.handle)

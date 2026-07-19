@@ -5,7 +5,7 @@ from src.ledger.domain.value_objects.account_number import AccountNumber
 from src.common.domain.value_objects.money import Money
 from src.common.domain.value_objects.currency_code import CurrencyCode
 from src.ledger.domain.repositories import AccountRepository
-from src.common.domain.exceptions import ConcurrencyException
+from src.common.domain.exceptions import ConcurrencyException, CurrencyNotFoundError
 
 class SqliteAccountRepository(AccountRepository):
     def __init__(self, uow: UnitOfWork):
@@ -33,14 +33,18 @@ class SqliteAccountRepository(AccountRepository):
         return self._map_row_to_account(row)
 
     def update(self, account: Account) -> None:
-        currency_row = self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)).fetchone()
-        if not currency_row: raise ValueError(f"Currency code {account.balance.currency.value} not found.")
+        currency_row = self._uow.conn.execute(
+            "SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)
+        ).fetchone()
+        if not currency_row: 
+            raise CurrencyNotFoundError(f"Currency code {account.balance.currency.value} not found.")
             
         cursor = self._uow.conn.execute(
             "UPDATE accounts SET balance = ?, currency_id = ?, version = version + 1 WHERE id = ? AND version = ?",
             (str(account.balance.amount), currency_row['id'], account.id, account.version)
         )
-        if cursor.rowcount == 0: raise ConcurrencyException(f"Optimistic locking conflict while updating account {account.id}.")
+        if cursor.rowcount == 0: 
+            raise ConcurrencyException(f"Optimistic locking conflict while updating account {account.id}.")
         account.version += 1
 
     def get_by_account_number(self, account_number: str) -> Account:
@@ -55,8 +59,14 @@ class SqliteAccountRepository(AccountRepository):
         return self._map_row_to_account(row)
 
     def add(self, account: Account) -> int:
-        currency_row = self._uow.conn.execute("SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)).fetchone()
-        currency_id = currency_row['id'] if currency_row else 1
+        currency_row = self._uow.conn.execute(
+            "SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)
+        ).fetchone()
+
+        if not currency_row:
+            raise CurrencyNotFoundError(f"Currency code {account.balance.currency.value} not found.")
+        
+        currency_id = currency_row['id']
         
         cursor = self._uow.conn.execute(
             "INSERT INTO accounts (user_id, merchant_id, currency_id, account_number, balance) VALUES (?, ?, ?, ?, ?)",

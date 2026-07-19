@@ -1,7 +1,12 @@
 from dataclasses import dataclass
 from typing import Optional
 from src.common.domain.value_objects.money import Money
-from src.common.domain.exceptions import InsufficientFundsError, CurrencyMismatchError
+from src.common.domain.exceptions import (
+    InsufficientFundsError, 
+    CurrencyMismatchError, 
+    NonZeroBalanceCurrencyChangeError, 
+    InvalidTopupAmountError
+)
 from src.ledger.domain.value_objects.account_number import AccountNumber
 
 @dataclass
@@ -32,7 +37,7 @@ class Account:
     
     def topup(self, amount: Money) -> None:
         if amount.amount <= 0:
-            raise ValueError("Topup amount must be greater than zero.")
+            raise InvalidTopupAmountError("Topup amount must be greater than zero.")
             
         if self.balance.currency != amount.currency:
             raise CurrencyMismatchError("Account currency does not match topup amount currency.")
@@ -55,5 +60,5 @@ class Account:
     def change_currency(self, new_currency_code: str) -> None:
         """Changes the account's currency. Enforces zero-balance invariant (BR-5)."""
         if not self.can_change_currency():
-            raise ValueError("Cannot change currency on an account with a balance > 0.")
+            raise NonZeroBalanceCurrencyChangeError("Cannot change currency on an account with a balance > 0.")
         self.balance = Money(self.balance.amount, new_currency_code)

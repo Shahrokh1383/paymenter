@@ -1,9 +1,8 @@
 import json
-import hmac
-import hashlib
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.notifications.domain.ports.webhook_outbox_port import WebhookOutboxPort
 from src.notifications.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort
+from src.notifications.infrastructure.utils.webhook_signer import WebhookSigner
 from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
@@ -27,8 +26,6 @@ class WebhookOutboxEventHandler:
         if not event.merchant_id:
             return
 
-        # Instantiates UoW. Thanks to ContextVars, if called inside a parent UoW, 
-        # it joins the exact same transaction.
         with self._uow:
             config = self._merchant_config_port.get_config(event.merchant_id)
             if not config or not config.webhook_enabled or not config.webhook_url or not config.webhook_secret:
@@ -43,11 +40,8 @@ class WebhookOutboxEventHandler:
             }
             payload_json = json.dumps(payload, sort_keys=True)
             
-            signature = hmac.new(
-                key=config.webhook_secret.encode('utf-8'),
-                msg=payload_json.encode('utf-8'),
-                digestmod=hashlib.sha256
-            ).hexdigest()
+            # Refactored: Use the dedicated WebhookSigner utility (DRY & SRP)
+            signature = WebhookSigner.sign(payload_json, config.webhook_secret)
 
             self._outbox_repo.add(
                 merchant_id=event.merchant_id,
@@ -55,4 +49,3 @@ class WebhookOutboxEventHandler:
                 payload=payload_json,
                 signature=signature
             )
-            # No explicit commit. The root UoW (e.g., CompleteFundsHandler) will commit this atomically.

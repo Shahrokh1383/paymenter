@@ -7124,20 +7124,81 @@
     "src/notifications/application/handlers/webhook_outbox_event_handler.py": {
       "id": "40101350-b750-4a5f-8e30-0f68c4d4c095",
       "filePath": "src/notifications/application/handlers/webhook_outbox_event_handler.py",
-      "hashValue": "c8fe0aceef96876b7f7cdc17117e69a0aa53392a53070819b1a0b34b82aa786a",
+      "hashValue": "896efec97e7374170ceff77d53e3353427e70cee5205960310f4e0648f47a48f",
       "diff": {
         "filePath": "src/notifications/application/handlers/webhook_outbox_event_handler.py",
-        "oldHash": "c8fe0aceef96876b7f7cdc17117e69a0aa53392a53070819b1a0b34b82aa786a",
-        "newHash": "c8fe0aceef96876b7f7cdc17117e69a0aa53392a53070819b1a0b34b82aa786a",
-        "addedLines": [],
-        "removedLines": [],
-        "modifiedLines": [
+        "oldHash": "896efec97e7374170ceff77d53e3353427e70cee5205960310f4e0648f47a48f",
+        "newHash": "896efec97e7374170ceff77d53e3353427e70cee5205960310f4e0648f47a48f",
+        "addedLines": [
           {
-            "lineNumber": 42,
-            "content": "                \"currency\": str(event.amount.currency)",
-            "type": "MODIFIED"
+            "lineNumber": 5,
+            "content": "from src.notifications.infrastructure.utils.webhook_signer import WebhookSigner",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 43,
+            "content": "            # Refactored: Use the dedicated WebhookSigner utility (DRY & SRP)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 44,
+            "content": "            signature = WebhookSigner.sign(payload_json, config.webhook_secret)",
+            "type": "ADDED"
           }
-        ]
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 2,
+            "content": "import hmac",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "import hashlib",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "        # Instantiates UoW. Thanks to ContextVars, if called inside a parent UoW, ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "        # it joins the exact same transaction.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 46,
+            "content": "            signature = hmac.new(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 47,
+            "content": "                key=config.webhook_secret.encode('utf-8'),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 48,
+            "content": "                msg=payload_json.encode('utf-8'),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 49,
+            "content": "                digestmod=hashlib.sha256",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 50,
+            "content": "            ).hexdigest()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 58,
+            "content": "            # No explicit commit. The root UoW (e.g., CompleteFundsHandler) will commit this atomically.",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
       }
     },
     "src/notifications/infrastructure/persistence/sqlite_merchant_webhook_config_adapter.py": {
@@ -7904,29 +7965,40 @@
     ".pytest_cache/v/cache/nodeids": {
       "id": "a52a38da-7c08-4af3-939a-8218ff606ecf",
       "filePath": ".pytest_cache/v/cache/nodeids",
-      "hashValue": "69c7253ad3faa15498cf8fbaa1b349d64fbfd69cb7f5eff80e7a32ea407ba1ae",
+      "hashValue": "1b1d22209acb51ee0c2fd192ebcee5bbc3c83d7e7873373a22bf6905c18adfc1",
       "diff": {
         "filePath": ".pytest_cache/v/cache/nodeids",
-        "oldHash": "69c7253ad3faa15498cf8fbaa1b349d64fbfd69cb7f5eff80e7a32ea407ba1ae",
-        "newHash": "69c7253ad3faa15498cf8fbaa1b349d64fbfd69cb7f5eff80e7a32ea407ba1ae",
+        "oldHash": "1b1d22209acb51ee0c2fd192ebcee5bbc3c83d7e7873373a22bf6905c18adfc1",
+        "newHash": "1b1d22209acb51ee0c2fd192ebcee5bbc3c83d7e7873373a22bf6905c18adfc1",
         "addedLines": [
           {
-            "lineNumber": 2,
-            "content": "  \"tests/integration/notifications/test_webhook_delivery.py::test_delivery_repo_mark_as_sent\",",
+            "lineNumber": 11,
+            "content": "  \"tests/unit/identity/domain/test_merchant_webhook.py::test_merchant_set_webhook_secret\",",
             "type": "ADDED"
           },
           {
-            "lineNumber": 3,
-            "content": "  \"tests/integration/notifications/test_webhook_delivery.py::test_delivery_repo_record_retry_and_get_pending\",",
+            "lineNumber": 12,
+            "content": "  \"tests/unit/notifications/test_webhook_signer.py::test_webhook_signer_consistent_for_same_input\",",
             "type": "ADDED"
           },
           {
-            "lineNumber": 4,
-            "content": "  \"tests/integration/notifications/test_webhook_delivery.py::test_retry_policy_calculates_next_attempt\",",
+            "lineNumber": 13,
+            "content": "  \"tests/unit/notifications/test_webhook_signer.py::test_webhook_signer_different_for_different_payloads\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "  \"tests/unit/notifications/test_webhook_signer.py::test_webhook_signer_generates_correct_signature\"",
             "type": "ADDED"
           }
         ],
-        "removedLines": [],
+        "removedLines": [
+          {
+            "lineNumber": 11,
+            "content": "  \"tests/unit/identity/domain/test_merchant_webhook.py::test_merchant_set_webhook_secret\"",
+            "type": "REMOVED"
+          }
+        ],
         "modifiedLines": []
       }
     },
@@ -8109,646 +8181,606 @@
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "src\\notifications\\infrastructure\\persistence\\sqlite_webhook_outbox_repository.py :",
+            "content": "src\\notifications\\application\\handlers\\webhook_outbox_event_handler.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 2,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
+            "content": "import json",
             "type": "REMOVED"
           },
           {
             "lineNumber": 3,
-            "content": "from src.notifications.domain.ports.webhook_outbox_port import WebhookOutboxPort",
+            "content": "import hmac",
             "type": "REMOVED"
           },
           {
             "lineNumber": 4,
-            "content": "",
+            "content": "import hashlib",
             "type": "REMOVED"
           },
           {
             "lineNumber": 5,
-            "content": "class SqliteWebhookOutboxRepository(WebhookOutboxPort):",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "    def __init__(self, uow: UnitOfWork):",
+            "content": "from src.notifications.domain.ports.webhook_outbox_port import WebhookOutboxPort",
             "type": "REMOVED"
           },
           {
             "lineNumber": 7,
-            "content": "        self._uow = uow",
+            "content": "from src.notifications.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort",
             "type": "REMOVED"
           },
           {
             "lineNumber": 8,
-            "content": "",
+            "content": "from src.ledger.domain.events.transaction_events import (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 9,
-            "content": "    def add(self, merchant_id: int, event_type: str, payload: str, signature: str) -> None:",
+            "content": "    TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 10,
-            "content": "        self._uow.conn.execute(",
+            "content": ")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 11,
-            "content": "            \"\"\"INSERT INTO webhook_outbox ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 12,
-            "content": "               (merchant_id, event_type, payload, status, attempts, signature) ",
+            "content": "class WebhookOutboxEventHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 13,
-            "content": "               VALUES (?, ?, ?, 'pending', 0, ?)\"\"\",",
+            "content": "    def __init__(self, uow: UnitOfWork, outbox_repo: WebhookOutboxPort, merchant_config_port: MerchantWebhookConfigPort):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 14,
-            "content": "            (merchant_id, event_type, payload, signature)",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 15,
-            "content": "        )",
+            "content": "        self._outbox_repo = outbox_repo",
             "type": "REMOVED"
           },
           {
             "lineNumber": 16,
-            "content": "",
+            "content": "        self._merchant_config_port = merchant_config_port",
             "type": "REMOVED"
           },
           {
             "lineNumber": 17,
-            "content": "src\\notifications\\domain\\ports\\webhook_outbox_port.py :",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 18,
-            "content": "from abc import ABC, abstractmethod",
+            "content": "    def handle_completed(self, event: TransactionCompletedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 19,
-            "content": "",
+            "content": "        self._process_event(\"payment.completed\", event)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 20,
-            "content": "class WebhookOutboxPort(ABC):",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 21,
-            "content": "    \"\"\"Port for persisting webhook messages to the outbox.\"\"\"",
+            "content": "    def handle_failed(self, event: TransactionFailedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 22,
-            "content": "    @abstractmethod",
+            "content": "        self._process_event(\"payment.failed\", event)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 23,
-            "content": "    def add(self, merchant_id: int, event_type: str, payload: str, signature: str) -> None:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 24,
-            "content": "        raise NotImplementedError",
+            "content": "    def handle_refunded(self, event: TransactionRefundedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 25,
-            "content": "",
+            "content": "        self._process_event(\"payment.refunded\", event)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 26,
-            "content": "src\\app\\main.py :",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 27,
-            "content": "import os",
+            "content": "    def _process_event(self, event_type: str, event) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 28,
-            "content": "import socket",
+            "content": "        if not event.merchant_id:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 29,
-            "content": "import threading",
+            "content": "            return",
             "type": "REMOVED"
           },
           {
             "lineNumber": 30,
-            "content": "import webbrowser",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 31,
-            "content": "from src.app.flask_app import create_app",
+            "content": "        # Instantiates UoW. Thanks to ContextVars, if called inside a parent UoW, ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 32,
-            "content": "",
+            "content": "        # it joins the exact same transaction.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 33,
-            "content": "def find_available_port(start_port=5000, max_port=5100):",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 34,
-            "content": "    for port in range(start_port, max_port):",
+            "content": "            config = self._merchant_config_port.get_config(event.merchant_id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 35,
-            "content": "        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:",
+            "content": "            if not config or not config.webhook_enabled or not config.webhook_url or not config.webhook_secret:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 36,
-            "content": "            try:",
+            "content": "                return",
             "type": "REMOVED"
           },
           {
             "lineNumber": 37,
-            "content": "                s.bind((\"127.0.0.1\", port))",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 38,
-            "content": "                return port",
+            "content": "            payload = {",
             "type": "REMOVED"
           },
           {
             "lineNumber": 39,
-            "content": "            except OSError:",
+            "content": "                \"event\": event_type,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 40,
-            "content": "                continue",
+            "content": "                \"transaction_id\": event.transaction_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 41,
-            "content": "    return start_port",
+            "content": "                \"merchant_id\": event.merchant_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 42,
-            "content": "",
+            "content": "                \"amount\": str(event.amount.amount),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 43,
-            "content": "def open_browser(url):",
+            "content": "                \"currency\": str(event.amount.currency)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 44,
-            "content": "    webbrowser.open_new_tab(url)",
+            "content": "            }",
             "type": "REMOVED"
           },
           {
             "lineNumber": 45,
-            "content": "",
+            "content": "            payload_json = json.dumps(payload, sort_keys=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 46,
-            "content": "if __name__ == '__main__':",
+            "content": "            ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 47,
-            "content": "    app = create_app()",
+            "content": "            signature = hmac.new(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 48,
-            "content": "    port = find_available_port()",
+            "content": "                key=config.webhook_secret.encode('utf-8'),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 49,
-            "content": "    url = f\"http://127.0.0.1:{port}\"",
+            "content": "                msg=payload_json.encode('utf-8'),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 50,
-            "content": "    ",
+            "content": "                digestmod=hashlib.sha256",
             "type": "REMOVED"
           },
           {
             "lineNumber": 51,
-            "content": "    if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':",
+            "content": "            ).hexdigest()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 52,
-            "content": "        threading.Timer(1.5, open_browser, args=[url]).start()",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 53,
-            "content": "",
+            "content": "            self._outbox_repo.add(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 54,
-            "content": "    print(f\"Starting Paymenter (Hexagonal Architecture) on {url}\")",
+            "content": "                merchant_id=event.merchant_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 55,
-            "content": "    app.run(debug=True, port=port)",
+            "content": "                event_type=event_type,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 56,
-            "content": "",
+            "content": "                payload=payload_json,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 57,
-            "content": "templates\\base.html :",
+            "content": "                signature=signature",
             "type": "REMOVED"
           },
           {
             "lineNumber": 58,
-            "content": "<!DOCTYPE html>",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 59,
-            "content": "<html lang=\"en\">",
+            "content": "            # No explicit commit. The root UoW (e.g., CompleteFundsHandler) will commit this atomically.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 60,
-            "content": "<head>",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 61,
-            "content": "    <meta charset=\"UTF-8\">",
+            "content": "src\\notifications\\infrastructure\\web\\webhook_worker.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 62,
-            "content": "    <title>Paymenter Dashboard</title>",
+            "content": "import time",
             "type": "REMOVED"
           },
           {
             "lineNumber": 63,
-            "content": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/app.css') }}\">",
+            "content": "import logging",
             "type": "REMOVED"
           },
           {
             "lineNumber": 64,
-            "content": "    {% block head %}{% endblock %}",
+            "content": "from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 65,
-            "content": "</head>",
+            "content": "from src.notifications.infrastructure.persistence.sqlite_webhook_delivery_repository import SqliteWebhookDeliveryRepository",
             "type": "REMOVED"
           },
           {
             "lineNumber": 66,
-            "content": "<body>",
+            "content": "from src.notifications.infrastructure.adapters.requests_http_client_adapter import RequestsHttpClientAdapter",
             "type": "REMOVED"
           },
           {
             "lineNumber": 67,
-            "content": "    <nav class=\"sidebar\">",
+            "content": "from src.notifications.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter",
             "type": "REMOVED"
           },
           {
             "lineNumber": 68,
-            "content": "        <h2>Paymenter</h2>",
+            "content": "from src.common.infrastructure.database import create_connection",
             "type": "REMOVED"
           },
           {
             "lineNumber": 69,
-            "content": "        <ul>",
+            "content": "from src.notifications.domain.services.webhook_retry_policy import WebhookRetryPolicy",
             "type": "REMOVED"
           },
           {
             "lineNumber": 70,
-            "content": "            <li><a href=\"{{ url_for('dashboard.accounts') }}\">Accounts</a></li>",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 71,
-            "content": "            <li><a href=\"{{ url_for('dashboard.escrow_accounts') }}\">Escrow Accounts</a></li>",
+            "content": "logger = logging.getLogger(__name__)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 72,
-            "content": "            <li><a href=\"{{ url_for('dashboard.currencies') }}\">Currencies</a></li>",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 73,
-            "content": "            <li><a href=\"{{ url_for('dashboard.users') }}\">Users</a></li>",
+            "content": "def run_worker():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 74,
-            "content": "            <li><a href=\"{{ url_for('dashboard.merchants') }}\">Merchants</a></li>",
+            "content": "    \"\"\"Main loop for the background webhook forwarder.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 75,
-            "content": "            <li><a href=\"{{ url_for('transactions.index') }}\">Transactions</a></li>",
+            "content": "    logger.info(\"Starting Webhook Forwarder Worker...\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 76,
-            "content": "        </ul>",
+            "content": "    http_client = RequestsHttpClientAdapter()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 77,
-            "content": "    </nav>",
+            "content": "    merchant_config_adapter = SqliteMerchantWebhookConfigAdapter(connection_factory=create_connection)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 78,
-            "content": "    <main class=\"content\">",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 79,
-            "content": "        {% with messages = get_flashed_messages(with_categories=true) %}",
+            "content": "    while True:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 80,
-            "content": "            {% if messages %}",
+            "content": "        try:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 81,
-            "content": "                {% for category, message in messages %}",
+            "content": "            with SqliteUnitOfWork() as uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 82,
-            "content": "                    <div class=\"alert alert-{{ category }}\">{{ message }}</div>",
+            "content": "                repo = SqliteWebhookDeliveryRepository(uow)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 83,
-            "content": "                {% endfor %}",
+            "content": "                pending_deliveries = repo.get_pending()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 84,
-            "content": "            {% endif %}",
+            "content": "                ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 85,
-            "content": "        {% endwith %}",
+            "content": "                for delivery in pending_deliveries:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 86,
-            "content": "        {% block body %}{% endblock %}",
+            "content": "                    config = merchant_config_adapter.get_config(delivery.merchant_id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 87,
-            "content": "    </main>",
+            "content": "                    if not config or not config.webhook_url:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 88,
-            "content": "    <script src=\"{{ url_for('static', filename='js/main.js') }}\"></script>",
+            "content": "                        logger.error(f\"No webhook URL for merchant {delivery.merchant_id}. Marking delivery {delivery.id} as failed.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 89,
-            "content": "    {% block scripts %}{% endblock %}",
+            "content": "                        repo.mark_as_failed(delivery.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 90,
-            "content": "</body>",
+            "content": "                        continue",
             "type": "REMOVED"
           },
           {
             "lineNumber": 91,
-            "content": "</html>",
+            "content": "                        ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 92,
-            "content": "",
+            "content": "                    headers = {",
             "type": "REMOVED"
           },
           {
             "lineNumber": 93,
-            "content": "templates\\merchants.html :",
+            "content": "                        \"Content-Type\": \"application/json\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 94,
-            "content": "{% extends 'base.html' %}",
+            "content": "                        \"X-Paymenter-Signature\": f\"sha256={delivery.signature}\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 95,
-            "content": "{% block head %}",
+            "content": "                        \"X-Paymenter-Event\": delivery.event_type,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 96,
-            "content": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/merchant.css') }}\">",
+            "content": "                        \"X-Paymenter-Delivery\": str(delivery.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 97,
-            "content": "{% endblock %}",
+            "content": "                    }",
             "type": "REMOVED"
           },
           {
             "lineNumber": 98,
-            "content": "",
+            "content": "                    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 99,
-            "content": "{% block body %}",
+            "content": "                    try:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 100,
-            "content": "<h1>Merchants</h1>",
+            "content": "                        status_code = http_client.post(config.webhook_url, headers, delivery.payload)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 101,
-            "content": "<form action=\"{{ url_for('dashboard.add_merchant') }}\" method=\"POST\">",
+            "content": "                        if 200 <= status_code < 300:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 102,
-            "content": "    <input type=\"text\" name=\"name\" placeholder=\"Merchant Name\" required>",
+            "content": "                            logger.info(f\"Delivery {delivery.id} sent successfully.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 103,
-            "content": "    <button type=\"submit\">Add Merchant</button>",
+            "content": "                            repo.mark_as_sent(delivery.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 104,
-            "content": "</form>",
+            "content": "                        else:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 105,
-            "content": "<table>",
+            "content": "                            raise Exception(f\"HTTP {status_code}\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 106,
-            "content": "    <tr><th>ID</th><th>Name</th><th>API Key</th><th>Active</th><th>Action</th></tr>",
+            "content": "                    except Exception as e:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 107,
-            "content": "    {% for m in merchants %}",
+            "content": "                        logger.warning(f\"Delivery {delivery.id} failed: {e}\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 108,
-            "content": "    <tr>",
+            "content": "                        attempts = delivery.attempts + 1",
             "type": "REMOVED"
           },
           {
             "lineNumber": 109,
-            "content": "        <td>{{ m.id }}</td><td>{{ m.name }}</td>",
+            "content": "                        if attempts >= WebhookRetryPolicy.MAX_ATTEMPTS:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 110,
-            "content": "        <td>",
+            "content": "                            logger.error(f\"Delivery {delivery.id} reached max attempts. Marking as failed.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 111,
-            "content": "            <span id=\"api-key-{{ m.id }}\">{{ m.api_key }}</span>",
+            "content": "                            repo.mark_as_failed(delivery.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 112,
-            "content": "            <button class=\"copy-btn\" data-target=\"api-key-{{ m.id }}\">Copy</button>",
+            "content": "                        else:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 113,
-            "content": "        </td>",
+            "content": "                            next_attempt = WebhookRetryPolicy.calculate_next_attempt(attempts)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 114,
-            "content": "        <td>{{ m.is_active }}</td>",
+            "content": "                            repo.record_retry(delivery.id, attempts, next_attempt)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 115,
-            "content": "        <td>",
+            "content": "                uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 116,
-            "content": "            <form action=\"{{ url_for('dashboard.toggle_merchant', id=m.id) }}\" method=\"POST\">",
+            "content": "        except Exception as e:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 117,
-            "content": "                <button type=\"submit\">Toggle</button>",
+            "content": "            logger.error(f\"Worker loop error: {e}\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 118,
-            "content": "            </form>",
+            "content": "            ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 119,
-            "content": "        </td>",
+            "content": "        time.sleep(10) # Poll every 10 seconds",
             "type": "REMOVED"
           },
           {
             "lineNumber": 120,
-            "content": "    </tr>",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 121,
-            "content": "    {% endfor %}",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 122,
-            "content": "</table>",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 123,
-            "content": "{% endblock %}",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 124,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 125,
-            "content": "{% block scripts %}",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 126,
-            "content": "    <script src=\"{{ url_for('static', filename='js/merchant.js') }}\"></script>",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 127,
-            "content": "{% endblock %}",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 128,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 129,
             "content": "",
             "type": "REMOVED"
           }
@@ -8759,76 +8791,96 @@
     "todo1.md": {
       "id": "eb3e9da4-f8c5-4b1b-93f0-254dc6d02436",
       "filePath": "todo1.md",
-      "hashValue": "e5082eb24f8ab2e1bbfd01e4bbf0b67e18c78b12b27ece65df2a95f407a198d5",
+      "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "diff": {
         "filePath": "todo1.md",
-        "oldHash": "e5082eb24f8ab2e1bbfd01e4bbf0b67e18c78b12b27ece65df2a95f407a198d5",
-        "newHash": "e5082eb24f8ab2e1bbfd01e4bbf0b67e18c78b12b27ece65df2a95f407a198d5",
+        "oldHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "newHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "addedLines": [],
         "removedLines": [
           {
+            "lineNumber": 1,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 3,
-            "content": "### Phase 3: The Forwarder – Background Worker",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 4,
-            "content": "**Goal:** Process the outbox without blocking the main request thread.",
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "**What we will build:**",
+            "content": "## 🧩 Revised Summary of Deliverables",
             "type": "REMOVED"
           },
           {
             "lineNumber": 7,
-            "content": "- A **standalone worker process** (e.g., a Python script or a Flask CLI command) that runs a loop:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 8,
-            "content": "  1. Query `webhook_outbox` for records with `status = 'pending'` and `next_attempt_at <= now()`.",
+            "content": "| Component | Description | Priority |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 9,
-            "content": "  2. For each record, send an HTTP POST to the merchant’s `webhook_url` with headers:",
+            "content": "| :--- | :--- | :--- |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 10,
-            "content": "     - `Content-Type: application/json`",
+            "content": "| **Domain Event** | Add `TransactionCompletedEvent` and publish it on successful completion. | High |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 11,
-            "content": "     - `X-Paymenter-Signature: sha256=<signature>`",
+            "content": "| **Identity Context** | Extend Merchant aggregate with webhook fields + secret generation. | High |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 12,
-            "content": "     - `X-Paymenter-Event: <event_type>`",
+            "content": "| **Outbox Table** | `webhook_outbox` table and repository for atomic persistence. | High |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 13,
-            "content": "     - `X-Paymenter-Delivery: <outbox_id>`",
+            "content": "| **Event Handlers** | Subscribers to domain events that convert them to outbox records (inside the UoW). | High |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 14,
-            "content": "  3. On successful response (2xx), mark the record as `sent`, increment attempts, and delete or archive.",
+            "content": "| **Worker Process** | Background process that reads outbox, sends HTTP POST with HMAC headers, and applies retry policy. | High |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 15,
-            "content": "  4. On failure, increment attempts, calculate next attempt time using **exponential backoff** (e.g., 1min, 5min, 30min, 1h, 2h), and update `next_attempt_at`. After a maximum number of attempts (e.g., 5), mark as `failed` and stop retrying.",
+            "content": "| **Signer Utility** | HMAC-SHA256 generation (infra adapter). | High |",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "| **Admin UI** | Settings page for webhook URL/secret, log viewer, and manual retry button. | Medium |",
             "type": "REMOVED"
           },
           {
             "lineNumber": 17,
-            "content": "- **Retry Policy** is defined as a Domain Service (pure logic) that calculates the next attempt time, keeping the worker free of complex rules.",
+            "content": "| **Retry Policy** | Domain service for exponential backoff scheduling. | Medium |",
             "type": "REMOVED"
           },
           {
@@ -8838,7 +8890,7 @@
           },
           {
             "lineNumber": 19,
-            "content": "- The worker runs in a separate thread within the Flask development server (for simplicity) or as a separate process in production. We’ll provide a `flask webhook-worker` CLI command.",
+            "content": "---",
             "type": "REMOVED"
           },
           {
@@ -8848,7 +8900,7 @@
           },
           {
             "lineNumber": 21,
-            "content": "---",
+            "content": "## 🔄 How This Differs from Your Original Blueprint",
             "type": "REMOVED"
           },
           {
@@ -8858,46 +8910,41 @@
           },
           {
             "lineNumber": 23,
-            "content": "### Phase 4: Observability – Audit Logs & Dashboard",
+            "content": "- **No direct call from admin controllers.** The admin actions only cause domain events; the event handlers produce outbox records.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 24,
-            "content": "**Goal:** See delivery status without querying the outbox table manually.",
+            "content": "- **Atomicity guaranteed** by the outbox pattern (events are never lost, even on crash).",
             "type": "REMOVED"
           },
           {
             "lineNumber": 25,
-            "content": "",
+            "content": "- **The HTTP dispatch is completely detached** from the request/response cycle, via a background worker.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 26,
-            "content": "- **`webhook_delivery_logs` table** (or reuse outbox with status) – already covered by the outbox.",
+            "content": "- **Webhook configuration** lives in the Identity context (where the Merchant aggregate already exists), not in a new silo.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 27,
-            "content": "- **Admin UI page** that queries the outbox for recent deliveries, colour‑coded by status.",
+            "content": "- **The whole system remains modular**, with clear boundaries: the webhook sending is an **infrastructure adapter** driven by domain events.",
             "type": "REMOVED"
           },
           {
             "lineNumber": 28,
-            "content": "- **Manual Retry** button: sets the outbox record back to `pending` and resets `next_attempt_at` to `now()`.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 29,
             "content": "",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 30,
+            "lineNumber": 29,
             "content": "---",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 31,
+            "lineNumber": 30,
             "content": "",
             "type": "REMOVED"
           }
@@ -8956,34 +9003,249 @@
     ".git/index": {
       "id": "b1be2e4b-6280-4f7a-b854-7339266e2d7e",
       "filePath": ".git/index",
-      "hashValue": "92f58897f4702af3d2ce969f26194d489468249ac6c52e97c9d66753fdd4b833",
+      "hashValue": "156dd7470dbf53bdd6ad511516962679b6b35a95c41c8ebfcb8383dad02b964e",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "92f58897f4702af3d2ce969f26194d489468249ac6c52e97c9d66753fdd4b833",
-        "newHash": "92f58897f4702af3d2ce969f26194d489468249ac6c52e97c9d66753fdd4b833",
+        "oldHash": "156dd7470dbf53bdd6ad511516962679b6b35a95c41c8ebfcb8383dad02b964e",
+        "newHash": "156dd7470dbf53bdd6ad511516962679b6b35a95c41c8ebfcb8383dad02b964e",
         "addedLines": [
           {
+            "lineNumber": 1,
+            "content": "DIRC\u0000\u0000\u0000\u0002\u0000\u0000\u0001/j^j�\u0007|��j^j�\u0007|��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00001:�it�3\u0002�`\u0011�U-\u0010�i�jh\u0000\u0013.doclink/.docignore\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^a�7n�,j^b�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "&i\u0007�k�\u001d�aL��L�Ӱo\u0015���\u0000\u0017.doclink/documents.json\u0000\u0000\u0000j^�\u001d\u001f��\u0004j^�\u001d\u001f�YX\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001x�����UM�\u001e�u\u0006�m�%�j��2\u0000\u0018.doclink/file-index.json\u0000\u0000j^m�\u000f��j^m�\u000f�>�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�&tq\u000ec\u001a��#Ȑ�\\���~��8\u0000\u0013.doclink/links.json\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^�\u001d&�Ōj^�\u001d'\u001d1X\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\tv��\u0019\u0012�i��G9�B���D�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "9>]\u0000\u001c.doclink/tracking-index.json\u0000\u0000\u0000\u0000\u0000\u0000j^j�\u0007�J@j^j�\u0007�P\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\\4��\u0016�\u001f#�]�9�3�/�m�\u0000\u0017.doclink/workspace.json\u0000\u0000\u0000jB��\f��LjB�v:��d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000^���\u0005_wy���H�J,ʕ-g\u000b6\u0000",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 185,
+            "content": "Tl\u0014\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0011tests/__init__.py\u0000j^�'+���j^�y\u0017���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000bB��\u000ez��\u000e�(\f�\u00051��Bf7{\u00008tests/integration/notifications/test_webhook_delivery.py\u0000\u0000j^y\u0012\u0015v4\u0004j^z\u00136;�|\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0010��{nj\"5.cA�m���\u0011���ڌ\u00006tests/integration/notifications/test_webhook_outbox.py\u0000\u0000\u0000\u0000j^p�*U�\u0018j^p�4� p\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0006�r�\u0006\u0004�\u0002\u001d�p\u0007�7�)>�蜑�\u00003tests/unit/identity/domain/test_merchant_webhook.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 186,
+            "content": "4g,`j^�\u000f",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 187,
+            "content": "�ِ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004�nf\u001c�B\u0010\u0000�P�j��:�op\u0013��\u0000/tests/unit/notifications/test_webhook_signer.py\u0000\u0000\u0000j?�I\u00126�pj^gl\u0000���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001dϣ�@\u0004�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 188,
+            "content": "tw�)�}C�H��\u00079�\u0000\u0007todo.md\u0000\u0000\u0000j@�.SB�j^�i\u001e$SL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0006:�\u0002����H\u0016,�u�W\u0004��£p^\u0000\btodo1.md\u0000\u0000TREE\u0000\u0000\u000b�\u0000-1 7",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 189,
+            "content": "src\u0000-1 6",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 190,
+            "content": "app\u00009 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 257,
+            "content": "#\u0016T�}*��Ϲ\u000e��\u0007�H�\u0016��notifications\u0000-1 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 258,
+            "content": "domain\u000015 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 262,
+            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u0000-1 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 263,
+            "content": "dto\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 267,
+            "content": "y��jH�\u0010E���#�(��)r\t�handlers\u0000-1 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 268,
+            "content": "infrastructure\u0000-1 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 269,
+            "content": "web\u00003 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 281,
+            "content": "�M.~���L���%�b��\u0000,�tests\u0000-1 2",
+            "type": "ADDED"
+          },
+          {
             "lineNumber": 282,
-            "content": "�Q&�c�\u0004�bӳ��J�X�[&���\u0018l��������4.\u0005`�\u0018��",
+            "content": "unit\u0000-1 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 283,
+            "content": "identity\u00001 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 294,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u0000-1 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 295,
+            "content": "templates\u000010 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 296,
+            "content": "n{�a�ׄj�I\u000e\u0011+R�f=J���?K\u001f�юU�\u0003\u0012��}(H�(\u0004",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 282,
-            "content": "�Q&�c�\u0004�bӳ��J�X�[&��/�6���}`֒H�L�;�A�",
+            "lineNumber": 1,
+            "content": "DIRC\u0000\u0000\u0000\u0002\u0000\u0000\u0001,j^j�\u0007|��j^j�\u0007|��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00001:�it�3\u0002�`\u0011�U-\u0010�i�jh\u0000\u0013.doclink/.docignore\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^a�7n�,j^b�",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "&i\u0007�k�\u001d�aL��L�Ӱo\u0015���\u0000\u0017.doclink/documents.json\u0000\u0000\u0000j^�g\f�)�j^�g\f��L\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001C�\u0014�\u0010���Rֿ�\u00107��\u0014��\u000fy�\u0000\u0018.doclink/file-index.json\u0000\u0000j^m�\u000f��j^m�\u000f�>�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�&tq\u000ec\u001a��#Ȑ�\\���~��8\u0000\u0013.doclink/links.json\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^��\u0003\u000eGHj^��\u0003A��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\b�(]�F��@��-��y\"~\u0000\u0010��aL\u0000\u001c.doclink/tracking-index.json\u0000\u0000\u0000\u0000\u0000\u0000j^j�\u0007�J@j^j�\u0007�P\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\\4��\u0016�\u001f#�]�9�3�/�m�\u0000\u0017.doclink/workspace.json\u0000\u0000\u0000jB��\f��LjB�v:��d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000^���\u0005_wy���H�J,ʕ-g\u000b6\u0000",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 184,
+            "content": "Tl\u0014\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0011tests/__init__.py\u0000j^�'+���j^�y\u0017���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000bB��\u000ez��\u000e�(\f�\u00051��Bf7{\u00008tests/integration/notifications/test_webhook_delivery.py\u0000\u0000j^y\u0012\u0015v4\u0004j^z\u00136;�|\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0010��{nj\"5.cA�m���\u0011���ڌ\u00006tests/integration/notifications/test_webhook_outbox.py\u0000\u0000\u0000\u0000j^p�*U�\u0018j^p�4� p\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0006�r�\u0006\u0004�\u0002\u001d�p\u0007�7�)>�蜑�\u00003tests/unit/identity/domain/test_merchant_webhook.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u00126�pj^gl\u0000���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001dϣ�@\u0004�",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 185,
+            "content": "tw�)�}C�H��\u00079�\u0000\u0007todo.md\u0000\u0000\u0000j@�.SB�j^�!\u0007��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0007�n#���w\u000b�����8>��7{~\u0000\btodo1.md\u0000\u0000TREE\u0000\u0000\fS\u0000300 7",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 186,
+            "content": "Y\u0004��Y�\u0013�}��\u0018fٝ�?�src\u0000239 6",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 187,
+            "content": "߉o�\u0018�nb\"�Z(��7U\u0002��aapp\u00009 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 254,
+            "content": "#\u0016T�}*��Ϲ\u000e��\u0007�H�\u0016��notifications\u000044 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 255,
+            "content": "\b�\u0004�>�z�/--'Ow�Y��\u001edomain\u000015 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 259,
+            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u000013 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 260,
+            "content": "���Z�|�ң�W)v�\u0018D��3�dto\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 264,
+            "content": "y��jH�\u0010E���#�(��)r\t�handlers\u00006 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 265,
+            "content": "���~��46����\u001b+�d�Z��infrastructure\u000015 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 266,
+            "content": "��T\u001e�4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 267,
+            "content": "�����t\u0006�a�\"){web\u00003 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 279,
+            "content": "�M.~���L���%�b��\u0000,�tests\u00004 2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 280,
+            "content": "��=��\u0014�ӪVeQ��\u0012.9��`unit\u00001 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 281,
+            "content": "��~\t7�* Hz�G�\\=�\u0012�c�identity\u00001 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 292,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u000010 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 293,
+            "content": "�L�6�4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 294,
+            "content": "(!CV\b�VЁF\\mstemplates\u000010 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 295,
+            "content": "n{�a�ׄj�I\u000e\u0011+R�f=J���ОSwv{\u0007�';\u001d+\u001fU�/���",
             "type": "REMOVED"
           }
         ],
         "modifiedLines": [
           {
             "lineNumber": 8,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^|�,n\u0012�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
+            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^�f5Z��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
             "type": "MODIFIED"
           },
           {
             "lineNumber": 13,
-            "content": "i @��p9�$\f\u0004\u0012\u000e��'\"��\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^|�!\u0001*T\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j^a�\u0002�e\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
+            "content": "i @��p9�$\f\u0004\u0012\u000e��'\"��\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^��'\u0014\u0017�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j^a�\u0002�e\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "\u00018��hjL��(�o8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004�gWI��ք\u0003Lu��]����A\u0000Bsrc/notifications/application/handlers/otp_notification_handler.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u0011o8�jL��(�o8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000b\u000e��\u001f�o��Ƭ����<����J�\u0000?src/notifications/application/handlers/receipt_email_handler.py\u0000\u0000\u0000j^c\t��\\j^h (��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002oN��\t�\u0016�3�ԉi]�\u0001)\u0019���\u0000Hsrc/notifications/application/handlers/retry_webhook_delivery_handler.py\u0000\u0000j^w\b%�ތj^��$xެ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\b�뢁�\u0013Z�\b��\u001f�\"���\u0011Ѫ\u0000Fsrc/notifications/application/handlers/webhook_outbox_event_handler.py\u0000\u0000\u0000\u0000j^�;\u0006�Lj^�;\u0006�L\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00001src/notifications/application/queries/__init__.py\u0000j^~�\u0002\u0016�j^\u0001!�\u000f�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000d�Y�\u0014�̹�9S�r٧\b��Y\fn\u0000Asrc/notifications/application/queries/get_all_deliveries_query.py\u0000j?�I\u0011iLj?�I\u0011iL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000$src/notifications/domain/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u0011��Hj?�I\u0011��H\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000*src/notifications/domain/ports/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000jC\u001b�9�<�j]��",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 131,
+            "content": "�*�\u001f�&\u0000Lsrc/notifications/infrastructure/persistence/sqlite_account_owner_adapter.py\u0000\u0000\u0000\u0000\u0000\u0000jB�r NE�jL��)\u001b��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004��1�\"F4Lc��&P�M���3Z\u0011\u0000Jsrc/notifications/infrastructure/persistence/sqlite_idempotency_adapter.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u0011�.|j?�I\u0011�.|\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002��,���\u001c�5.x0-�P��>mR�\u0000Osrc/notifications/infrastructure/persistence/sqlite_merchant_details_adapter.py\u0000\u0000\u0000j^w4\u001e5qTj^w8;r��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004\u001ev?��/k�\f�f\u000e�q\t�\u0018�D\u0000Vsrc/notifications/infrastructure/persistence/sqlite_merchant_webhook_config_adapter.py\u0000\u0000\u0000\u0000j^�\u0019�\fhj^�h\u000e���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\f�с��U���\u000eM�_��2�\u001b�Y\u0000Rsrc/notifications/infrastructure/persistence/sqlite_webhook_delivery_repository.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^wc\u0004\u0002�hj^wg\u0001Q�\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002�6��\u000e\u0019�\u0013���\u000b�K�\u0014X��T�\u0000Psrc/notifications/infrastructure/persistence/sqlite_webhook_outbox_repository.py\u0000\u0000j?�I\u0011�l�j?�I\u0011�l�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00001src/notifications/infrastructure/smtp/__init__.py\u0000j?�I\u0011��xjL��)+(8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000f=u��oh��:����-\u001e4xqL(�\u00005src/notifications/infrastructure/smtp/smtp_adapter.py\u0000\u0000\u0000\u0000\u0000j^��\u0018���j^��\u0018���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00002src/notifications/infrastructure/utils/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^��0QO\\j^��\"�,h\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001�\u0012����!����{��r�Zzh\u00008src/notifications/infrastructure/utils/webhook_signer.py\u0000\u0000j^�\u00112~ބj^�\u00112~ބ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00000src/notifications/infrastructure/web/__init__.py\u0000\u0000j^�<+�9�j^�D\u0006x\b�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004Δgp\u0004\u0003��p\t�!�V{9q\u0011!4�\u0000Dsrc/notifications/infrastructure/web/webhook_dashboard_controller.py\u0000\u0000\u0000\u0000\u0000\u0000j^�\u000eP�j^�+-���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\f�Z-\u0010\u000e���.;NU]��]����6\u00006src/notifications/infrastructure/web/webhook_worker.py\u0000\u0000\u0000\u0000j(",
             "type": "MODIFIED"
           }
         ]
@@ -9160,14 +9422,40 @@
     ".git/logs/HEAD": {
       "id": "f36607ac-baba-467d-9d4d-e3f6418309e4",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "cdcb6077ac14a014d3c82e63a77ddf0210ccc89637b8d97a2d12cfa1fb83e816",
-      "diff": null
+      "hashValue": "2e66d83701e328803e27e7dd6499802b8a9960fc88cd6568cb87716307c0b39d",
+      "diff": {
+        "filePath": ".git/logs/HEAD",
+        "oldHash": "2e66d83701e328803e27e7dd6499802b8a9960fc88cd6568cb87716307c0b39d",
+        "newHash": "2e66d83701e328803e27e7dd6499802b8a9960fc88cd6568cb87716307c0b39d",
+        "addedLines": [
+          {
+            "lineNumber": 174,
+            "content": "978b4cb1cb15b34fc450dc18e9dabd8174e7e9da 9f445496fc897f258b33ab382c9708290d46a163 Shahrokh <shahrokh.hatami2004@gmail.com> 1784578997 +0330\tcommit: feat(webhook): complete background dispatcher and observability dashboard",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/logs/refs/heads/dev": {
       "id": "f4721c83-72e0-487d-8588-946276647798",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "1f490b1245fead2dd1572c9bdd8a6a7b8403a077fd6d087ccb3b2fafdacdf3a0",
-      "diff": null
+      "hashValue": "ee4d8fd3e1d6cfa1cf757705707ae4fd5fc72a991a89548f7d1934a2a6ab6f7c",
+      "diff": {
+        "filePath": ".git/logs/refs/heads/dev",
+        "oldHash": "ee4d8fd3e1d6cfa1cf757705707ae4fd5fc72a991a89548f7d1934a2a6ab6f7c",
+        "newHash": "ee4d8fd3e1d6cfa1cf757705707ae4fd5fc72a991a89548f7d1934a2a6ab6f7c",
+        "addedLines": [
+          {
+            "lineNumber": 7,
+            "content": "978b4cb1cb15b34fc450dc18e9dabd8174e7e9da 9f445496fc897f258b33ab382c9708290d46a163 Shahrokh <shahrokh.hatami2004@gmail.com> 1784578997 +0330\tcommit: feat(webhook): complete background dispatcher and observability dashboard",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/objects/f4/03a88a03e70a44e75a1b6f78c2944ad3744928": {
       "id": "60f25e26-48c6-41f9-9115-eba60b7b6fcc",
@@ -9178,14 +9466,257 @@
     ".git/COMMIT_EDITMSG": {
       "id": "06e6664d-4ae9-452f-a7fb-52b9d77b9b22",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "9b624b5f68f875d4c45a0e887b93012d0ee79b216d277347cd2f9e8afcc22e83",
-      "diff": null
+      "hashValue": "2a0ce11067d6733f4c76499894a9312179a2e56d452c48d0448bb0a9e6e3f2af",
+      "diff": {
+        "filePath": ".git/COMMIT_EDITMSG",
+        "oldHash": "2a0ce11067d6733f4c76499894a9312179a2e56d452c48d0448bb0a9e6e3f2af",
+        "newHash": "2a0ce11067d6733f4c76499894a9312179a2e56d452c48d0448bb0a9e6e3f2af",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "feat(webhook): complete background dispatcher and observability dashboard",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "- Implement standalone background worker (flask webhook-worker CLI command)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "  - Runs continuous loop polling webhook_outbox for pending, due records",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "  - Sends HTTP POST with standardized headers (X-Paymenter-Signature, Event, Delivery)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "  - Handles success (2xx) by marking as 'sent' and archival-ready",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "  - Handles failures by incrementing attempts and scheduling exponential backoff",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "- Introduce RetryPolicy as a pure Domain Service (infrastructure-agnostic)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "  - Encapsulates exponential backoff calculation (1m, 5m, 30m, 1h, 2h)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "  - Defines max attempts threshold (5) before marking as 'failed'",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 12,
+            "content": "  - Keeps worker logic lean and business rules centrally testable",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "- Build Admin observability UI leveraging the outbox table",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 15,
+            "content": "  - Color-coded dashboard for pending/sent/failed deliveries",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "  - Query filters for merchant_id, event_type, and date ranges",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 17,
+            "content": "  - Eliminates redundant 'webhook_delivery_logs' table by reusing outbox as source of truth",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 18,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "- Add Manual Retry capability for failed/pending records",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 20,
+            "content": "  - Admin button resets record status to 'pending' and next_attempt_at to now()",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 21,
+            "content": "  - Enables operational recovery without database intervention",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 22,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 23,
+            "content": "This completes the store-and-forward lifecycle. Webhooks are now:",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "- Decoupled from request/response cycle (non-blocking)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "- Persisted atomically with business transactions (Phase 2)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 26,
+            "content": "- Delivered reliably via background worker with intelligent retries",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "- Fully observable and manageable via admin dashboard",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 28,
+            "content": "",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "feat(webhook): implement outbox pattern for atomic webhook persistence",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "- Add webhook_outbox table with id, merchant_id, event_type, payload, status,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "  attempts, timestamps, next_attempt_at, and pre-computed signature column",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "- Implement WebhookOutboxRepository (infrastructure adapter) for storing,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "  querying, and updating outbox records",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "- Create dedicated event handlers subscribing to TransactionCompletedEvent,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "  TransactionFailedEvent, and TransactionRefundedEvent",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "- Handlers fetch merchant webhook configuration (URL, secret, enabled) via ACL",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "  from the Identity context before building the outbox record",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "- Build exact JSON payload and compute HMAC signature once at creation time",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 12,
+            "content": "- CRITICAL: Restructure event listener execution to run WITHIN the UoW",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 13,
+            "content": "  transaction boundary, ensuring outbox records are committed atomically",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "  alongside the business entity changes — eliminating the risk of event loss",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 15,
+            "content": "  caused by in-memory bus crashes",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "- Pre-generate signature to guarantee idempotency and avoid redundant",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 17,
+            "content": "  cryptographic operations during retry attempts",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "This completes Phase 2, establishing a reliable store-and-forward mechanism",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 20,
+            "content": "that serves as the single source of truth for pending webhook deliveries.",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/refs/heads/dev": {
       "id": "3a51be2c-3684-449b-96ae-7b4ba6729963",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "78d79babd2454b42dde03c0f963f5252d432fcd639cf6f94357e2620f7a5ca73",
-      "diff": null
+      "hashValue": "a0ee0ad9172689e8e2fb16562c3f9c9a66be77207bc72cdcc8ee7ba5ca65d12f",
+      "diff": {
+        "filePath": ".git/refs/heads/dev",
+        "oldHash": "a0ee0ad9172689e8e2fb16562c3f9c9a66be77207bc72cdcc8ee7ba5ca65d12f",
+        "newHash": "a0ee0ad9172689e8e2fb16562c3f9c9a66be77207bc72cdcc8ee7ba5ca65d12f",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "9f445496fc897f258b33ab382c9708290d46a163",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "978b4cb1cb15b34fc450dc18e9dabd8174e7e9da",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/objects/97/8b4cb1cb15b34fc450dc18e9dabd8174e7e9da": {
       "id": "bdf0f3b2-a14b-4793-a660-37ba387dc00b",
@@ -9232,32 +9763,32 @@
     ".git/gk/config": {
       "id": "54ef732f-a641-4f94-ba94-433ca67f11bb",
       "filePath": ".git/gk/config",
-      "hashValue": "0d30579dfe8e11d5a7fe62812e50366e4bec24e98cfffd1de328a39e5b875040",
+      "hashValue": "b67e32cdd71ee861765fe5d435a8f019548f84d6719eb5375863f115d4cb5e1f",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "0d30579dfe8e11d5a7fe62812e50366e4bec24e98cfffd1de328a39e5b875040",
-        "newHash": "0d30579dfe8e11d5a7fe62812e50366e4bec24e98cfffd1de328a39e5b875040",
+        "oldHash": "b67e32cdd71ee861765fe5d435a8f019548f84d6719eb5375863f115d4cb5e1f",
+        "newHash": "b67e32cdd71ee861765fe5d435a8f019548f84d6719eb5375863f115d4cb5e1f",
         "addedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-20T20:16:49.315Z",
+            "content": "\tgk-last-accessed = 2026-07-20T20:26:28.153Z",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-20T20:16:49.315Z",
+            "content": "\tgk-last-modified = 2026-07-20T20:26:28.153Z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-20T19:55:53.341Z",
+            "content": "\tgk-last-accessed = 2026-07-20T20:16:49.315Z",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-20T19:55:53.341Z",
+            "content": "\tgk-last-modified = 2026-07-20T20:16:49.315Z",
             "type": "REMOVED"
           }
         ],
@@ -11675,6 +12206,649 @@
       "id": "09924104-7eb3-4f35-a7fc-bb6dabdd4c37",
       "filePath": "static/css/app.css",
       "hashValue": "3a90305895d54a6cf52cdb85cdf6dee111649a47c2450b39ffeed04dec2a3c90",
+      "diff": null
+    },
+    ".git/objects/14/a410fb88a952d6bfc31037cce614abbf0f79af": {
+      "id": "2075297b-e5cb-46a5-88f6-135984c7034a",
+      "filePath": ".git/objects/14/a410fb88a952d6bfc31037cce614abbf0f79af",
+      "hashValue": "60cbc2c6698bda54071f8642b97b6ed339a2fae67feaa20fd6617bafb3b56328",
+      "diff": null
+    },
+    ".git/objects/5d/a346be9440bc832ddeff79227e0010bfb9614c": {
+      "id": "afbe4f31-2d01-4da7-8866-9fc474e1fc05",
+      "filePath": ".git/objects/5d/a346be9440bc832ddeff79227e0010bfb9614c",
+      "hashValue": "06e29e38e71653c0ec6f5478552ba6b74e70f22ef6df0c0eb6aaed88a4e83231",
+      "diff": null
+    },
+    ".git/objects/ec/fa6b239ca13ab16edc97708ec2b3e79b6f4039": {
+      "id": "f87eaa0c-f6dd-49ee-aecf-0bf367eccd63",
+      "filePath": ".git/objects/ec/fa6b239ca13ab16edc97708ec2b3e79b6f4039",
+      "hashValue": "ce3b852c60541362f2987f32cce94206cb32be6e59705bf33bacd5eb14554899",
+      "diff": null
+    },
+    ".git/objects/6e/23e2aed4f0770b908bf6eed2383e8fae377b7e": {
+      "id": "6f2d00c2-6f7d-4455-9d10-329abfd01a8e",
+      "filePath": ".git/objects/6e/23e2aed4f0770b908bf6eed2383e8fae377b7e",
+      "hashValue": "8648af339bbc7d77365ae772706f10818c67cf50fab53ea001c9eeabe92f8388",
+      "diff": null
+    },
+    ".git/objects/1c/0a93ce0d4ccf0ca3129a24d1bbd2cc9b7a2ecd": {
+      "id": "c2ff9795-0fab-44f4-9062-568a5ba420d5",
+      "filePath": ".git/objects/1c/0a93ce0d4ccf0ca3129a24d1bbd2cc9b7a2ecd",
+      "hashValue": "7de96211efbe6b1819f72892c517e3f523a68d4a19b18af6b2beaebab3383a71",
+      "diff": null
+    },
+    ".git/objects/2f/3e35b8886f0773532bb8f92fde5fa1c6dff910": {
+      "id": "3c284b78-1098-4679-bfc4-7c378df3f0d5",
+      "filePath": ".git/objects/2f/3e35b8886f0773532bb8f92fde5fa1c6dff910",
+      "hashValue": "ebe0728267238274316018e3969debaa7dc08d80027dcf4cdb4df55685d6493f",
+      "diff": null
+    },
+    ".git/objects/df/8b7567e75a667b1bcdab4e0df1401431c39a61": {
+      "id": "c8c2733a-cb67-456c-a537-f92dd94dee9d",
+      "filePath": ".git/objects/df/8b7567e75a667b1bcdab4e0df1401431c39a61",
+      "hashValue": "c154ea874eeca21f9a4c3e7e0dcd2fb6170c0439852408bf1d06993f7930d2c3",
+      "diff": null
+    },
+    ".git/objects/be/91472f80b54f959feac85106b6046cf0cffd19": {
+      "id": "90bac31d-e3e0-46bd-a902-689484de632c",
+      "filePath": ".git/objects/be/91472f80b54f959feac85106b6046cf0cffd19",
+      "hashValue": "a56ac3121c484c749417efae039b99c073234058668b5c5b36a894ccbf7bd224",
+      "diff": null
+    },
+    ".git/objects/5d/97104df632ea2b842792bf63fc726b996d8386": {
+      "id": "c8366163-60b5-42df-9146-72f86822ecfc",
+      "filePath": ".git/objects/5d/97104df632ea2b842792bf63fc726b996d8386",
+      "hashValue": "6ef77e31eddbb0b54fa1b26d65a620e3190fff444fd9129d83f7334fe49db0a8",
+      "diff": null
+    },
+    ".git/objects/d5/9df5f103d6d8248467232e4ca1f3df03e34694": {
+      "id": "1e8592a8-8e74-41a7-92b2-3d4f2bc0fa71",
+      "filePath": ".git/objects/d5/9df5f103d6d8248467232e4ca1f3df03e34694",
+      "hashValue": "d7604b4a7308079641e01ad914a0e55287d61e9ba7c3b7a3991144b091c1a810",
+      "diff": null
+    },
+    ".git/objects/ef/c321dc3974db2371ef6f92f4533a8e9a33acb0": {
+      "id": "0b445add-5e73-45e7-9aa5-74b96e2c3f75",
+      "filePath": ".git/objects/ef/c321dc3974db2371ef6f92f4533a8e9a33acb0",
+      "hashValue": "2a0b862381019af2262196b819691a35f5fea5163a92aaf6b5dec626dd699385",
+      "diff": null
+    },
+    ".git/objects/6a/8327758df3eda52efb9efcd23bd1c5b5071ce4": {
+      "id": "9199cf97-ecf5-4cdc-93ac-059a0fced69d",
+      "filePath": ".git/objects/6a/8327758df3eda52efb9efcd23bd1c5b5071ce4",
+      "hashValue": "fe0c08279b8c091f5b5f6e6c0a8ebe28cb2c1b188765588cd35ee93225ed8561",
+      "diff": null
+    },
+    ".git/objects/94/67700403c4f970098c21bb567b3971112134ea": {
+      "id": "922310bc-241c-4838-914d-bf2a005c7763",
+      "filePath": ".git/objects/94/67700403c4f970098c21bb567b3971112134ea",
+      "hashValue": "e078b9d59505af792fcc3e8d4a940c0686e78978e35c911c537036ff561a43f0",
+      "diff": null
+    },
+    ".git/objects/4e/afeb09ff16dd33a5d489695da5012919a48afd": {
+      "id": "56fa8561-4970-4a32-ad57-b1ceed19fac8",
+      "filePath": ".git/objects/4e/afeb09ff16dd33a5d489695da5012919a48afd",
+      "hashValue": "416ed60684c80c43136933dd907eefbfccfe2916c8227a26ae374d069eb2c000",
+      "diff": null
+    },
+    ".git/objects/35/3ef089ed0704d5bda6f7087f0148a6620210a3": {
+      "id": "a64f24aa-e6ca-4942-9d01-ad8a9fb2f58e",
+      "filePath": ".git/objects/35/3ef089ed0704d5bda6f7087f0148a6620210a3",
+      "hashValue": "546c4c7a39715f2d5421683b57fbe752d32f56135b42306e77c7c8438fc6c4a2",
+      "diff": null
+    },
+    ".git/objects/5a/2d100e988ce32e3b4e555da6b65df8b984a736": {
+      "id": "b620e3ba-f5e1-4b0a-bc8f-40d7f916053b",
+      "filePath": ".git/objects/5a/2d100e988ce32e3b4e555da6b65df8b984a736",
+      "hashValue": "894fa46f38e44f2e6f4a84f451965052013bb0238bbe5e1e87a3163d57b9a26d",
+      "diff": null
+    },
+    ".git/objects/78/833ff5b47b95df7bc86eb910a62014822af283": {
+      "id": "7edd8cc2-16ca-48a4-a770-4c81277a4279",
+      "filePath": ".git/objects/78/833ff5b47b95df7bc86eb910a62014822af283",
+      "hashValue": "1df537c921c7a54dddc0b1f1617c51d150b42c92ca6a02d171fe32754b186e8d",
+      "diff": null
+    },
+    ".git/objects/7e/7c2d142df80f10c0c5321e13521aa551baac7c": {
+      "id": "98df9131-ca12-4dc2-9ec8-db9c1ba4757a",
+      "filePath": ".git/objects/7e/7c2d142df80f10c0c5321e13521aa551baac7c",
+      "hashValue": "c22293f094307ae518ab4ec0683e597caf7dbe262757279993875686a130c39a",
+      "diff": null
+    },
+    ".git/objects/7e/bf20c2892d38153210e9252cf39720c70f0b48": {
+      "id": "d22ee928-77a0-4930-872b-8349a01bb7a0",
+      "filePath": ".git/objects/7e/bf20c2892d38153210e9252cf39720c70f0b48",
+      "hashValue": "826b67cd759c5735056644a3622ecdb1c3e931d9539d323af2e896971252ed28",
+      "diff": null
+    },
+    ".git/objects/d4/59bd148cccb9dc3953b172d9a708f7e1590c6e": {
+      "id": "80e00585-bd2d-44f3-b6e2-1cebefc2ebc8",
+      "filePath": ".git/objects/d4/59bd148cccb9dc3953b172d9a708f7e1590c6e",
+      "hashValue": "8388870492e3da06cc8d76babbca76887ef094ebcb738e8f75ea385f0d1bd978",
+      "diff": null
+    },
+    ".git/objects/dc/834e0e052b57abc525b64f2e99181d72c116eb": {
+      "id": "e6a36c66-e668-4a5f-983d-55185c73583e",
+      "filePath": ".git/objects/dc/834e0e052b57abc525b64f2e99181d72c116eb",
+      "hashValue": "e0f6b282bac73928806f450dbc029cb80ffea649e69da2bccb700bd8a2a11b5f",
+      "diff": null
+    },
+    ".git/objects/05/a1c08529595e4aff0bbdaf92814b5ca5efa12d": {
+      "id": "8f0bfebf-f2e7-435f-a46e-6f2aca55e8ba",
+      "filePath": ".git/objects/05/a1c08529595e4aff0bbdaf92814b5ca5efa12d",
+      "hashValue": "0ef8fd62bcb8713a1dfd64829260581129382065494db38d38eb53a943e965d2",
+      "diff": null
+    },
+    ".git/objects/87/d181cfe255e2ceec0e4d855fa4e132de1bc259": {
+      "id": "1c37331d-89a1-4cea-ac15-63f87f191f80",
+      "filePath": ".git/objects/87/d181cfe255e2ceec0e4d855fa4e132de1bc259",
+      "hashValue": "665ac00257d8120abcfac62e748495e6a0d995db61a51025e15f0ce903bcdb64",
+      "diff": null
+    },
+    ".git/objects/89/f20e7abb820ef3b6280cd805319ffa4266377b": {
+      "id": "717832b3-8025-460e-bad1-3324b2ef37a3",
+      "filePath": ".git/objects/89/f20e7abb820ef3b6280cd805319ffa4266377b",
+      "hashValue": "5515d0660c4cd880303746fb1cb708a501ef49820d8a8430677b2107887a11bf",
+      "diff": null
+    },
+    ".git/objects/a9/4ca2369a340a2821435608b556d081465c6d73": {
+      "id": "63aeb4ab-7a0c-4c2e-a24a-8517351e565d",
+      "filePath": ".git/objects/a9/4ca2369a340a2821435608b556d081465c6d73",
+      "hashValue": "f38d3c3fe2864b202d7220d37216a415d95705eb259af78a5ddc39af5e5aa2ec",
+      "diff": null
+    },
+    ".git/objects/79/90da6a48c21045d5c19e23a72899f3297209c4": {
+      "id": "f786522e-d840-428d-a93b-632cd1340fbf",
+      "filePath": ".git/objects/79/90da6a48c21045d5c19e23a72899f3297209c4",
+      "hashValue": "a775411c7211ac8322830b390e36c9de94c510925c6454e820d60e0616723581",
+      "diff": null
+    },
+    ".git/objects/22/57dd62479945f372dd8e6310f66b2d7c3d4148": {
+      "id": "8c530604-56fa-4921-bffc-c2a24bcf985b",
+      "filePath": ".git/objects/22/57dd62479945f372dd8e6310f66b2d7c3d4148",
+      "hashValue": "0832706adea9c2d358c7c131bba10fcb9ae4f1b038f5d256bd29e5f71006522d",
+      "diff": null
+    },
+    ".git/objects/06/6b2d93658702832fbc1e8cbb9797af779c2603": {
+      "id": "f521eec4-ec71-4360-9459-0123205b802c",
+      "filePath": ".git/objects/06/6b2d93658702832fbc1e8cbb9797af779c2603",
+      "hashValue": "7c1db9eb005439c112336fd558ac08b25ea599ffbbe8473d579bd461636ac3bf",
+      "diff": null
+    },
+    ".git/objects/a5/f5e32c39a7df8dbca61dec4033dd05bfa1a408": {
+      "id": "4ebaf3af-2f87-44f9-bfa7-f9ef1c819707",
+      "filePath": ".git/objects/a5/f5e32c39a7df8dbca61dec4033dd05bfa1a408",
+      "hashValue": "c1cbc5d4ce0ef7bd67d31739ba8f0f2f5858762778fefdd2cc55ac9d810fda7a",
+      "diff": null
+    },
+    ".git/objects/4a/20d8b13f959c21bc4ec6515d30daea89dfde1e": {
+      "id": "1bf308a0-2dcc-45a9-b7a0-2bdff49c3367",
+      "filePath": ".git/objects/4a/20d8b13f959c21bc4ec6515d30daea89dfde1e",
+      "hashValue": "f3b6a9bb842a3b02e1d5acf097c72bc5a00ed1fa179187af53aae78b496d62a8",
+      "diff": null
+    },
+    ".git/objects/d5/818e09529c17c50982eaccbdec03d83d687f04": {
+      "id": "5da4ab01-fcda-44cf-876f-fda28dd36c30",
+      "filePath": ".git/objects/d5/818e09529c17c50982eaccbdec03d83d687f04",
+      "hashValue": "0e9d34a97dd04bcf14a9039e9a135867848c11faff0c98f9a401015e28bcd487",
+      "diff": null
+    },
+    ".git/objects/14/ef06d7dec4e2759949357ef95ce47efcd09a78": {
+      "id": "2a27cd90-dea8-4e25-9394-76d2e810d404",
+      "filePath": ".git/objects/14/ef06d7dec4e2759949357ef95ce47efcd09a78",
+      "hashValue": "c61275f7704377fef29c3233767991766a127b5e3bfb7b1459648264d1bebad5",
+      "diff": null
+    },
+    ".git/objects/df/e8541ed7340d95bb8bb7aa7406d061ad22297b": {
+      "id": "69904757-9262-4779-a862-8cf5525db228",
+      "filePath": ".git/objects/df/e8541ed7340d95bb8bb7aa7406d061ad22297b",
+      "hashValue": "d0d11b2003fa0e90c5c4830da8988c09e79dd42ef691a446cbb218969bd41010",
+      "diff": null
+    },
+    ".git/objects/df/896fdc18ff6e6222d85a28a6f037550284ea61": {
+      "id": "43ab1e63-04be-4127-afdb-1879ab854eeb",
+      "filePath": ".git/objects/df/896fdc18ff6e6222d85a28a6f037550284ea61",
+      "hashValue": "398f484f36374bbea09e8793d4c63a3b053f839a5a400d0432ca0f36db5e704e",
+      "diff": null
+    },
+    ".git/objects/2d/fae10c82e8604c2d68d20c34f1781987e1189f": {
+      "id": "0d6407f7-3e28-441d-84d4-548bceb4056a",
+      "filePath": ".git/objects/2d/fae10c82e8604c2d68d20c34f1781987e1189f",
+      "hashValue": "20da4ddb29f695c67f4528ea8cc0dcd3a250c41b7f1d2a7049eb1704441f3c46",
+      "diff": null
+    },
+    ".git/objects/3d/cd9d74972eb56baa4cc56c7a6077ea071b113c": {
+      "id": "80460062-c25d-43d8-96a3-f64954686382",
+      "filePath": ".git/objects/3d/cd9d74972eb56baa4cc56c7a6077ea071b113c",
+      "hashValue": "0789a1fea8db1d5413306f7b142bacfd05046598c2225d360013d240668c1941",
+      "diff": null
+    },
+    ".git/objects/3b/3149df422477a20620c12e26bd0aa70efa8f7c": {
+      "id": "3491374a-55d1-4b82-bc14-200bb8734214",
+      "filePath": ".git/objects/3b/3149df422477a20620c12e26bd0aa70efa8f7c",
+      "hashValue": "78da43070dc49ba0d05f8fddff46410f7d9a7e1e4c5e8c8613718e090d3ce90d",
+      "diff": null
+    },
+    ".git/objects/6c/1c699e9d7ddce35cf2250e4bf3a7b7ccddad94": {
+      "id": "1dea7007-4861-4282-bf33-578adb10a76b",
+      "filePath": ".git/objects/6c/1c699e9d7ddce35cf2250e4bf3a7b7ccddad94",
+      "hashValue": "c71675a9514c4446373318d56fa1ad1987d772a9215c8bce290c288747b54477",
+      "diff": null
+    },
+    ".git/objects/6e/7b9261a6d7846adc490e112b5281663d4ae08f": {
+      "id": "e7ec10ff-7ed3-49e7-898d-75b661737cc0",
+      "filePath": ".git/objects/6e/7b9261a6d7846adc490e112b5281663d4ae08f",
+      "hashValue": "e2fccfeb26e9095c898d0c4b7b7a7ddca1320f5dcb60deb77c871eca4a4fb419",
+      "diff": null
+    },
+    ".git/objects/ea/6a0aaea11ae9fcbf366f047dd08f65cac9062a": {
+      "id": "467a29de-347e-4cdf-86b6-2d1b03fafb5d",
+      "filePath": ".git/objects/ea/6a0aaea11ae9fcbf366f047dd08f65cac9062a",
+      "hashValue": "bea92d0e253d579902ff1f962c310556391eb1bd2a4e4794c215ab15ea8e71c8",
+      "diff": null
+    },
+    ".git/objects/ea/af256ca0eeee9dffb49f919265b2ffc8ff5e37": {
+      "id": "9401de4d-2738-41f6-a587-de9e41494e82",
+      "filePath": ".git/objects/ea/af256ca0eeee9dffb49f919265b2ffc8ff5e37",
+      "hashValue": "3b4c3ee98a4d4669ece97972b7373f86c53b40def99613adb88eb670a60c0c07",
+      "diff": null
+    },
+    ".git/objects/fa/9a827e89873436bdfe9ba61b2bed64dc5aa8f0": {
+      "id": "e5fb7f7f-ee42-4b23-9fe7-bc747a81ebfb",
+      "filePath": ".git/objects/fa/9a827e89873436bdfe9ba61b2bed64dc5aa8f0",
+      "hashValue": "14207d3fa2ac2205ea33bba9f3f466daa73ce4b65ddba6036744bc1cb668bd01",
+      "diff": null
+    },
+    ".git/objects/f9/8ae35a957cfbd2a3be572976951844d7e53396": {
+      "id": "17254a36-6cc7-43c9-9b9b-68e872377b50",
+      "filePath": ".git/objects/f9/8ae35a957cfbd2a3be572976951844d7e53396",
+      "hashValue": "045bd2431494e4867f574c033afbf8d842e8e75013d7bf7ddfe4aab079935a39",
+      "diff": null
+    },
+    ".git/objects/08/9204ecb23eb87a842f2d2d274f778659d5d21e": {
+      "id": "5ebb4636-e050-42ba-bbe2-a2363c4c4821",
+      "filePath": ".git/objects/08/9204ecb23eb87a842f2d2d274f778659d5d21e",
+      "hashValue": "2b4fd1fa382750e87458fb5f1890792fd43aafe2af003d8e7ec79d32c6b67a7e",
+      "diff": null
+    },
+    ".git/objects/b4/fe3d9af614e7d3aa56655192d4122e39c5ee60": {
+      "id": "dde6e9f1-1a7b-4dca-a8fa-f93b9f62ee74",
+      "filePath": ".git/objects/b4/fe3d9af614e7d3aa56655192d4122e39c5ee60",
+      "hashValue": "d713d7736fe87f14477fcbd9a91c2a61da6861e784dcc39e12bfb76700e6316b",
+      "diff": null
+    },
+    ".git/objects/34/1eb344d6310486f9040a35a09c53cd630dc4fa": {
+      "id": "d6752833-e382-45bb-8a27-ee341d414527",
+      "filePath": ".git/objects/34/1eb344d6310486f9040a35a09c53cd630dc4fa",
+      "hashValue": "460025f79ffd011f4f35ab8f204cfe93387072edd5df374515a0d668fbc85073",
+      "diff": null
+    },
+    ".git/objects/6b/24192fdf7cc3f7e76defa5e8a98aa4b315c267": {
+      "id": "f97685ff-c443-4aa3-8bf2-5e4c9a304c49",
+      "filePath": ".git/objects/6b/24192fdf7cc3f7e76defa5e8a98aa4b315c267",
+      "hashValue": "7fa55e493d21175d132557b2bf97f58624cd284983b894db99d4208b05933954",
+      "diff": null
+    },
+    ".git/objects/9f/445496fc897f258b33ab382c9708290d46a163": {
+      "id": "d8f6c72e-462a-4453-b407-c960ba4d111b",
+      "filePath": ".git/objects/9f/445496fc897f258b33ab382c9708290d46a163",
+      "hashValue": "6526817db2f42fa389ccaf1cf99bf008866bf84b6bdc77ac9593cce1efde05ff",
+      "diff": null
+    },
+    ".git/objects/e7/f93d673519a1f0e5dc09bf2333a1bc38330b29": {
+      "id": "ba7367a7-5a2e-4378-8195-fed747adbfe9",
+      "filePath": ".git/objects/e7/f93d673519a1f0e5dc09bf2333a1bc38330b29",
+      "hashValue": "ac39c357d1f6639c5178add44031069e03cd289382f4a3e83b711c08c2da5e9c",
+      "diff": null
+    },
+    ".git/objects/59/04ee86f859bb13bd7debbaf61866d99ded3f8e": {
+      "id": "194d92a5-a8c7-4d6d-8aa4-58058a85c9d1",
+      "filePath": ".git/objects/59/04ee86f859bb13bd7debbaf61866d99ded3f8e",
+      "hashValue": "69e6af1f51c55daa46deafe10e547b346d711d2f4ee9989fd9f631044cdc03fe",
+      "diff": null
+    },
+    "src/notifications/infrastructure/utils/webhook_signer.py": {
+      "id": "5694661f-7393-4c71-a79b-299e81854bc1",
+      "filePath": "src/notifications/infrastructure/utils/webhook_signer.py",
+      "hashValue": "16654b25ca6851eaf66e824b9b5ba85d59f9949d2f6a7823848b31b5f4f3471c",
+      "diff": {
+        "filePath": "src/notifications/infrastructure/utils/webhook_signer.py",
+        "oldHash": "16654b25ca6851eaf66e824b9b5ba85d59f9949d2f6a7823848b31b5f4f3471c",
+        "newHash": "16654b25ca6851eaf66e824b9b5ba85d59f9949d2f6a7823848b31b5f4f3471c",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "import hmac",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "import hashlib",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "class WebhookSigner:",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "    \"\"\"Utility class for generating HMAC-SHA256 signatures for webhook payloads.\"\"\"",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "    @staticmethod",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "    def sign(payload: str, secret: str) -> str:",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "        \"\"\"Generates a hex digest of the HMAC-SHA256 signature.\"\"\"",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "        return hmac.new(",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "            key=secret.encode('utf-8'),",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 12,
+            "content": "            msg=payload.encode('utf-8'),",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 13,
+            "content": "            digestmod=hashlib.sha256",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "        ).hexdigest()",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
+    },
+    "src/notifications/infrastructure/utils/__init__.py": {
+      "id": "032f3981-a8ac-4768-9aae-bc0fe656019e",
+      "filePath": "src/notifications/infrastructure/utils/__init__.py",
+      "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff": null
+    },
+    "tests/unit/notifications/test_webhook_signer.py": {
+      "id": "422f4a44-96b1-407a-b68a-83094781b4de",
+      "filePath": "tests/unit/notifications/test_webhook_signer.py",
+      "hashValue": "fd131b264b61785f92b57f08b4c541879fc4cf3b2823d31128514c2358612948",
+      "diff": {
+        "filePath": "tests/unit/notifications/test_webhook_signer.py",
+        "oldHash": "fd131b264b61785f92b57f08b4c541879fc4cf3b2823d31128514c2358612948",
+        "newHash": "fd131b264b61785f92b57f08b4c541879fc4cf3b2823d31128514c2358612948",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "import pytest",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "from src.notifications.infrastructure.utils.webhook_signer import WebhookSigner",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "def test_webhook_signer_generates_correct_signature():",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "    payload = '{\"event\":\"payment.completed\",\"transaction_id\":\"txn_123\"}'",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "    secret = \"whsec_supersecret\"",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "    # Manually compute expected signature to verify",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "    import hmac",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "    import hashlib",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "    expected_signature = hmac.new(",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 12,
+            "content": "        key=secret.encode('utf-8'),",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 13,
+            "content": "        msg=payload.encode('utf-8'),",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "        digestmod=hashlib.sha256",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 15,
+            "content": "    ).hexdigest()",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 17,
+            "content": "    actual_signature = WebhookSigner.sign(payload, secret)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 18,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "    assert actual_signature == expected_signature",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 20,
+            "content": "    assert len(actual_signature) == 64 # SHA256 hex digest length",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 21,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 22,
+            "content": "def test_webhook_signer_consistent_for_same_input():",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 23,
+            "content": "    payload = '{\"event\":\"payment.failed\"}'",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "    secret = \"another_secret\"",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 26,
+            "content": "    sig1 = WebhookSigner.sign(payload, secret)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "    sig2 = WebhookSigner.sign(payload, secret)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 28,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 29,
+            "content": "    assert sig1 == sig2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "def test_webhook_signer_different_for_different_payloads():",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "    secret = \"another_secret\"",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 33,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 34,
+            "content": "    sig1 = WebhookSigner.sign('{\"event\":\"payment.completed\"}', secret)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 35,
+            "content": "    sig2 = WebhookSigner.sign('{\"event\":\"payment.refunded\"}', secret)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 36,
+            "content": "    ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 37,
+            "content": "    assert sig1 != sig2",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
+    },
+    "tests/unit/notifications/__pycache__/test_webhook_signer.cpython-313-pytest-9.1.1.pyc": {
+      "id": "dea4d069-356f-417f-a79f-2a50e563fb1b",
+      "filePath": "tests/unit/notifications/__pycache__/test_webhook_signer.cpython-313-pytest-9.1.1.pyc",
+      "hashValue": "073af836291dbf757a33ae381ff4e8e594499cb4746f437bd084a630e5c64bf9",
+      "diff": null
+    },
+    "src/notifications/infrastructure/utils/__pycache__/webhook_signer.cpython-313.pyc": {
+      "id": "fa3c6b9d-d149-48f9-af9f-4e127779a23e",
+      "filePath": "src/notifications/infrastructure/utils/__pycache__/webhook_signer.cpython-313.pyc",
+      "hashValue": "9c3393c9b7a476ee8c60bbe3711bee8f6ae015ff12d035bb51a07695e8f201c1",
+      "diff": null
+    },
+    "src/notifications/infrastructure/utils/__pycache__/__init__.cpython-313.pyc": {
+      "id": "bf13ffef-8b5f-431c-8a15-69cddab14941",
+      "filePath": "src/notifications/infrastructure/utils/__pycache__/__init__.cpython-313.pyc",
+      "hashValue": "44a88b504122eb5dc6ae2e1ca09b4d05c4dc06b800442bf330ab41ab5f8d9c86",
+      "diff": null
+    },
+    ".git/objects/e1/d0f2f1554daf1e9b7506e86dfe25a56a9faa32": {
+      "id": "5787026b-02f2-48fe-a10c-8603f06945bc",
+      "filePath": ".git/objects/e1/d0f2f1554daf1e9b7506e86dfe25a56a9faa32",
+      "hashValue": "5522521714b2dc26e80a495161d4066b2360441f45e0f0e6b187060e732e1caa",
+      "diff": null
+    },
+    ".git/objects/cd/1912ce698ace4739a64284c3e444ef0a393e5d": {
+      "id": "afa90af2-bd1d-47a3-b6d1-bff4a7673ea6",
+      "filePath": ".git/objects/cd/1912ce698ace4739a64284c3e444ef0a393e5d",
+      "hashValue": "33e9c4c16c7203eeb9524ed422df52266d0c42c391f4f140b9147780a1f69ea9",
+      "diff": null
+    },
+    ".git/objects/be/02ffb08ea448162cb275be5704f5b0c2a3705e": {
+      "id": "1bce8e29-18ee-45ca-a6dd-73a9c82595db",
+      "filePath": ".git/objects/be/02ffb08ea448162cb275be5704f5b0c2a3705e",
+      "hashValue": "d7a2371cab3aa747668a43d884fe2de2bd02a75dc1c8615fc08f50d0b03630b9",
+      "diff": null
+    },
+    ".git/objects/12/90d67fbbf5218294d0ec877bb39d72915a7a68": {
+      "id": "c5809c7b-6164-48f6-a9b8-21a9d4fc2b33",
+      "filePath": ".git/objects/12/90d67fbbf5218294d0ec877bb39d72915a7a68",
+      "hashValue": "bfaa261273cc20331ee5c9c155110079d895202ed077a227957a785562efbaa7",
+      "diff": null
+    },
+    ".git/objects/6e/661c9b421000cc50b86ab7c03ace6f701389f8": {
+      "id": "1a2b3d83-3121-4b6a-bc35-feac5046c8f5",
+      "filePath": ".git/objects/6e/661c9b421000cc50b86ab7c03ace6f701389f8",
+      "hashValue": "4daf3b0323dcb9b23b63580a21ed2c22eee0b159999a25ed23f2b57c7830c306",
+      "diff": null
+    },
+    ".git/objects/eb/a281a4135a8008b6991fe922aeedf09911d1aa": {
+      "id": "dfd1700e-6026-45af-a72e-d93dbd6e2277",
+      "filePath": ".git/objects/eb/a281a4135a8008b6991fe922aeedf09911d1aa",
+      "hashValue": "b2bc5260a1c158f458429137c71822e4e8e022e7dd5a66aa8983bb83f6d04836",
       "diff": null
     }
   }

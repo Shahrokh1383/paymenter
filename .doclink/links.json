@@ -466,22 +466,6 @@
       "migratedAt": null
     },
     {
-      "id": "fab94db6-7652-4ba0-95c9-70d3dfeb0727",
-      "codeFileId": "02b5a91a-ad12-4602-a8c6-30a5823582c5",
-      "documentId": "c91c49cf-b08f-41e4-9e03-87f3a3400b22",
-      "type": "DIRECT",
-      "createdAt": "2026-07-19T13:35:29.322Z",
-      "migratedAt": null
-    },
-    {
-      "id": "e9e72eb6-4422-4578-9419-75624185a13d",
-      "codeFileId": "b301d59a-f588-433c-ac65-df2807ea4f11",
-      "documentId": "c91c49cf-b08f-41e4-9e03-87f3a3400b22",
-      "type": "DIRECT",
-      "createdAt": "2026-07-19T13:35:29.687Z",
-      "migratedAt": null
-    },
-    {
       "id": "38c29f89-8947-4d94-8d9a-b6c417537ffe",
       "codeFileId": "3f0a16fc-91b7-4064-991c-c8f9f7effac1",
       "documentId": "c91c49cf-b08f-41e4-9e03-87f3a3400b22",

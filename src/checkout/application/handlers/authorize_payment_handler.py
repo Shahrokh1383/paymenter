@@ -21,7 +21,7 @@ class AuthorizePaymentHandler:
         self._fund_port = fund_port
         self._lookup_port = lookup_port
 
-    def handle(self, command: AuthorizePaymentCommand) -> Tuple[int, str]:
+    def handle(self, command: AuthorizePaymentCommand) -> Tuple[str, str]:
         token_vo = SessionToken(command.session_token)
         card_vo = CardNumber(command.card_number)
         

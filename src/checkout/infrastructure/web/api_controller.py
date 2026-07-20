@@ -8,9 +8,7 @@ from src.identity.infrastructure.persistence.sqlite_merchant_repository import S
 
 from src.checkout.application.commands.initiate_payment_command import InitiatePaymentCommand
 from src.checkout.application.commands.refund_payment_command import RefundPaymentCommand
-from src.checkout.application.handlers.refund_payment_handler import RefundPaymentHandler
 
-from src.checkout.infrastructure.persistence.ledger_refund_adapter import LedgerRefundAdapter
 from src.checkout.infrastructure.persistence.ledger_verification_adapter import LedgerVerificationAdapter
 from src.common.domain.exceptions import DomainException
 
@@ -46,7 +44,6 @@ def pay():
 
     try:
         uow = SqliteUnitOfWork()
-        event_bus = current_app.di_container.event_bus
         
         command = InitiatePaymentCommand(
             merchant_id=g.merchant.id,
@@ -84,9 +81,8 @@ def refund():
         
     try:
         uow = SqliteUnitOfWork()
-        event_bus = current_app.di_container.event_bus
         
-        command = RefundPaymentCommand(transaction_id=int(data['transaction_id']))
+        command = RefundPaymentCommand(transaction_id=data['transaction_id'])
         
         with uow:
             handler = current_app.di_container.get_refund_payment_handler(uow)
@@ -103,7 +99,7 @@ def refund():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
-@api_bp.route('/verify/<int:transaction_id>', methods=['GET'])
+@api_bp.route('/verify/<string:transaction_id>', methods=['GET'])
 def verify(transaction_id):
     """Verifies the status of a transaction."""
     try:

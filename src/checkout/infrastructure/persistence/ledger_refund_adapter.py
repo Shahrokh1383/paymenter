@@ -6,6 +6,6 @@ class LedgerRefundAdapter(TransactionRefundPort):
     def __init__(self, ledger_handler: FailAndRefundHandler):
         self._ledger_handler = ledger_handler
 
-    def refund_or_fail(self, transaction_id: int) -> None:
+    def refund_or_fail(self, transaction_id: str) -> None:
         command = FailAndRefundCommand(transaction_id=transaction_id)
         self._ledger_handler.handle(command)

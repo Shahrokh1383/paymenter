@@ -5,7 +5,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class TransactionStatus:
     """Immutable DTO representing the status of a transaction from the Ledger."""
-    transaction_id: int
+    transaction_id: str
     status: str
     amount: float
     currency_code: str
@@ -16,7 +16,7 @@ class TransactionVerificationPort(ABC):
     """
     
     @abstractmethod
-    def get_transaction_status(self, transaction_id: int) -> Optional[TransactionStatus]:
+    def get_transaction_status(self, transaction_id: str) -> Optional[TransactionStatus]:
         """
         Queries the Ledger for the current status of a transaction.
         Returns None if the transaction does not exist or does not belong to the requesting merchant.

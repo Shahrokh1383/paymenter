@@ -1,10 +1,11 @@
 # Paymenter Gateway: Laravel Integration Guide (Hosted Payment Page)
 
-This document provides a complete, production-like workflow for integrating a Laravel application with the Paymenter Payment Gateway simulator using the **Hosted Payment Page (HPP)** architecture. This ensures your Laravel application remains PCI-DSS compliant by never handling raw credit card numbers.
+**Version 2.0 – UUID transaction IDs**  
+**Paymenter version:** 1.0+ with the above fixes applied.
+
+---
 
 ## 1. Prerequisites
-
-Before writing any Laravel code, ensure the following are running and set up:
 
 1.  **Local SMTP Sink:** Start your `smtp-server` project on port `1025` to intercept OTPs and Receipts.
 2.  **Paymenter Dashboard:** Start Paymenter (defaults to `http://127.0.0.1:5000`).
@@ -12,31 +13,32 @@ Before writing any Laravel code, ensure the following are running and set up:
 4.  **Copy API Key:** Copy the Merchant's API Key.
 5.  **Test User Account:** Create a User in Paymenter and Topup their balance so they can pay.
 
+---
+
 ## 2. Laravel Configuration
 
-**Update `.env` file:**
+**.env**
 ```env
-# Verify the port shown in your Paymenter terminal
 PAYMENTER_API_URL=http://127.0.0.1:5000/api
-PAYMENTER_API_KEY=your_copied_merchant_api_key_here
+PAYMENTER_API_KEY=your_api_key_here
+PAYMENTER_CURRENCY=USD
 ```
 
-**Update `config/services.php`:**
+**config/services.php**
 ```php
-return [
-    // ... other services
-    'paymenter' => [
-        'url' => env('PAYMENTER_API_URL'),
-        'key' => env('PAYMENTER_API_KEY'),
-    ],
-];
+'paymenter' => [
+    'url' => env('PAYMENTER_API_URL'),
+    'key' => env('PAYMENTER_API_KEY'),
+    'currency' => env('PAYMENTER_CURRENCY', 'USD'),
+],
 ```
 
-## 3. Creating the Payment Service Class
+---
 
-To adhere to SRP, we create a dedicated Service class. Notice that we **no longer send card numbers** to the API. We only send the intent data.
+## 3. Paymenter Service Class
 
-**Create `app/Services/PaymenterService.php`:**
+Create `app/Services/PaymenterService.php`.  
+**Important:** `verify()` and `refund()` now expect `string` transaction IDs.
 
 ```php
 <?php
@@ -56,14 +58,14 @@ class PaymenterService
         $this->apiKey = config('services.paymenter.key');
     }
 
-    /**
-     * Create a Payment Session (Intent)
-     */
-    public function createSession(float $amount, string $currencyCode, string $userEmail, string $callbackUrl)
+    private function httpClient()
     {
-        $response = Http::withHeaders([
-            'x-api-key' => $this->apiKey,
-        ])->post("{$this->apiUrl}/pay", [
+        return Http::withHeaders(['x-api-key' => $this->apiKey])->timeout(15);
+    }
+
+    public function createSession(float $amount, string $currencyCode, string $userEmail, string $callbackUrl): array
+    {
+        $response = $this->httpClient()->post("{$this->apiUrl}/pay", [
             'amount'        => $amount,
             'currency_code' => $currencyCode,
             'user_email'    => $userEmail,
@@ -73,142 +75,108 @@ class PaymenterService
         if ($response->successful()) {
             return $response->json(); // Contains 'token' and 'payment_url'
         }
-
-        throw new \Exception($response->json('error', 'Payment session creation failed.'), $response->status());
+        throw new \Exception($response->json('error', 'Session creation failed.'), $response->status());
     }
 
-    /**
-     * Verify a transaction status
-     */
-    public function verify(int $transactionId)
+    public function verify(string $transactionId): array
     {
-        $response = Http::withHeaders([
-            'x-api-key' => $this->apiKey,
-        ])->get("{$this->apiUrl}/verify/{$transactionId}");
+        $response = $this->httpClient()->get("{$this->apiUrl}/verify/{$transactionId}");
 
         if ($response->successful()) {
             return $response->json();
         }
-
         throw new \Exception($response->json('error', 'Verification failed.'), $response->status());
     }
 
-    /**
-     * Refund a transaction
-     */
-    public function refund(int $transactionId)
+    public function refund(string $transactionId): array
     {
-        $response = Http::withHeaders([
-            'x-api-key' => $this->apiKey,
-        ])->post("{$this->apiUrl}/refund", [
+        $response = $this->httpClient()->post("{$this->apiUrl}/refund", [
             'transaction_id' => $transactionId,
         ]);
 
         if ($response->successful()) {
             return $response->json();
         }
-
         throw new \Exception($response->json('error', 'Refund failed.'), $response->status());
     }
 }
 ```
 
-## 4. Laravel Implementation Workflow
+---
 
-### Step 1: Initiate Checkout (Controller)
+## 4. Database Schema
 
-When the user clicks "Checkout", you create a session and redirect them to the secure Paymenter Gateway.
+**Migration for `payments` table:**
+```php
+$table->string('gateway_transaction_id', 64)->nullable();
+```
+
+**Model `Payment`** – No cast needed for this column (it will be a string).
+
+---
+
+## 5. Integration Workflow
+
+### 5.1 Initiate Checkout
 
 ```php
-<?php
-
-namespace App\Http\Controllers;
-
 use App\Services\PaymenterService;
-use Illuminate\Http\Request;
 
-class CheckoutController extends Controller
+public function processCheckout(Request $request, PaymenterService $paymenter)
 {
-    public function processCheckout(Request $request, PaymenterService $paymenter)
-    {
-        $orderAmount = 150000; // Example: Get from cart
-        $currencyCode = 'IRR'; 
-        $userEmail = 'testuser@example.com'; // Get from authenticated user
-        
-        // Define where Paymenter should send the user after they enter their Card & OTP
-        $callbackUrl = route('checkout.callback'); 
+    $amount = 1500; // Example: Get from cart
+    $currency = config('services.paymenter.currency');
+    $userEmail = auth()->user()->email;
+    $callbackUrl = route('checkout.callback');
 
-        try {
-            $result = $paymenter->createSession(
-                $orderAmount, 
-                $currencyCode, 
-                $userEmail, 
-                $callbackUrl
-            );
-
-            // Redirect user to the isolated Paymenter Gateway Page
-            return redirect($result['payment_url']);
-
-        } catch (\Exception $e) {
-            return back()->withErrors(['payment' => $e->getMessage()]);
-        }
-    }
+    // Define where Paymenter should send the user after they enter their Card & OTP
+    $result = $paymenter->createSession($amount, $currency, $userEmail, $callbackUrl);
+    return redirect($result['payment_url']);
 }
 ```
 
-### Step 2: Handle the Gateway Callback
+### 5.2 Handle the Gateway Callback
 
-After the user enters their Card and OTP on the Paymenter Gateway, Paymenter redirects them back to your `callback_url` with the `transaction_id`.
+The gateway redirects the user back with:
+- `transaction_id` (UUID string)
+- `gateway_status` (e.g., `Pending`)
+- `ref` (your custom reference)
 
 ```php
 public function handleCallback(Request $request)
 {
-    $transactionId = $request->query('transaction_id');
-    $gatewayStatus = $request->query('gateway_status'); // Usually 'Pending' awaiting admin approval
+    $transactionId = $request->query('transaction_id'); // string
+    $ref = $request->query('ref');
 
-    if (!$transactionId) {
-        return redirect()->route('checkout.failed')->withErrors('Payment canceled or failed.');
-    }
+    // Find your subscription or order by $ref
+    $payment = Payment::where('gateway_transaction_id', $transactionId)->firstOrNew();
+    $payment->gateway_transaction_id = $transactionId;
+    $payment->status = PaymentStatus::PENDING;
+    $payment->save();
 
-    // Save the transaction_id to your Order model
-    // Order::where('session_id', $sessionId)->update(['payment_transaction_id' => $transactionId, 'status' => 'awaiting_settlement']);
-
-    // Show a "Waiting for Bank Approval" page to the user
-    return view('checkout.waiting', ['transactionId' => $transactionId]);
+    return redirect("{$frontendUrl}/payment-result?transaction_id={$transactionId}");
 }
 ```
 
-### Step 3: Verification & Fulfillment (Webhook / Polling)
+### 5.3 Poll for Settlement (AJAX)
 
-Because the Admin must manually click **[Complete]** in the simulator, your Laravel app should poll the `/api/verify` endpoint via AJAX, or you can simulate a Webhook.
+Create an endpoint that your frontend polls:
 
 ```php
-public function checkStatus(Request $request, PaymenterService $paymenter)
+public function pollStatus(Request $request, PaymenterService $paymenter)
 {
-    $transactionId = $request->input('transaction_id');
+    $transactionId = $request->input('transaction_id'); // string
+    $result = $paymenter->verify($transactionId);
 
-    try {
-        $result = $paymenter->verify($transactionId);
-
-        if ($result['status'] === 'Success') {
-            // Payment is Complete! Fulfill the order.
-            // Note: Paymenter has also automatically emailed a Success Receipt to the user.
-            return response()->json(['status' => 'success', 'message' => 'Payment successful!']);
-        }
-
-        if ($result['status'] === 'Failed' || $result['status'] === 'Refunded') {
-            return response()->json(['status' => 'failed', 'message' => 'Payment failed.']);
-        }
-
-        return response()->json(['status' => 'pending', 'message' => 'Waiting for gateway settlement...']);
-
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    // $result['status'] can be: 'Pending', 'Success', 'Failed', 'Refunded'
+    if ($result['status'] === 'Success') {
+        // Fulfill the order
     }
+    return response()->json($result);
 }
 ```
 
-### Step 4: Processing Refunds (Admin Panel)
+### 5.4 Processing Refunds (Admin Panel)
 
 If you trigger a refund from your Laravel admin panel, Paymenter will process it and **automatically email a Refund Receipt** to the customer.
 
@@ -216,26 +184,27 @@ If you trigger a refund from your Laravel admin panel, Paymenter will process it
 public function processRefund($orderId, PaymenterService $paymenter)
 {
     $order = Order::findOrFail($orderId);
-
-    try {
-        $paymenter->refund($order->payment_transaction_id);
-        // $order->update(['status' => 'refunded']);
-        return back()->with('success', 'Refund processed. Customer has been notified via email.');
-    } catch (\Exception $e) {
-        return back()->withErrors(['refund' => $e->getMessage()]);
-    }
+    $paymenter->refund($order->payment_transaction_id); // string
+    // Update order status
 }
 ```
 
 ---
 
-## The Simulator Reality Check (Important for Developers)
+## 6. Simulator Reality Check
 
-When testing your Laravel application with Paymenter, remember the exact flow:
+1. **Laravel calls `/api/pay`** → returns `token` and `payment_url`. No OTP yet.
+2. **User is redirected** to the Paymenter gateway page.
+3. **User enters card** and clicks “Request OTP” → OTP sent to the cardholder’s registered email (check your SMTP sink).
+4. **User submits OTP** → Paymenter holds funds and redirects back with `transaction_id` (UUID string) and `gateway_status=Pending`.
+5. **Manual step:** In Paymenter admin dashboard, click **[Complete]** to settle, or **[Fail]** to reject.
+6. **Receipts** are automatically sent to the cardholder’s email.
+7. **Your polling** picks up the final status via `/api/verify/{transaction_id}`.
 
-1.  **Laravel creates Session**: Laravel calls `/api/pay`. Paymenter creates a secure session token and returns the `payment_url`. **NO OTP is sent at this stage.**
-2.  **User Authorization**: Laravel redirects the user to the `payment_url`. The user enters their Card Number on the Paymenter Gateway page and clicks **"Request OTP"**. 
-3.  **OTP Dispatch**: Paymenter verifies the card, resolves the **registered Paymenter account email** tied to that specific card (ignoring the Laravel email), and sends the OTP to the local SMTP sink.
-4.  **Callback**: The user enters the OTP, Paymenter holds the funds, and redirects the user back to Laravel. The transaction is now `Pending`.
-5.  **MANUAL ACTION REQUIRED**: You (the developer) must open the Paymenter Admin Dashboard, find the Pending transaction, and click **[Complete]** or **[Fail]**.
-6.  **Automated Receipts**: The moment you click Complete/Fail, check your SMTP Web UI. A beautifully formatted HTML receipt has instantly arrived in the **actual Paymenter account owner's inbox** (the user whose funds were moved).
+---
+
+## 7. Important Notes
+
+- **Always treat `transaction_id` as a string** in your Laravel code and database.
+- The Paymenter API `verify` and `refund` endpoints now accept and return string IDs.
+- The callback URL receives the same UUID string; do not cast it to integer.

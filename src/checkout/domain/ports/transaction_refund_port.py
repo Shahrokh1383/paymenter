@@ -6,7 +6,7 @@ class TransactionRefundPort(ABC):
     """
     
     @abstractmethod
-    def refund_or_fail(self, transaction_id: int) -> None:
+    def refund_or_fail(self, transaction_id: str) -> None:
         """
         Requests the Ledger to either fail a Pending transaction (refunding the user)
         or refund a Successful transaction (reversing both legs).

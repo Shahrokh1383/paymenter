@@ -11,8 +11,8 @@ class FundReservationPort(ABC):
     @abstractmethod
     def hold_funds(
         self,
-        from_account_id: int,
-        to_account_id: int,
+        from_account_id: str,
+        to_account_id: str,
         amount: Decimal,
         currency_code: str,
         merchant_id: Optional[int] = None,

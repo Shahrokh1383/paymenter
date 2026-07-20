@@ -82,6 +82,15 @@
       "linkCount": 0,
       "isOrphaned": true,
       "deleted": true
+    },
+    {
+      "id": "92aa6cf4-3ad7-4648-99df-c8bb5fc7be30",
+      "path": "docs/backend/checkout/CheckoutModule.md",
+      "title": "CheckoutModule",
+      "lastModified": "2026-07-20T16:38:41.773Z",
+      "linkCount": 39,
+      "isOrphaned": false,
+      "deleted": false
     }
   ]
 }

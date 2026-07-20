@@ -2403,6 +2403,207 @@
         }
       ],
       "committedAt": "2026-07-20T10:28:04.503Z"
+    },
+    {
+      "id": "d9fb0343-f326-4a6c-9237-11cf48bc2457",
+      "fileHashes": [
+        {
+          "id": "018d622b-26d2-4a3f-b6db-a72fb89157c2",
+          "filePath": "src/checkout/domain/entities/payment_session.py",
+          "hashValue": "97d4fe4ab96d09acf133a3bc12fae6787270bdbb34a9b8b04737df9e47b54780"
+        },
+        {
+          "id": "4b8c5250-3b7d-49d1-8cbd-26125dd9fe0c",
+          "filePath": "src/checkout/domain/events/otp_requested_event.py",
+          "hashValue": "d17c10aa64216962e56ceb0d7c216ade961e2981d50539589dcde458e3816924"
+        },
+        {
+          "id": "d601e325-c553-4599-ad79-0c89db93659d",
+          "filePath": "src/checkout/domain/events/payment_initiated_event.py",
+          "hashValue": "b422e18ac589f3b15b21545a272b54791651d0f5f8b1378c39a6814c3beb7d8b"
+        },
+        {
+          "id": "e0d7da97-4fba-4b8a-ba1f-43fbf15d22fd",
+          "filePath": "src/checkout/domain/value_objects/callback_url.py",
+          "hashValue": "e6aacfad8675cf8f5d76f588d1b18bcfc4cd0484ca84e6a5dcbc53fad426bd22"
+        },
+        {
+          "id": "8e7e0c58-7ee1-4c78-b10f-f38302b40c84",
+          "filePath": "src/checkout/domain/value_objects/card_number.py",
+          "hashValue": "39d97b0dcb9188e725dc1e680b0dd29f488506576f10da4601e59a7c7874b925"
+        },
+        {
+          "id": "5b2b7023-5d0f-4eee-b6ff-3f5df38866ca",
+          "filePath": "src/checkout/domain/value_objects/otp_code.py",
+          "hashValue": "e53fcbfba5e3d62c94810bc5a1facdfe137f2a424d7c588046b5494c509408bd"
+        },
+        {
+          "id": "5cebf219-85f4-4fda-8392-c2c8f0cb53ec",
+          "filePath": "src/checkout/domain/value_objects/session_token.py",
+          "hashValue": "0be191694c5b02294aa4c65c1dc0ceafca88c514392566f00616777c808f1435"
+        },
+        {
+          "id": "1a7a8560-8740-436b-8fc9-93fdfe8be94f",
+          "filePath": "src/checkout/domain/ports/account_lookup_port.py",
+          "hashValue": "6403819a5d907494aefa77fba788fc1cae1026eb9a07bbb18a2f4e09adcc010f"
+        },
+        {
+          "id": "e6779924-ad03-4d3c-a9bd-be396b6a485c",
+          "filePath": "src/checkout/domain/ports/fund_reservation_port.py",
+          "hashValue": "5a5a954f6de3e1a09701f3d172bc5a5f621901a23be52ad5193f080eba0363a1"
+        },
+        {
+          "id": "bb0eb341-cd27-4e5c-b25f-29174965a58d",
+          "filePath": "src/checkout/domain/ports/otp_generator.py",
+          "hashValue": "238e32d0542a82fd094faa94d8da4fa0be4c11d954ae6f46e471d38790a417ff"
+        },
+        {
+          "id": "00a19a9e-0e6b-4cbc-8067-2db0fc34477f",
+          "filePath": "src/checkout/domain/ports/session_token_generator.py",
+          "hashValue": "d766b39f561b262800be9918b9e94e1959673919b9aa39776ffb23c2a78b0b0b"
+        },
+        {
+          "id": "d2f763c0-3845-44e2-8e73-932e02cb4309",
+          "filePath": "src/checkout/domain/ports/transaction_refund_port.py",
+          "hashValue": "0cc835a5f0644d62930fc8a737a59c7ea4804f46cf45cd9c8eacd7c545b76bc4"
+        },
+        {
+          "id": "490953da-d21f-4de2-93b2-c1e191e1d60f",
+          "filePath": "src/checkout/domain/ports/transaction_verification_port.py",
+          "hashValue": "79e8f1405c96e7926cc49325785df5051d423ec6e2bd8e69272abb070e677cd2"
+        },
+        {
+          "id": "2b7ec35f-bf21-4e7e-b1c7-3626fac6f7ea",
+          "filePath": "src/checkout/domain/repositories.py",
+          "hashValue": "7ac3d3864445630e371da1375f22dbe820dc254955627e0e255e4cbda8773241"
+        },
+        {
+          "id": "4a6743b0-02ff-4851-9893-fc6cba5e33ef",
+          "filePath": "src/checkout/application/commands/authorize_payment_command.py",
+          "hashValue": "adbccd91c887a7045f4c732f18878baeb850b0c42100686e3f7b946b4dc95836"
+        },
+        {
+          "id": "4073b1fe-8588-477a-9a11-b07798fa6efe",
+          "filePath": "src/checkout/application/commands/initiate_payment_command.py",
+          "hashValue": "f1bf9a0cf2271d59eb108c0ab8eba275d85b55e7ccfb9f886b048cdafb137670"
+        },
+        {
+          "id": "372c79a4-e0c1-4593-bcb8-d01b2da8371b",
+          "filePath": "src/checkout/application/commands/refund_payment_command.py",
+          "hashValue": "67d565108594f0d70f14c233e2eebf485440910fc3f40bb11932a1d76ddeeb50"
+        },
+        {
+          "id": "213a8c61-ba48-4c53-a1e8-ebdf781aee40",
+          "filePath": "src/checkout/application/commands/request_otp_command.py",
+          "hashValue": "1c984c19a4cfa3c6dd8412f53fa58c9a54ae3a0403ef6e719617d8a80b77d078"
+        },
+        {
+          "id": "40f7d7ab-950e-4f06-99c9-8d3a4ae28388",
+          "filePath": "src/checkout/application/handlers/authorize_payment_handler.py",
+          "hashValue": "c8c573e8232645d85b2e92ae276591be725dbd8c0dd205b12387b55720ebd770"
+        },
+        {
+          "id": "65b71c4e-810c-48d3-bbdc-4d9909966bc4",
+          "filePath": "src/checkout/application/handlers/initiate_payment_handler.py",
+          "hashValue": "035fe5c4ca8e0927595c4b650d41155c5649c483ed9e72c7d309b80791076a0e"
+        },
+        {
+          "id": "682a1d9e-9538-4bdd-9b1a-9fb0e000530b",
+          "filePath": "src/checkout/application/handlers/refund_payment_handler.py",
+          "hashValue": "0170990adcce7e99d45f097ebdb3af16cfbf51b06e0075e312a10c1722567739"
+        },
+        {
+          "id": "e870f60d-73f1-404b-b176-44cda57a8825",
+          "filePath": "src/checkout/application/handlers/request_otp_handler.py",
+          "hashValue": "1cff24d61b50d93ff390b6836895dd0b8fbe2ff7bc2fbdc7d7cc06e012470b6b"
+        },
+        {
+          "id": "73d9e4a2-5bec-43f0-97eb-7e115bb41add",
+          "filePath": "src/checkout/infrastructure/persistence/identity_account_lookup_adapter.py",
+          "hashValue": "68ef86669f1bad60671be0118ed306fd74c8fd61cbefb086081f2cb6d669fd45"
+        },
+        {
+          "id": "b6f9010d-a5a1-4573-96eb-981460e8ba32",
+          "filePath": "src/checkout/infrastructure/persistence/ledger_fund_reservation_adapter.py",
+          "hashValue": "41afb27f9280209b4a800d6aab618485196bc598862fb323e0c5cbfdc8416d59"
+        },
+        {
+          "id": "cbafe819-666d-40f8-bd41-9771fa3b1998",
+          "filePath": "src/checkout/infrastructure/persistence/ledger_refund_adapter.py",
+          "hashValue": "ff74dfdd8eedb8321daee474037342e2fd7d0e97ca43f75718753ac9fa277830"
+        },
+        {
+          "id": "44ec1eaa-4a2e-48a6-82df-403278259ddd",
+          "filePath": "src/checkout/infrastructure/persistence/ledger_verification_adapter.py",
+          "hashValue": "00174bf02f4f7a3a47bf5e64ad24ca8de7120b06730cdcb614c3abc19ac40e5c"
+        },
+        {
+          "id": "5529cfee-18a1-48ae-89c4-507024c33c8f",
+          "filePath": "src/checkout/infrastructure/persistence/sqlite_session_repository.py",
+          "hashValue": "c3e7df1434ae2c4ccc6dc988bfac0a245089b07168b81260d77fc6d92faeb6c1"
+        },
+        {
+          "id": "f6ae3edc-acf6-42ab-9dcf-fcf6983279a2",
+          "filePath": "src/checkout/infrastructure/services/otp_generator.py",
+          "hashValue": "921020bbdf899ae675b34f904ae8893ad039f070314d082787f2226e1ce0a97b"
+        },
+        {
+          "id": "8561cb23-3387-4e54-a6f7-368ef72725d6",
+          "filePath": "src/checkout/infrastructure/services/session_token_generator.py",
+          "hashValue": "c96b492304a4722ad486bad23c9392c57d9f8b2972991f70cc43521a8ca073c0"
+        },
+        {
+          "id": "80c06404-fed8-480f-b9fe-2bee5db0c090",
+          "filePath": "src/checkout/infrastructure/web/api_controller.py",
+          "hashValue": "b58ea900705a84accdf9d280fb828e6c3251c776dfe5b22618f920d540b8b556"
+        },
+        {
+          "id": "03435dff-bd3c-4c9e-9ea8-551e56a3ad34",
+          "filePath": "src/checkout/infrastructure/web/gateway_controller.py",
+          "hashValue": "cb506fbb3ba5589edcfe4affaf80fbdeba45d6649e4597b42246fcc11d35a9bc"
+        },
+        {
+          "id": "c90d805e-8ee1-4e4d-96f3-f29d6ca4fcc2",
+          "filePath": "src/ledger/application/commands/hold_funds_command.py",
+          "hashValue": "a214e1b0c5d402f9f23170dd4c4492d8af45dfdaa85f01a5d158a260af798627"
+        },
+        {
+          "id": "8bf53477-9c15-4cca-afeb-5b9e2b5b44c9",
+          "filePath": "src/ledger/application/handlers/hold_funds_handler.py",
+          "hashValue": "53f4b95250e44ed80254a0251f872db147d1abaea91ea0e45eb5fac47d74eabb"
+        },
+        {
+          "id": "21b22c28-6751-4716-8cf5-d77a8ba76261",
+          "filePath": "src/ledger/application/commands/fail_and_refund_command.py",
+          "hashValue": "011783a34b51676d2514862010089e310f77b8e851beea11a845397b2a1f85f2"
+        },
+        {
+          "id": "56e72b82-2bf2-4e6c-974d-5eaa930352f7",
+          "filePath": "src/ledger/application/handlers/fail_and_refund_handler.py",
+          "hashValue": "b7ace25c0d90b46f3d58a1143fd032e1c14f140d0b423f93aee9fd727769b57e"
+        },
+        {
+          "id": "3e94669a-ecdb-4506-b2f1-4bc5200a3ce0",
+          "filePath": "src/identity/domain/value_objects/api_key.py",
+          "hashValue": "331556d6d7dbbb6aaed2ee226bf0e0b2bcee67c86730b199471448804ce00714"
+        },
+        {
+          "id": "6573bd87-5683-466c-8712-a93f67d4c786",
+          "filePath": "src/identity/infrastructure/persistence/sqlite_merchant_repository.py",
+          "hashValue": "10865d89d2560b570eedff22c7dc560fa7184bdd0068d689df2c5f79692fcd19"
+        },
+        {
+          "id": "e4c5f33d-fe6a-43d0-b52e-671b7804be4c",
+          "filePath": "src/app/di/checkout_di.py",
+          "hashValue": "1069a76370ffd99523e7334e21ca5ca496ba49216b764f6ef06b355f69a52c57"
+        },
+        {
+          "id": "041a39a7-5872-4eae-b790-3ecceada25d1",
+          "filePath": "src/common/infrastructure/database/schemas/checkout/checkout.py",
+          "hashValue": "9b65abf90fce249ab7e393b1e2369f29d1cde85523499b744410fa55339960e5"
+        }
+      ],
+      "committedAt": "2026-07-20T17:58:33.928Z"
     }
   ]
 }

@@ -1,39 +1,39 @@
 {
   "version": "1.0",
-  "lastScan": "2026-07-20T11:01:45.025Z",
+  "lastScan": "2026-07-20T17:40:41.605Z",
   "files": {
     ".": {
       "id": "76610c98-aee9-47de-9b34-a9a80a2030bf",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src": {
       "id": "ff3540d3-e3ad-4e57-af91-a8d4ee5f0390",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications": {
       "id": "e918bbed-ee18-48a9-89d0-9f626d2fb7e3",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/infrastructure": {
       "id": "26285c6c-901a-4b49-a711-e29a568501bf",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/infrastructure/smtp": {
       "id": "36474ae2-4470-4eb1-8d1a-fec7f0fc19ec",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -47,7 +47,7 @@
     "src/notifications/infrastructure/persistence": {
       "id": "fa3145f7-a839-481a-b2e6-15f13e4f1d1c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -75,14 +75,14 @@
     "src/notifications/domain": {
       "id": "793e6b81-1ced-4685-8898-74ca803965db",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/domain/value_objects": {
       "id": "bce57fc2-7de0-4c99-a7be-46ba23511d86",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -96,7 +96,7 @@
     "src/notifications/domain/ports": {
       "id": "a7c12699-b6b4-48cb-bcc0-928d54580d61",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -131,14 +131,14 @@
     "src/notifications/application": {
       "id": "b6cdfdac-ad30-43b8-a028-57400981bb35",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/notifications/application/handlers": {
       "id": "65b870b5-7292-4775-b4c3-1331b6d37f0d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -159,21 +159,21 @@
     "src/ledger": {
       "id": "d9479384-6d98-44de-a934-0eb55023e1f9",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/infrastructure": {
       "id": "2bdedeca-4327-4582-8557-e6b60468df05",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/infrastructure/web": {
       "id": "5645af5e-f620-4117-ae4c-2ca734cc4a2e",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -194,7 +194,7 @@
     "src/ledger/infrastructure/web/schemas": {
       "id": "e0330668-5510-4efe-8553-8309019d4e99",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -208,7 +208,7 @@
     "src/ledger/infrastructure/persistence": {
       "id": "53cba337-a8e2-4c68-9f5a-3cf68ca3d51c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -264,7 +264,7 @@
     "src/ledger/infrastructure/adapters": {
       "id": "3f55c0f6-b60a-4ebf-8dd6-1b66cc638861",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -278,14 +278,14 @@
     "src/ledger/domain": {
       "id": "07ff1e84-a2b5-4140-b6b2-78e14ce0bf6f",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/domain/value_objects": {
       "id": "ddf3a906-6992-435d-91e7-0ffa6a4bf87d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -306,7 +306,7 @@
     "src/ledger/domain/services": {
       "id": "58c60b53-b778-49e5-ac85-9f2a8061c884",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -327,7 +327,7 @@
     "src/ledger/domain/ports": {
       "id": "62cb1f54-96ca-4646-8816-9f0d19e39e9d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -341,7 +341,7 @@
     "src/ledger/domain/events": {
       "id": "a7d45d13-7c78-43e4-855c-aeb3405b754a",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -369,7 +369,7 @@
     "src/ledger/domain/entities": {
       "id": "3cd63165-68b8-49e0-834f-305d3ea7baa4",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -390,21 +390,21 @@
     "src/ledger/domain/entities/account.py": {
       "id": "0feb4a0c-a833-45dd-9384-bb3da42612be",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:32.622Z",
+      "lastModified": "2026-07-20T16:39:01.239Z",
       "size": 3576,
       "isDirectory": false
     },
     "src/ledger/application": {
       "id": "10f47983-6e8a-4bb6-8e42-18045b6dece4",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/ledger/application/queries": {
       "id": "95e595a2-801f-48b1-bdc9-7b7c786bb1fe",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -446,7 +446,7 @@
     "src/ledger/application/ports": {
       "id": "9a325910-8a2c-4098-a16a-c62ef9ea4ebf",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -488,7 +488,7 @@
     "src/ledger/application/handlers": {
       "id": "c291b8a7-8306-4ebe-8b50-25c86bbb7414",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -586,7 +586,7 @@
     "src/ledger/application/dto": {
       "id": "280dd6cf-2237-448a-a7d4-c055882cd70e",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -621,7 +621,7 @@
     "src/ledger/application/commands": {
       "id": "48f29c4e-ced9-4074-8897-969335844388",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -684,21 +684,21 @@
     "src/identity": {
       "id": "5a9424e0-0cd2-4c2a-8c1a-e817f2b7a4d1",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/infrastructure": {
       "id": "cef24c1f-90ea-45b3-9c57-e010626cb889",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/infrastructure/web": {
       "id": "5a090b0a-cd39-4008-bc07-1cd430282cbe",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -712,7 +712,7 @@
     "src/identity/infrastructure/persistence": {
       "id": "9fc86e8b-3d65-4142-8d64-397ce6b311ff",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -733,14 +733,14 @@
     "src/identity/domain": {
       "id": "14ec0388-346d-4544-97a1-606d0aa0e0e4",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/domain/value_objects": {
       "id": "0d24ecd8-3760-40f1-94dc-3cc6d691ed7f",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -768,14 +768,14 @@
     "src/identity/domain/ports": {
       "id": "44bcc787-6bc2-4fb5-8409-28105bcedefa",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/domain/events": {
       "id": "33d8e043-18bf-4b88-a5a0-3e32552e8e9c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -803,7 +803,7 @@
     "src/identity/domain/entities": {
       "id": "09c137bc-a152-4753-84e5-498dc730d086",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -824,14 +824,14 @@
     "src/identity/application": {
       "id": "23fc29e4-809d-48f5-bea0-87ab5df29252",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/identity/application/queries": {
       "id": "feb08ed5-eb3d-41f3-8912-c6a66bc7bbf6",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -845,7 +845,7 @@
     "src/identity/application/handlers": {
       "id": "77a7dfba-8fdd-4c2e-9cc9-deb987cd9f79",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -866,7 +866,7 @@
     "src/identity/application/handlers/on_account_created_handler.py": {
       "id": "9754fcb0-99f9-4cde-b5ea-05d12e8d8a29",
       "hash": null,
-      "lastModified": "2026-07-19T12:58:32.362Z",
+      "lastModified": "2026-07-20T17:26:05.951Z",
       "size": 1251,
       "isDirectory": false
     },
@@ -894,7 +894,7 @@
     "src/identity/application/dto": {
       "id": "1fca474a-d5b9-4cf4-98de-1c5346a641c1",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -915,7 +915,7 @@
     "src/identity/application/commands": {
       "id": "a8e03464-2c12-4f97-aa22-0687fea118db",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -936,21 +936,21 @@
     "src/common": {
       "id": "d3c96840-ef97-4742-9e8b-81a7e50c38bb",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure": {
       "id": "a3403d15-a380-4955-942f-31558f912d69",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/web": {
       "id": "d9128399-e77b-43d0-8d1b-934350a557e1",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -964,7 +964,7 @@
     "src/common/infrastructure/persistence": {
       "id": "cba56cbb-9c81-4882-be1c-f58f36862f8d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -992,21 +992,35 @@
     "src/common/infrastructure/database": {
       "id": "3a355f21-bfbf-4f0d-83f9-f53b39a7ad05",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
+    },
+    "src/common/infrastructure/database/storage": {
+      "id": "be43a056-cbf9-4866-839d-94817bee1c38",
+      "hash": null,
+      "lastModified": "2026-07-20T17:40:41.605Z",
+      "size": 0,
+      "isDirectory": true
+    },
+    "src/common/infrastructure/database/storage/paymenter.db": {
+      "id": "fde75c8f-b490-4b2d-ae60-0b4958503938",
+      "hash": null,
+      "lastModified": "2026-07-20T16:04:10.742Z",
+      "size": 98304,
+      "isDirectory": false
     },
     "src/common/infrastructure/database/schemas": {
       "id": "489c0ac4-f0bb-4b51-b748-ff0ab6bf0175",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/infrastructure/database/schemas/notifications": {
       "id": "a790e53f-85ae-45d7-8f25-01839f3bc381",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1020,7 +1034,7 @@
     "src/common/infrastructure/database/schemas/ledger": {
       "id": "bb09778a-38ba-4425-8109-6e462d245c74",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1034,7 +1048,7 @@
     "src/common/infrastructure/database/schemas/identity": {
       "id": "ed1a50a6-71de-4a33-905e-8486a5548fd5",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1055,7 +1069,7 @@
     "src/common/infrastructure/database/schemas/checkout": {
       "id": "13219b8e-4f7f-4cbc-99fa-80fc880b123a",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1069,14 +1083,14 @@
     "src/common/domain": {
       "id": "a5a11488-c9a3-4a2e-a7bf-5a017c34b67c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/common/domain/value_objects": {
       "id": "5589aa3d-5571-4b42-88cc-b33d2c957353",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1104,7 +1118,7 @@
     "src/common/domain/ports": {
       "id": "cb1fd111-7a25-439c-82e8-b8c3ffece394",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1132,21 +1146,21 @@
     "src/checkout": {
       "id": "3885abb7-76c2-4f88-9327-d0899f9e3f69",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/infrastructure": {
       "id": "4ef54827-d1df-4f15-919c-f88d54b9d71e",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/infrastructure/web": {
       "id": "e6c99f81-16de-493b-b7c6-e7e06c94f729",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1160,14 +1174,14 @@
     "src/checkout/infrastructure/web/api_controller.py": {
       "id": "5afc5530-116a-4390-b295-a0a142fd0609",
       "hash": null,
-      "lastModified": "2026-06-30T02:28:23.145Z",
-      "size": 4964,
+      "lastModified": "2026-07-20T15:33:04.067Z",
+      "size": 4664,
       "isDirectory": false
     },
     "src/checkout/infrastructure/services": {
       "id": "6a4d6e9b-c8a3-4b3f-b68f-0b86142e9929",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1188,7 +1202,7 @@
     "src/checkout/infrastructure/persistence": {
       "id": "123bf590-adbb-413c-b8f0-37ea624b15a1",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1202,21 +1216,21 @@
     "src/checkout/infrastructure/persistence/ledger_verification_adapter.py": {
       "id": "9221f460-1cf8-4c8b-b1f5-ce11b76b745f",
       "hash": null,
-      "lastModified": "2026-06-27T13:12:41.190Z",
+      "lastModified": "2026-07-20T15:29:41.988Z",
       "size": 981,
       "isDirectory": false
     },
     "src/checkout/infrastructure/persistence/ledger_refund_adapter.py": {
       "id": "8d3e94d9-8616-44e3-8a21-75ffdd3be23c",
       "hash": null,
-      "lastModified": "2026-07-06T19:34:52.688Z",
+      "lastModified": "2026-07-20T15:30:02.284Z",
       "size": 605,
       "isDirectory": false
     },
     "src/checkout/infrastructure/persistence/ledger_fund_reservation_adapter.py": {
       "id": "8fc76927-f4e3-4f30-8440-ecfdf6dcb868",
       "hash": null,
-      "lastModified": "2026-07-06T19:34:52.687Z",
+      "lastModified": "2026-07-20T15:50:14.432Z",
       "size": 1183,
       "isDirectory": false
     },
@@ -1230,14 +1244,14 @@
     "src/checkout/domain": {
       "id": "e6c6cb83-6333-4cc9-bde4-3b64b8e697d5",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/domain/value_objects": {
       "id": "6bdad111-aa3a-4706-8a94-d29773140b8d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1279,21 +1293,21 @@
     "src/checkout/domain/ports": {
       "id": "23852ce3-3cb5-4cb0-891a-374c42d1361c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/domain/ports/transaction_verification_port.py": {
       "id": "70b9cd00-bfe4-4a76-b6eb-d8c9e50d2f5d",
       "hash": null,
-      "lastModified": "2026-06-27T13:12:41.178Z",
+      "lastModified": "2026-07-20T15:27:51.969Z",
       "size": 812,
       "isDirectory": false
     },
     "src/checkout/domain/ports/transaction_refund_port.py": {
       "id": "d0b7cf1f-0e89-420d-b766-604bc3bf1883",
       "hash": null,
-      "lastModified": "2026-06-27T13:12:41.178Z",
+      "lastModified": "2026-07-20T15:27:16.349Z",
       "size": 477,
       "isDirectory": false
     },
@@ -1314,21 +1328,21 @@
     "src/checkout/domain/ports/fund_reservation_port.py": {
       "id": "85dbc52c-256f-4ffd-b151-e9ebde3f00e9",
       "hash": null,
-      "lastModified": "2026-06-27T13:12:41.177Z",
+      "lastModified": "2026-07-20T15:28:39.435Z",
       "size": 757,
       "isDirectory": false
     },
     "src/checkout/domain/ports/account_lookup_port.py": {
       "id": "dc6b8b13-50f7-4800-bcb0-205f55fe0466",
       "hash": null,
-      "lastModified": "2026-06-30T02:28:23.143Z",
+      "lastModified": "2026-07-20T15:29:09.871Z",
       "size": 523,
       "isDirectory": false
     },
     "src/checkout/domain/events": {
       "id": "b7105a79-1abb-421c-9a47-5cbee1630969",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1349,7 +1363,7 @@
     "src/checkout/domain/entities": {
       "id": "2d713fe7-5c77-4f68-8748-a941c248b337",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1363,14 +1377,14 @@
     "src/checkout/application": {
       "id": "ca2dadc8-2dcd-45a1-912b-5adc99566f2e",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "src/checkout/application/handlers": {
       "id": "44e4297a-a054-4e67-ab96-212c6874415c",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1398,14 +1412,14 @@
     "src/checkout/application/handlers/authorize_payment_handler.py": {
       "id": "e20b39a6-b43c-4e2f-a3e4-78f8587a1348",
       "hash": null,
-      "lastModified": "2026-07-06T19:34:52.685Z",
+      "lastModified": "2026-07-20T15:26:29.410Z",
       "size": 2386,
       "isDirectory": false
     },
     "src/checkout/application/commands": {
       "id": "cda260ba-7be8-432c-94e6-ec7aad514b58",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1419,7 +1433,7 @@
     "src/checkout/application/commands/refund_payment_command.py": {
       "id": "4087262d-4df4-49d4-b962-8a8cf1b231d5",
       "hash": null,
-      "lastModified": "2026-06-27T13:12:41.164Z",
+      "lastModified": "2026-07-20T15:26:51.458Z",
       "size": 114,
       "isDirectory": false
     },
@@ -1440,7 +1454,7 @@
     "src/app": {
       "id": "bc1ae5fe-fc72-44b3-a958-d1b1a2445ccc",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1468,7 +1482,7 @@
     "src/app/di": {
       "id": "98f975b0-daa8-4229-8939-5302ebc17bf1",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1503,7 +1517,7 @@
     "docs": {
       "id": "2f7e0d86-453a-4f31-b722-44a014155afe",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1517,14 +1531,14 @@
     "docs/backend": {
       "id": "6135e5a5-4007-4878-8b35-6cb89ee82fe8",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/backend/ledger": {
       "id": "6d49353e-2b3e-44ff-ab1b-35ae06c3e084",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1545,7 +1559,7 @@
     "docs/backend/identity": {
       "id": "abe0d703-7781-46cd-8e6c-7b5f079fc1e8",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
@@ -1580,15 +1594,15 @@
     "docs/backend/guideline": {
       "id": "98c5b58d-47d8-4974-bc8b-684e6b57321d",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     "docs/backend/guideline/Laravel_Integration_Guide.md": {
       "id": "d006e699-fbe7-4aab-b916-35009430a44d",
       "hash": null,
-      "lastModified": "2026-06-30T02:28:23.131Z",
-      "size": 8879,
+      "lastModified": "2026-07-20T16:41:40.424Z",
+      "size": 6531,
       "isDirectory": false
     },
     "docs/backend/guideline/Constitution.md": {
@@ -1598,304 +1612,115 @@
       "size": 10374,
       "isDirectory": false
     },
-    "docs/backend/common": {
-      "id": "d71a2027-8133-43ef-9e2e-0841c5c16bb7",
+    "docs/backend/checkout": {
+      "id": "fe0bcc89-5255-4048-8789-5f9b9cb6640e",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
+    },
+    "docs/backend/checkout/CheckoutModule.md": {
+      "id": "925b2159-a94a-487e-9bc2-394930a97c38",
+      "hash": null,
+      "lastModified": "2026-07-20T17:40:31.772Z",
+      "size": 11196,
+      "isDirectory": false
     },
     ".git": {
       "id": "0947cff5-c810-44e5-bd14-13e1ee213fb6",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     ".doclink": {
       "id": "562c2e52-c6ae-486d-8560-0ca3e56c3163",
       "hash": null,
-      "lastModified": "2026-07-20T11:01:45.025Z",
+      "lastModified": "2026-07-20T17:40:41.605Z",
       "size": 0,
       "isDirectory": true
     },
     ".git/gk/config": {
-      "id": "3446bdc9-c7f5-42b5-84af-12e588f3aec6",
+      "id": "35f62673-ab45-4d64-8ae3-21d7f059c9c8",
       "hash": null,
-      "lastModified": "2026-07-20T11:02:15.739Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "todo1.md": {
-      "id": "78d37892-f207-4f8a-a3bb-39dd11b191b7",
-      "hash": null,
-      "lastModified": "2026-07-20T11:02:25.315Z",
+      "lastModified": "2026-07-20T17:41:32.975Z",
       "size": 0,
       "isDirectory": false
     },
     "fix.txt": {
-      "id": "147400cd-5d19-4eaf-aa4d-c112c5f1e3c4",
+      "id": "ac8e8a9f-221b-4e63-82e0-400cbc62b798",
       "hash": null,
-      "lastModified": "2026-07-20T11:03:11.546Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    ".road_analyzer_exclude.json": {
-      "id": "d9f70ae9-ae7b-44b2-a054-c72505f8288a",
-      "hash": null,
-      "lastModified": "2026-07-20T11:03:52.302Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "roadmap.txt": {
-      "id": "c06b69be-a752-4259-bdd2-218a972b6de5",
-      "hash": null,
-      "lastModified": "2026-07-20T11:03:55.618Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "content.txt": {
-      "id": "e943e155-445d-465c-8a2b-6c2df80111e2",
-      "hash": null,
-      "lastModified": "2026-07-20T11:08:13.688Z",
+      "lastModified": "2026-07-20T17:42:13.868Z",
       "size": 0,
       "isDirectory": false
     },
     ".git/index.lock": {
-      "id": "9a8365ed-db43-4b62-9d56-f69c58158dea",
+      "id": "5594c4a6-b333-46a4-84f3-c8ad4aa0ac4d",
       "hash": null,
-      "lastModified": "2026-07-20T11:10:09.683Z",
+      "lastModified": "2026-07-20T17:42:46.235Z",
       "size": 0,
       "isDirectory": false
     },
     ".git/index": {
-      "id": "e81db8b4-a7b6-4a3e-b17d-1821375b0c35",
+      "id": "d8b6ea53-d843-4203-a5d7-cf657de58484",
       "hash": null,
-      "lastModified": "2026-07-20T11:10:09.778Z",
+      "lastModified": "2026-07-20T17:42:46.311Z",
       "size": 0,
       "isDirectory": false
     },
-    "docs/backend/checkout/CheckoutModule.md": {
-      "id": "925b2159-a94a-487e-9bc2-394930a97c38",
+    "src/identity/application/handlers/__pycache__/on_account_created_handler.cpython-313.pyc": {
+      "id": "e87e1829-4a86-4a0d-b31a-4d1dae66dfc8",
       "hash": null,
-      "lastModified": "2026-07-20T12:14:26.508Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/__pycache__/__init__.cpython-313.pyc": {
-      "id": "f41e17c7-f01c-43d8-b2f7-022a3daed36c",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:05.887Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/__pycache__/__init__.cpython-313.pyc": {
-      "id": "4d97714c-6a3b-4cc2-98dd-2a773920d437",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:05.951Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/__pycache__/__init__.cpython-313.pyc": {
-      "id": "c6545857-4ada-4748-ace8-ea458055d576",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.018Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/identity/__pycache__/identity.cpython-313.pyc": {
-      "id": "8f0fa0fa-068c-4a8a-afc9-24690384c9bc",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.073Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/identity/__pycache__/merchant_summaries_schema.cpython-313.pyc": {
-      "id": "41999a3c-5385-44bb-90b8-f992ae5d7f15",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.236Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/__pycache__/__init__.cpython-313.pyc": {
-      "id": "ad37c1d6-1913-451b-9c02-8891c5417922",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.301Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/identity/__pycache__/__init__.cpython-313.pyc": {
-      "id": "293d56a2-ea84-4661-be43-6f567dbc3f37",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.385Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/__pycache__/event_bus.cpython-313.pyc": {
-      "id": "3b6ae6f5-f8ad-4728-b6ac-ddc4261f6aac",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.489Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/ledger/__pycache__/ledger.cpython-313.pyc": {
-      "id": "c1208bfd-4c20-493b-ae81-056c974c9c0d",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.561Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/ledger/__pycache__/__init__.cpython-313.pyc": {
-      "id": "b1e50676-0cd4-49d3-9931-d9c041a7c674",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.627Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/checkout/__pycache__/checkout.cpython-313.pyc": {
-      "id": "fc1cc4d5-22b8-475e-ba65-c3bf6c6bc86f",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.713Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/checkout/__pycache__/__init__.cpython-313.pyc": {
-      "id": "0f49ba2a-2e80-417f-bf74-85006a61ecce",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.768Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/schemas/notifications/__pycache__/notifications.cpython-313.pyc": {
-      "id": "8a6634c6-e12d-484f-963c-2da23926a949",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.811Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/__pycache__/exceptions.cpython-313.pyc": {
-      "id": "c4691650-78bc-443b-be8c-7718e9e9e8d8",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.886Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/__pycache__/__init__.cpython-313.pyc": {
-      "id": "f3fe346e-eb68-4940-a2fd-ffe0d1054dbe",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:06.952Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/ports/__pycache__/event_bus.cpython-313.pyc": {
-      "id": "5f2d5df6-1f9d-42bd-a31a-3c5f9702af1d",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.032Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/ports/__pycache__/unit_of_work.cpython-313.pyc": {
-      "id": "44835a99-ad09-4df6-bb4b-04b474649216",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.106Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/ports/__pycache__/__init__.cpython-313.pyc": {
-      "id": "db283097-2815-40da-93cb-21a9355528fa",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.173Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/persistence/__pycache__/sqlite_unit_of_work.cpython-313.pyc": {
-      "id": "5ceaf3b2-670f-4329-818b-71db3b21d4d4",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.248Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/persistence/__pycache__/__init__.cpython-313.pyc": {
-      "id": "72702bae-396d-45b8-aab8-50335088533d",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.314Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/__pycache__/generators.cpython-313.pyc": {
-      "id": "6b2a903f-4fb6-420c-acdf-e1b65728650a",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.394Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/value_objects/__pycache__/currency_code.cpython-313.pyc": {
-      "id": "ce85a628-9cf3-443d-83a3-09f0d9048d73",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.476Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/domain/value_objects/__pycache__/__init__.cpython-313.pyc": {
-      "id": "c363e31c-442c-4619-b8a3-1ad5c515096f",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:07.555Z",
+      "lastModified": "2026-07-20T17:51:58.333Z",
       "size": 0,
       "isDirectory": false
     },
     "src/ledger/domain/entities/__pycache__/account.cpython-313.pyc": {
-      "id": "ef339bc6-7d3c-4652-8361-fbe9fa4244cc",
+      "id": "899c9a13-a292-4672-a624-edca1d0417a3",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:07.665Z",
+      "lastModified": "2026-07-20T17:51:58.420Z",
       "size": 0,
       "isDirectory": false
     },
-    "src/common/domain/value_objects/__pycache__/money.cpython-313.pyc": {
-      "id": "7c8c9bdd-e3f1-46ae-9e4c-59425dadd299",
+    "content.txt": {
+      "id": "2661bca6-8b1f-4d42-a781-80cd5243102d",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:07.718Z",
+      "lastModified": "2026-07-20T17:52:46.220Z",
       "size": 0,
       "isDirectory": false
     },
-    "src/common/domain/value_objects/__pycache__/email_address.cpython-313.pyc": {
-      "id": "8cae089b-cc68-4314-a26d-952d484cf861",
+    "todo1.md": {
+      "id": "541de9dd-e619-4024-93d7-744c82d5a2cf",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:07.836Z",
+      "lastModified": "2026-07-20T17:54:15.679Z",
       "size": 0,
       "isDirectory": false
     },
-    "src/common/infrastructure/database/storage/paymenter.db": {
-      "id": "fde75c8f-b490-4b2d-ae60-0b4958503938",
+    "fix2.txt": {
+      "id": "7ce4530d-ac7e-4128-be80-ce7b9b1df6f4",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:07.899Z",
+      "lastModified": "2026-07-20T17:54:40.506Z",
       "size": 0,
       "isDirectory": false
     },
-    "src/common/infrastructure/web/__pycache__/__init__.cpython-313.pyc": {
-      "id": "43cfb14e-9c3c-4725-8104-3756e55ff6c1",
+    "src/common/infrastructure/database/storage/paymenter.db-journal": {
+      "id": "0573e1c9-cd62-47fe-8dd9-bc9bcb21b6d0",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:07.970Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/web/__pycache__/idempotency.cpython-313.pyc": {
-      "id": "a68debda-167c-4480-833e-78580f5e5285",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:08.050Z",
-      "size": 0,
-      "isDirectory": false
-    },
-    "src/common/infrastructure/database/storage/paymenter.db-wal": {
-      "id": "b755748e-0d03-4636-b2da-e956186b249b",
-      "hash": null,
-      "lastModified": "2026-07-20T12:17:22.265Z",
+      "lastModified": "2026-07-20T17:56:10.383Z",
       "size": 0,
       "isDirectory": false
     },
     "src/common/infrastructure/database/storage/paymenter.db-shm": {
-      "id": "0749ab06-00ef-4483-8eb2-76d94e2b45e9",
+      "id": "74ae7c66-4e46-4956-b24c-53d1de54ac41",
       "hash": null,
-      "lastModified": "2026-07-20T12:17:22.339Z",
+      "lastModified": "2026-07-20T17:56:10.420Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/common/infrastructure/database/storage/paymenter.db-wal": {
+      "id": "e0073bcf-9f22-49ce-9aa9-0760d302536a",
+      "hash": null,
+      "lastModified": "2026-07-20T17:56:10.441Z",
       "size": 0,
       "isDirectory": false
     }

@@ -9,7 +9,7 @@
 
 1.  **Local SMTP Sink:** Start your `smtp-server` project on port `1025` to intercept OTPs and Receipts.
 2.  **Paymenter Dashboard:** Start Paymenter (defaults to `http://127.0.0.1:5000`).
-3.  **Active Currency & Merchant:** Create a currency (e.g., `IRR`) and a Merchant in the Paymenter Dashboard.
+3.  **Active Currency & Merchant:** Create a currency (e.g., `USD`) and a Merchant in the Paymenter Dashboard.
 4.  **Copy API Key:** Copy the Merchant's API Key.
 5.  **Test User Account:** Create a User in Paymenter and Topup their balance so they can pay.
 

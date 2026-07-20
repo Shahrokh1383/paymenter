@@ -16,6 +16,7 @@ from src.ledger.application.queries.get_active_currencies_query import GetActive
 from src.identity.application.commands.identity_commands import OnboardMerchantCommand, ToggleMerchantCommand
 from src.identity.application.commands.register_user_command import RegisterUserCommand
 from src.identity.application.queries.identity_queries import GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery
+from src.identity.application.commands.webhook_commands import ConfigureWebhookCommand, GenerateWebhookSecretCommand
 
 # UoW (Transaction Boundary)
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
@@ -162,6 +163,35 @@ def toggle_merchant(id):
         with uow:
             handler = current_app.di_container.get_toggle_merchant_handler(uow)
             handler.handle(ToggleMerchantCommand(merchant_id=id))
+    except Exception as e:
+        flash(str(e), 'error')
+    return redirect(url_for('dashboard.merchants'))
+
+@dashboard_bp.route('/merchants/<int:id>/webhook/configure', methods=['POST'])
+def configure_webhook(id):
+    try:
+        url = request.form.get('webhook_url')
+        enabled = request.form.get('webhook_enabled') == 'on'
+        
+        uow = SqliteUnitOfWork()
+        with uow:
+            handler = current_app.di_container.get_configure_webhook_handler(uow)
+            handler.handle(ConfigureWebhookCommand(merchant_id=id, webhook_url=url, webhook_enabled=enabled))
+        flash("Webhook configuration updated successfully.", 'success')
+    except Exception as e:
+        flash(str(e), 'error')
+    return redirect(url_for('dashboard.merchants'))
+
+@dashboard_bp.route('/merchants/<int:id>/webhook/generate-secret', methods=['POST'])
+def generate_webhook_secret(id):
+    try:
+        uow = SqliteUnitOfWork()
+        with uow:
+            handler = current_app.di_container.get_generate_webhook_secret_handler(uow)
+            secret = handler.handle(GenerateWebhookSecretCommand(merchant_id=id))
+        # In a real app, this would be displayed via a secure temporary view. 
+        # Flashing is acceptable for the simulator.
+        flash(f"New Webhook Secret (shown once): {secret}", 'success')
     except Exception as e:
         flash(str(e), 'error')
     return redirect(url_for('dashboard.merchants'))

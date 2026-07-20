@@ -11,7 +11,10 @@ CREATE TABLE IF NOT EXISTS merchants (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     api_key TEXT NOT NULL UNIQUE,
-    is_active BOOLEAN NOT NULL DEFAULT 1
+    is_active BOOLEAN NOT NULL DEFAULT 1,
+    webhook_url TEXT,
+    webhook_secret TEXT,
+    webhook_enabled BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS user_cards (

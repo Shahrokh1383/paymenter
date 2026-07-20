@@ -1,4 +1,4 @@
-## 🧱 Revised Blueprint: Constitution‑Compliant Webhook System
+## 🧱 Blueprint: Constitution‑Compliant Webhook System
 
 ### Principle: Webhooks are a *side effect* of Domain Events.
 When an admin clicks **[Complete]**, that button calls a Ledger handler which mutates the `Transaction` aggregate and publishes a `TransactionCompletedEvent` (or `TransactionSuccessEvent`). The webhook engine **subscribes** to that event, completely decoupled from the UI.

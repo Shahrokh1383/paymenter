@@ -15,6 +15,8 @@ from src.identity.application.handlers.read_model_handlers import (
 from src.identity.application.handlers.merchant_read_model_handlers import (
     MerchantOnboardedReadModelHandler, MerchantToggledReadModelHandler
 )
+from src.identity.application.handlers.webhook_handlers import ConfigureWebhookHandler, GenerateWebhookSecretHandler
+from src.identity.application.commands.webhook_commands import ConfigureWebhookCommand, GenerateWebhookSecretCommand
 
 # Identity Domain Events
 from src.identity.domain.events.user_events import UserRegisteredEvent
@@ -56,6 +58,12 @@ def register_identity(container):
 
     def get_register_user_handler(uow: SqliteUnitOfWork) -> RegisterUserHandler:
         return RegisterUserHandler(uow, SqliteUserRepository(uow), bus)
+    
+    def get_configure_webhook_handler(uow: SqliteUnitOfWork) -> ConfigureWebhookHandler:
+        return ConfigureWebhookHandler(uow, SqliteMerchantRepository(uow))
+
+    def get_generate_webhook_secret_handler(uow: SqliteUnitOfWork) -> GenerateWebhookSecretHandler:
+        return GenerateWebhookSecretHandler(uow, SqliteMerchantRepository(uow))
 
     # Bind factories to container
     container.get_all_users_handler = get_all_users_handler
@@ -64,3 +72,5 @@ def register_identity(container):
     container.get_onboard_merchant_handler = get_onboard_merchant_handler
     container.get_toggle_merchant_handler = get_toggle_merchant_handler
     container.get_register_user_handler = get_register_user_handler
+    container.get_configure_webhook_handler = get_configure_webhook_handler
+    container.get_generate_webhook_secret_handler = get_generate_webhook_secret_handler

@@ -16,11 +16,13 @@
     "find.py",
     "static\\css",
     "src\\notifications",
-    "src\\identity"
+    "src\\identity",
+    "src\\ledger",
+    "src\\checkout"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-20T19:51:15.143Z",
+  "lastModified": "2026-07-20T21:00:38.400Z",
   "version": 1
 }

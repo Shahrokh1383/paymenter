@@ -109,6 +109,15 @@
       "linkCount": 12,
       "isOrphaned": false,
       "deleted": true
+    },
+    {
+      "id": "fd8b43ad-6d14-4853-bcfb-d13002b51f06",
+      "path": "docs/backend/guideline/laravel2.md",
+      "title": "Laravel2",
+      "lastModified": "2026-07-20T21:08:46.101Z",
+      "linkCount": 0,
+      "isOrphaned": true,
+      "deleted": false
     }
   ]
 }

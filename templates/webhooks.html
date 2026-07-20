@@ -1,27 +1,34 @@
 {% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+{% endblock %}
 
 {% block body %}
 <h1>Webhook Deliveries</h1>
 <table>
-    <tr>
-        <th>ID</th><th>Merchant</th><th>Event</th><th>Status</th><th>Attempts</th><th>Next Attempt</th><th>Action</th>
-    </tr>
-    {% for d in deliveries %}
-    <tr class="webhook-status-{{ d.status }}">
-        <td>{{ d.id }}</td>
-        <td>{{ d.merchant_id }}</td>
-        <td>{{ d.event_type }}</td>
-        <td>{{ d.status }}</td>
-        <td>{{ d.attempts }}</td>
-        <td>{{ d.next_attempt_at if d.next_attempt_at else '-' }}</td>
-        <td>
-            {% if d.status != 'pending' %}
-            <form action="{{ url_for('webhooks.retry', id=d.id) }}" method="POST">
-                <button type="submit">Retry</button>
-            </form>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>ID</th><th>Merchant</th><th>Event</th><th>Status</th><th>Attempts</th><th>Next Attempt</th><th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in deliveries %}
+        <tr class="webhook-status-{{ d.status }}">
+            <td>{{ d.id }}</td>
+            <td>{{ d.merchant_id }}</td>
+            <td>{{ d.event_type }}</td>
+            <td>{{ d.status }}</td>
+            <td>{{ d.attempts }}</td>
+            <td>{{ d.next_attempt_at if d.next_attempt_at else '-' }}</td>
+            <td>
+                {% if d.status != 'pending' %}
+                <form action="{{ url_for('webhooks.retry', id=d.id) }}" method="POST">
+                    <button type="submit">Retry</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

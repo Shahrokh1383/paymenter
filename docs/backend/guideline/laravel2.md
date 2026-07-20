@@ -1,17 +1,17 @@
 # Paymenter Gateway: Laravel Integration Guide (Hosted Payment Page)
 
-**Version 3.0 – UUID transaction IDs & Webhooks**  
+**Version 2.0 – UUID transaction IDs**  
+**Paymenter version:** 1.0+ with the above fixes applied.
 
 ---
 
 ## 1. Prerequisites
 
 1.  **Local SMTP Sink:** Start your `smtp-server` project on port `1025` to intercept OTPs and Receipts.
-2.  **Paymenter Dashboard:** Start Paymenter (defaults to `http://127.0.0.1:5000`). Ensure the background worker is running (`flask webhook-worker`).
+2.  **Paymenter Dashboard:** Start Paymenter (defaults to `http://127.0.0.1:5000`).
 3.  **Active Currency & Merchant:** Create a currency (e.g., `USD`) and a Merchant in the Paymenter Dashboard.
-4.  **Configure Webhooks:** In the Paymenter Dashboard, go to Merchants, configure your `webhook_url` (e.g., `https://your-laravel-app.com/api/webhooks/paymenter`), generate a `webhook_secret`, and enable it.
-5.  **Copy API Key & Webhook Secret:** Copy the Merchant's API Key and the newly generated Webhook Secret.
-6.  **Test User Account:** Create a User in Paymenter and Topup their balance so they can pay.
+4.  **Copy API Key:** Copy the Merchant's API Key.
+5.  **Test User Account:** Create a User in Paymenter and Topup their balance so they can pay.
 
 ---
 
@@ -19,10 +19,9 @@
 
 **.env**
 ```env
-PAYMENTER_API_URL=http://127.0.0.1:5001/api
+PAYMENTER_API_URL=http://127.0.0.1:5000/api
 PAYMENTER_API_KEY=your_api_key_here
 PAYMENTER_CURRENCY=USD
-PAYMENTER_WEBHOOK_SECRET=your_webhook_secret_here
 ```
 
 **config/services.php**
@@ -31,7 +30,6 @@ PAYMENTER_WEBHOOK_SECRET=your_webhook_secret_here
     'url' => env('PAYMENTER_API_URL'),
     'key' => env('PAYMENTER_API_KEY'),
     'currency' => env('PAYMENTER_CURRENCY', 'USD'),
-    'webhook_secret' => env('PAYMENTER_WEBHOOK_SECRET'),
 ],
 ```
 
@@ -144,8 +142,6 @@ The gateway redirects the user back with:
 - `gateway_status` (e.g., `Pending`)
 - `ref` (your custom reference)
 
-*Note: This route is just for redirecting the user back to your frontend. Business logic fulfillment should happen in the Webhook handler (5.3).*
-
 ```php
 public function handleCallback(Request $request)
 {
@@ -162,96 +158,34 @@ public function handleCallback(Request $request)
 }
 ```
 
-### 5.3 Handle Webhooks (Async Business Logic Fulfillment)
+### 5.3 Poll for Settlement (AJAX)
 
-Paymenter will send an HTTP POST request to your configured `webhook_url` when a transaction finalizes. You must verify the cryptographic signature to ensure the request is authentic.
+Create an endpoint that your frontend polls:
 
-**Webhook Payload Headers:**
-- `X-Paymenter-Signature: sha256=<hex_signature>`
-- `X-Paymenter-Event: payment.completed` (or `payment.failed`, `payment.refunded`)
-- `X-Paymenter-Delivery: <delivery_id>`
-
-**Webhook Payload Body (JSON):**
-```json
-{
-    "event": "payment.completed",
-    "transaction_id": "uuid-string",
-    "merchant_id": 1,
-    "amount": "1500.00",
-    "currency": "USD"
-}
-```
-
-**Laravel Controller Example:**
 ```php
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\Models\Payment;
-use App\Enums\PaymentStatus;
-
-class WebhookController extends Controller
+public function pollStatus(Request $request, PaymenterService $paymenter)
 {
-    public function handlePaymenter(Request $request)
-    {
-        // 1. Verify Cryptographic Signature
-        $signature = $request->header('X-Paymenter-Signature');
-        $payload = $request->getContent(); // Raw JSON string
-        
-        $computedSignature = 'sha256=' . hash_hmac('sha256', $payload, config('services.paymenter.webhook_secret'));
+    $transactionId = $request->input('transaction_id'); // string
+    $result = $paymenter->verify($transactionId);
 
-        if (!hash_equals($signature, $computedSignature)) {
-            abort(401, 'Invalid Webhook Signature');
-        }
-
-        $data = json_decode($payload, true);
-        $transactionId = $data['transaction_id'];
-
-        // 2. Idempotency Check & Business Logic
-        $payment = Payment::where('gateway_transaction_id', $transactionId)->first();
-        if (!$payment) {
-            abort(404, 'Payment not found');
-        }
-
-        // Only process if the payment is currently pending
-        if ($payment->status === PaymentStatus::PENDING) {
-            switch ($data['event']) {
-                case 'payment.completed':
-                    $payment->status = PaymentStatus::SUCCESS;
-                    // Fulfill the order...
-                    break;
-                    
-                case 'payment.failed':
-                    $payment->status = PaymentStatus::FAILED;
-                    // Notify user of failure...
-                    break;
-                    
-                case 'payment.refunded':
-                    $payment->status = PaymentStatus::REFUNDED;
-                    // Revoke order access...
-                    break;
-            }
-            $payment->save();
-        }
-
-        // 3. Acknowledge receipt of the Webhook
-        return response()->json(['status' => 'success']);
+    // $result['status'] can be: 'Pending', 'Success', 'Failed', 'Refunded'
+    if ($result['status'] === 'Success') {
+        // Fulfill the order
     }
+    return response()->json($result);
 }
 ```
 
 ### 5.4 Processing Refunds (Admin Panel)
 
-If you trigger a refund from your Laravel admin panel, Paymenter will process it, **automatically email a Refund Receipt** to the customer, and **trigger a `payment.refunded` webhook**.
+If you trigger a refund from your Laravel admin panel, Paymenter will process it and **automatically email a Refund Receipt** to the customer.
 
 ```php
 public function processRefund($orderId, PaymenterService $paymenter)
 {
     $order = Order::findOrFail($orderId);
     $paymenter->refund($order->payment_transaction_id); // string
-    
-    // Note: Do not mark the order as refunded here. 
-    // Wait for the 'payment.refunded' webhook to ensure atomicity.
+    // Update order status
 }
 ```
 
@@ -265,8 +199,7 @@ public function processRefund($orderId, PaymenterService $paymenter)
 4. **User submits OTP** → Paymenter holds funds and redirects back with `transaction_id` (UUID string) and `gateway_status=Pending`.
 5. **Manual step:** In Paymenter admin dashboard, click **[Complete]** to settle, or **[Fail]** to reject.
 6. **Receipts** are automatically sent to the cardholder’s email.
-7. **Webhook Triggered:** Paymenter's background worker picks up the state change and instantly fires an HTTP POST webhook to your Laravel application with the final status and HMAC signature.
-8. **Your polling** (if used as a fallback) picks up the final status via `/api/verify/{transaction_id}`.
+7. **Your polling** picks up the final status via `/api/verify/{transaction_id}`.
 
 ---
 
@@ -275,6 +208,3 @@ public function processRefund($orderId, PaymenterService $paymenter)
 - **Always treat `transaction_id` as a string** in your Laravel code and database.
 - The Paymenter API `verify` and `refund` endpoints now accept and return string IDs.
 - The callback URL receives the same UUID string; do not cast it to integer.
-- **Webhooks are the source of truth for final status.** Always implement webhook handling to update your database. Relying solely on client-side polling can lead to race conditions.
-- **Always verify the `X-Paymenter-Signature` header** in your webhook controller to prevent spoofing attacks.
-- Paymenter uses an Outbox Pattern with exponential backoff retries (1m, 5m, 30m, 1h, 2h). If your Laravel app returns a non-2xx HTTP status, Paymenter will retry the webhook up to 5 times.

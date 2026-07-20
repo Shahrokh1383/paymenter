@@ -5,27 +5,53 @@
 
 {% block body %}
 <h1>Merchants</h1>
-<form action="{{ url_for('dashboard.add_merchant') }}" method="POST">
+<form action="{{ url_for('dashboard.add_merchant') }}" method="POST" style="margin-bottom: 20px;">
     <input type="text" name="name" placeholder="Merchant Name" required>
     <button type="submit">Add Merchant</button>
 </form>
+
 <table>
-    <tr><th>ID</th><th>Name</th><th>API Key</th><th>Active</th><th>Action</th></tr>
-    {% for m in merchants %}
-    <tr>
-        <td>{{ m.id }}</td><td>{{ m.name }}</td>
-        <td>
-            <span id="api-key-{{ m.id }}">{{ m.api_key }}</span>
-            <button class="copy-btn" data-target="api-key-{{ m.id }}">Copy</button>
-        </td>
-        <td>{{ m.is_active }}</td>
-        <td>
-            <form action="{{ url_for('dashboard.toggle_merchant', id=m.id) }}" method="POST">
-                <button type="submit">Toggle</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>API Key</th>
+            <th>Active</th>
+            <th>Webhook Configuration</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in merchants %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.name }}</td>
+            <td>
+                <span id="api-key-{{ m.id }}">{{ m.api_key }}</span>
+                <button class="copy-btn" data-target="api-key-{{ m.id }}">Copy</button>
+            </td>
+            <td>{{ m.is_active }}</td>
+            <td>
+                <form action="{{ url_for('dashboard.configure_webhook', id=m.id) }}" method="POST" style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+                    <input type="url" name="webhook_url" value="{{ m.webhook_url or '' }}" placeholder="https://your-app.com/webhook" required style="flex: 1; min-width: 200px;">
+                    <label style="display: flex; align-items: center; gap: 2px;">
+                        <input type="checkbox" name="webhook_enabled" {{ 'checked' if m.webhook_enabled else '' }}>
+                        Enabled
+                    </label>
+                    <button type="submit">Save</button>
+                </form>
+                <form action="{{ url_for('dashboard.generate_webhook_secret', id=m.id) }}" method="POST" style="margin-top: 5px;">
+                    <button type="submit" class="btn-secondary" style="width: 100%;">Generate New Secret</button>
+                </form>
+            </td>
+            <td>
+                <form action="{{ url_for('dashboard.toggle_merchant', id=m.id) }}" method="POST">
+                    <button type="submit">Toggle</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}
 

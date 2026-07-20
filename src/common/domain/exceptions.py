@@ -2,6 +2,10 @@ class DomainException(Exception):
     """Base exception for all domain-level errors."""
     pass
 
+class NotFoundError(DomainException):
+    """Raised when any entity is not found."""
+    pass
+
 class InsufficientFundsError(DomainException):
     pass
 
@@ -11,7 +15,7 @@ class CurrencyMismatchError(DomainException):
 class InvalidTransactionStateError(DomainException):
     pass
 
-class AccountNotFoundError(DomainException):
+class AccountNotFoundError(NotFoundError):
     pass
 
 class ConcurrencyException(DomainException):
@@ -20,7 +24,7 @@ class ConcurrencyException(DomainException):
 class UserAlreadyExistsError(DomainException):
     pass
 
-class CurrencyNotFoundError(DomainException):
+class CurrencyNotFoundError(NotFoundError):
     pass
 
 class CurrencyAlreadyExistsError(DomainException):

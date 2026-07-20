@@ -60,7 +60,12 @@ class SqliteMerchantRepository(MerchantRepository):
         rows = self._uow.conn.execute("SELECT * FROM merchant_summaries").fetchall()
         return [
             MerchantSummaryDTO(
-                id=row['id'], name=row['name'], api_key=row['api_key'], is_active=bool(row['is_active'])
+                id=row['id'], 
+                name=row['name'], 
+                api_key=row['api_key'], 
+                is_active=bool(row['is_active']),
+                webhook_url=row['webhook_url'],
+                webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False
             ) for row in rows
         ]
 

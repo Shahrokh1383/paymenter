@@ -14,3 +14,6 @@ button { background: #3498db; color: #fff; border: none; cursor: pointer; }
 button:hover { background: #2980b9; }
 .alert { padding: 10px; background: #e74c3c; color: #fff; margin-bottom: 15px; }
 .alert-error { background: #e74c3c; }
+.webhook-status-sent { background-color: #d4edda; }
+.webhook-status-failed { background-color: #f8d7da; }
+.webhook-status-pending { background-color: #fff3cd; }

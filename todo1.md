@@ -1,33 +1,6 @@
 
 
-### Phase 3: The Forwarder – Background Worker
-**Goal:** Process the outbox without blocking the main request thread.
 
-**What we will build:**
-- A **standalone worker process** (e.g., a Python script or a Flask CLI command) that runs a loop:
-  1. Query `webhook_outbox` for records with `status = 'pending'` and `next_attempt_at <= now()`.
-  2. For each record, send an HTTP POST to the merchant’s `webhook_url` with headers:
-     - `Content-Type: application/json`
-     - `X-Paymenter-Signature: sha256=<signature>`
-     - `X-Paymenter-Event: <event_type>`
-     - `X-Paymenter-Delivery: <outbox_id>`
-  3. On successful response (2xx), mark the record as `sent`, increment attempts, and delete or archive.
-  4. On failure, increment attempts, calculate next attempt time using **exponential backoff** (e.g., 1min, 5min, 30min, 1h, 2h), and update `next_attempt_at`. After a maximum number of attempts (e.g., 5), mark as `failed` and stop retrying.
-
-- **Retry Policy** is defined as a Domain Service (pure logic) that calculates the next attempt time, keeping the worker free of complex rules.
-
-- The worker runs in a separate thread within the Flask development server (for simplicity) or as a separate process in production. We’ll provide a `flask webhook-worker` CLI command.
-
----
-
-### Phase 4: Observability – Audit Logs & Dashboard
-**Goal:** See delivery status without querying the outbox table manually.
-
-- **`webhook_delivery_logs` table** (or reuse outbox with status) – already covered by the outbox.
-- **Admin UI page** that queries the outbox for recent deliveries, colour‑coded by status.
-- **Manual Retry** button: sets the outbox record back to `pending` and resets `next_attempt_at` to `now()`.
-
----
 
 ### Phase 5: Cryptographic Engine (Utility)
 **What we will build:**

@@ -1,4 +1,5 @@
 import os
+import click
 from flask import Flask, redirect, url_for
 from src.common.infrastructure.database import Database
 from src.app.di_container import DIContainer
@@ -25,12 +26,21 @@ def create_app():
     from src.checkout.infrastructure.web.gateway_controller import gateway_bp
     from src.checkout.infrastructure.web.api_controller import api_bp
     from src.ledger.infrastructure.web.transaction_api_controller import transaction_api_bp
+    from src.notifications.infrastructure.web.webhook_dashboard_controller import webhook_bp # NEW
 
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(transaction_bp)
     app.register_blueprint(gateway_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(transaction_api_bp)
+    app.register_blueprint(webhook_bp) # NEW
+
+    # 4. Register CLI Commands
+    @app.cli.command("webhook-worker")
+    def run_webhook_worker():
+        """Runs the webhook background worker."""
+        from src.notifications.infrastructure.web.webhook_worker import run_worker
+        run_worker()
 
     @app.route('/')
     def index():

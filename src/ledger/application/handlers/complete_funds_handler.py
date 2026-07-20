@@ -16,8 +16,6 @@ class CompleteFundsHandler:
         self._system_account_resolver = system_account_resolver
 
     def handle(self, command: CompleteFundsCommand) -> None:
-        event_to_publish = None
-        
         with self._uow:
             txn = self._txn_repo.get_by_id(command.transaction_id)
             if not txn:
@@ -43,7 +41,6 @@ class CompleteFundsHandler:
                 self._account_repo.update(to_acc)
             if escrow_acc is not from_acc and escrow_acc is not to_acc:
                 self._account_repo.update(escrow_acc)
-            self._uow.commit()
 
             event_to_publish = TransactionCompletedEvent(
                 transaction_id=txn.id,
@@ -52,5 +49,6 @@ class CompleteFundsHandler:
                 merchant_id=txn.merchant_id
             )
             
-        if event_to_publish:
+            # MOVED INSIDE UoW: Event handlers will now join this transaction
             self._event_bus.publish(event_to_publish)
+            # Commit is handled automatically by __exit__

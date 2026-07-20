@@ -10,6 +10,10 @@ from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
 from src.checkout.domain.events.otp_requested_event import OtpRequestedEvent
+from src.notifications.application.handlers.webhook_outbox_event_handler import WebhookOutboxEventHandler
+from src.notifications.infrastructure.persistence.sqlite_webhook_outbox_repository import SqliteWebhookOutboxRepository
+from src.notifications.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter
+from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
 
 
 def register_notifications(container):
@@ -33,7 +37,17 @@ def register_notifications(container):
         idempotency_port=idempotency_adapter
     )
     
-    container.event_bus.subscribe(TransactionCompletedEvent, receipt_handler.handle_completed)
-    container.event_bus.subscribe(TransactionFailedEvent, receipt_handler.handle_failed)
-    container.event_bus.subscribe(TransactionRefundedEvent, receipt_handler.handle_refunded)
+    merchant_webhook_config_adapter = SqliteMerchantWebhookConfigAdapter(connection_factory=create_connection)
+
+    def get_webhook_outbox_handler():
+        uow = SqliteUnitOfWork()
+        return WebhookOutboxEventHandler(
+            uow=uow,
+            outbox_repo=SqliteWebhookOutboxRepository(uow),
+            merchant_config_port=merchant_webhook_config_adapter
+        )
+    
+    container.event_bus.subscribe(TransactionCompletedEvent, lambda e: get_webhook_outbox_handler().handle_completed(e))
+    container.event_bus.subscribe(TransactionFailedEvent, lambda e: get_webhook_outbox_handler().handle_failed(e))
+    container.event_bus.subscribe(TransactionRefundedEvent, lambda e: get_webhook_outbox_handler().handle_refunded(e))
     container.event_bus.subscribe(OtpRequestedEvent, otp_handler.handle_otp_requested)

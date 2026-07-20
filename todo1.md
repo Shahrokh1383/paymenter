@@ -1,31 +1,4 @@
 
-### Phase 2: Outbox Pattern – The “Store” Part of Store‑and‑Forward
-**Goal:** Prevent event loss. Since the current event bus is in‑memory and can lose events on crash, we must persist webhook jobs *atomically* with the business transaction. The outbox pattern is the canonical solution.
-
-**What we will build:**
-- **A new `webhook_outbox` table** in the same database, with columns:
-  - `id` (auto‑increment or UUID)
-  - `merchant_id`
-  - `event_type` (e.g., `payment.completed`)
-  - `payload` (JSON, the exact body to be sent)
-  - `created_at`
-  - `status` (pending / sent / failed)
-  - `attempts` (integer)
-  - `last_attempt_at`
-  - `next_attempt_at` (for scheduling retries)
-  - `signature` (pre‑calculated HMAC, so retries don’t regenerate)
-
-- **A dedicated `WebhookOutboxRepository`** (infrastructure adapter) to persist and query outbox messages.
-
-- **Event Handlers** that subscribe to the relevant domain events (`TransactionCompletedEvent`, `TransactionFailedEvent`, `TransactionRefundedEvent`). These handlers:
-  1. Receive the domain event.
-  2. Fetch the merchant’s webhook configuration (URL, secret, enabled) via an ACL to the Identity context.
-  3. If webhooks are enabled for that merchant, build the exact JSON payload and compute the HMAC signature.
-  4. Persist the outbox record *within the same UoW transaction* that the handler runs in. (The handlers are called after `uow.commit()` in the current architecture; we may need to move them **inside** the transaction. This is a small restructuring but essential for atomicity.)
-
-**Important:** The outbox record is the **source of truth** for pending webhooks. No background job is created until the business transaction commits.
-
----
 
 ### Phase 3: The Forwarder – Background Worker
 **Goal:** Process the outbox without blocking the main request thread.

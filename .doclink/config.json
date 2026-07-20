@@ -27,7 +27,8 @@
     "todo1.md",
     "venv",
     "__init__.py",
-    "__pycache__"
+    "__pycache__",
+    ".pytest_cache"
   ],
   "schemaVersion": "1.0",
   "docFolder": {

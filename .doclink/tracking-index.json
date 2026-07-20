@@ -6337,57 +6337,201 @@
     ".git/index": {
       "id": "c8886ee1-51e0-4ac8-aa3c-d756df8244f6",
       "filePath": ".git/index",
-      "hashValue": "de0fdaf104be608a6828523eebcc643954f6396e8e86d12bceaea22abbeae552",
+      "hashValue": "27dab7afd4fd7efef69f49edef195130c5b5cfb5ee5ee53aad1f413f4d3a53b8",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "de0fdaf104be608a6828523eebcc643954f6396e8e86d12bceaea22abbeae552",
-        "newHash": "de0fdaf104be608a6828523eebcc643954f6396e8e86d12bceaea22abbeae552",
+        "oldHash": "27dab7afd4fd7efef69f49edef195130c5b5cfb5ee5ee53aad1f413f4d3a53b8",
+        "newHash": "27dab7afd4fd7efef69f49edef195130c5b5cfb5ee5ee53aad1f413f4d3a53b8",
         "addedLines": [
           {
-            "lineNumber": 8,
-            "content": "i @��p9�$\f\u0004\u0012\u000e��'\"��\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^]�\u001e��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j^`�",
+            "lineNumber": 169,
+            "content": "�\u0000263 7",
             "type": "ADDED"
           },
           {
-            "lineNumber": 9,
-            "content": "\u001b��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
+            "lineNumber": 170,
+            "content": "[d|�i�[V\u0002Uak�",
             "type": "ADDED"
           },
           {
-            "lineNumber": 269,
-            "content": "�Q&�c�\u0004�bӳ��J�X�[&�K:)����R�\u001c+����\u0010\u001c�Y�",
+            "lineNumber": 171,
+            "content": "<�\tk �src\u0000208 6",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 172,
+            "content": "\u0015��/��G�\u0014W\u0003ٺc�;ٟ��app\u00009 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 209,
+            "content": "�\u001a��a*C\u0013���Y:�iܜ�checkout\u000044 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 210,
+            "content": "\u000f���\u0019X\u001du\u0013ڜu㌆�i�n�domain\u000019 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 218,
+            "content": "�\u0007m�8�s1�u�S\u000e���_�g\u001ainfrastructure\u000013 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 219,
+            "content": "��N\u00032w\u001f>�\u0002������\u0015��4web\u00003 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 220,
+            "content": "u_��A��v������\u0010\"*��<services\u00003 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 252,
+            "content": ":s@$�\u0001��\u0015��K�zO\u0015���\u0014docs\u000010 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 253,
+            "content": "\u0010�&5?�0��\u001d\b�\u001c��1T}��backend\u00009 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 254,
+            "content": "\u0014�;F-\u001e���Y��ޤ����\u001e8ledger\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 255,
+            "content": "�MT���NѬ��\u0019�\u0002\u0012�\u0014b<�checkout\u00001 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 256,
+            "content": "�[\u0013ݟN6\u001f`i$>�\u0016�@Z\u0012{Uidentity\u00004 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 258,
+            "content": "����=qmguideline\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 259,
+            "content": "�M.~���L���%�b��\u0000,�tests\u00001 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 264,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u000010 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 265,
+            "content": "a\u0002jY�+W�e\\�N\f�������templates\u00009 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 266,
+            "content": "�Q&�c�\u0004�bӳ��J�X�[&�U\u0004�&~��-�;�?���;g���",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 8,
-            "content": "i @��p9�$\f\u0004\u0012\u000e��'\"��\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^]�\u001e��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j\\��\u0004:PD\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
+            "lineNumber": 169,
+            "content": "\u0005\u0000-1 7",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 268,
-            "content": "�Q&�c�\u0004�bӳ��J�X�[&�3rcW\\�#��9�wćhc'u#\u000f",
+            "lineNumber": 170,
+            "content": "src\u0000-1 6",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 171,
+            "content": "app\u00009 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 208,
+            "content": "�\u001a��a*C\u0013���Y:�iܜ�checkout\u0000-1 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 209,
+            "content": "domain\u000019 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 217,
+            "content": "�\u0007m�8�s1�u�S\u000e���_�g\u001ainfrastructure\u0000-1 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 218,
+            "content": "web\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 219,
+            "content": "services\u00003 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 251,
+            "content": ":s@$�\u0001��\u0015��K�zO\u0015���\u0014docs\u0000-1 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 252,
+            "content": "backend\u0000-1 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 253,
+            "content": "ledger\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 254,
+            "content": "�MT���NѬ��\u0019�\u0002\u0012�\u0014b<�checkout\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 255,
+            "content": "identity\u00004 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 257,
+            "content": "����=qmguideline\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 258,
+            "content": "tests\u00001 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 263,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 264,
+            "content": "templates\u00009 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 265,
+            "content": "�Q&�c�\u0004�bӳ��J�X�[&�\u001bm`�@�Mk��4k*�ǽy\u0000��",
             "type": "REMOVED"
           }
         ],
-        "modifiedLines": [
-          {
-            "lineNumber": 5,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j^`�4��(\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^\u0011\"\tM\u001f�j^\u0011'#��t\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00005�gW\u0015d ��@\"�&��",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 53,
-            "content": "� �\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000'src/checkout/infrastructure/__init__.py\u0000\u0000\u0000j?�I\u000b\b�(j?�I\u000b\b�(\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00003src/checkout/infrastructure/persistence/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000jB�r\u001e,��jL\u0003\\(�`\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0005�t������-\u0005���\u0007�L�\\R|\u0000Jsrc/checkout/infrastructure/persistence/identity_account_lookup_adapter.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u000b>Y\bj^C�\u0019��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004�A֞���nvz���e���F�E�\u0000Jsrc/checkout/infrastructure/persistence/ledger_fund_reservation_adapter.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u000b>Y\bj^>�\u0010�R\u0014\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002]���u>�~Y��\u0014���\b��2\u0000@src/checkout/infrastructure/persistence/ledger_refund_adapter.py\u0000\u0000j?�I\u000bM��j^>�:�0 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0003�h0�fh\u0011fQ��\u0002=�\u000e�\u001f���\u0000Fsrc/checkout/infrastructure/persistence/ledger_verification_adapter.py\u0000\u0000\u0000\u0000j?�I\u000bM��jL\u0003\\)\f\u001a8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000eT�!�?\u001d�RL��n��7ږ�gyX\u0000Dsrc/checkout/infrastructure/persistence/sqlite_session_repository.py\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u000b\\��j?�I\u000b\\��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00000src/checkout/infrastructure/services/__init__.py\u0000\u0000j?�I\u000b{{lj?�I\u000b{{l\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001�o��k\\ibף�癟az�T�*�\u00005src/checkout/infrastructure/services/otp_generator.py\u0000\u0000\u0000\u0000\u0000j?�I\u000b�.�j?�I\u000b�.�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002\f\u000eǦ�\u0007�\u001f��cg�ai\u0013W\u0010E�\u0000?src/checkout/infrastructure/services/session_token_generator.py\u0000\u0000\u0000j?�I\u000b���j?�I\u000b���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000+src/checkout/infrastructure/web/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\u000b�\u0007<j^?�\u0003��\u0004\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00128�\u0015���KVy'ѣ�@��ʟ�V\u00001src/checkout/infrastructure/web/api_controller.py\u0000j?�I\u000b�\u0007<jL\u0003\\)\f\u001a8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000fw�\u0013�W�\u001b뇎��ǔ\u0012�Z�Z\u001d\u00005src/checkout/infrastructure/web/gateway_controller.py\u0000\u0000\u0000\u0000\u0000j]��1Ĩ4j]��1Ĩ4\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0016src/common/__init__.py\u0000\u0000\u0000\u0000j]��1�1(j]��1�1(\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u001dsrc/common/domain/__init__.py\u0000\u0000\u0000\u0000\u0000j]��1�1\u0000j]��1�1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004\u0010$���Z��E�C��xN){6\u000fH|\u0000\u001fsrc/common/domain/exceptions.py\u0000\u0000\u0000j]��1�F�j]��1�F�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000#src/common/domain/ports/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j]��2\b��j]��2\b��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001������v쟘�6����\u0003\u0016�\u0006\u0000$src/common/domain/ports/event_bus.py\u0000\u0000\u0000\u0000\u0000\u0000j]��2\u001a\u0019@j]��2\u001a\u0019@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001�\"9v\u0004������\u0014\u001b\u0017�2*�M�\u0000'src/common/domain/ports/unit_of_work.py\u0000\u0000\u0000j]��2)�tj]��2)�t\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000+src/common/domain/value_objects/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j]��2)�tj]��28�\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0003�h�\u0001���\u0007ٓ\u0015V$y�4=�.;�\u00000src/common/domain/value_objects/currency_code.py\u0000\u0000j]��28�\u0010j]��28�\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001�mT3堜��`3�hy���D*�\u00000src/common/domain/value_objects/email_address.py\u0000\u0000j]��28�\u0010j]��2��\b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0005��\u001f�S\f��\u001fTG��\u001cqv�hb=\u0000(src/common/domain/value_objects/money.py\u0000\u0000j]��2�\" j]��2�\" \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000%src/common/infrastructure/__init__.py\u0000\u0000\u0000\u0000\u0000j]��2��dj]��2��d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0007h\u000e.)s�>10��\u0017h�d�O�\u0001��\u0000.src/common/infrastructure/database/__init__.py\u0000\u0000\u0000\u0000j]��3\u000f\u0001�j]��3\u000f\u0001�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00006src/common/infrastructure/database/schemas/__init__.py\u0000\u0000\u0000\u0000j]��3\u001e> j]��3\u001e> \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000?src/common/infrastructure/database/schemas/checkout/__init__.py\u0000\u0000\u0000j]��3\u001e> j]��35\u0003\b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002�Bϟ��A�w�\u00161\u0013�m�0D��\u0000?src/common/infrastructure/database/schemas/checkout/checkout.py\u0000\u0000\u0000j]��3<�\u0018j]��3<�\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000?src/common/infrastructure/database/schemas/identity/__init__.py\u0000\u0000\u0000j]��3MI\u0018j]��3`��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004�\u0010\u0003鹌�9�[RI�-�s\u000b9��!\u0000?src/common/infrastructure/database/schemas/identity/identity.py\u0000\u0000\u0000j]��3`��j]��3rQ�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�i�\u0012#ߤ�K�>�d\u0002_��sd��\u0000Psrc/common/infrastructure/database/schemas/identity/merchant_summaries_schema.py\u0000\u0000j]��3�*�j]��3�*�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000=src/common/infrastructure/database/schemas/ledger/__init__.py\u0000\u0000\u0000\u0000\u0000j]��3�\u00128j]��3�\u00128\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0005T�%\"E��I�p�b��\u0015*\u0015!(\u0001_\u0000;src/common/infrastructure/database/schemas/ledger/ledger.py\u0000\u0000\u0000\u0000\u0000\u0000\u0000j]��3���j]��3���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�6ڨ\u0005�\u001a����u�\u0010܎���\u001d�\u0000Isrc/common/infrastructure/database/schemas/notifications/notifications.py\u0000j]��3�.\u0000j]��3�.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002�y���\u001b�,\u001f�b�d��e\f�u�d\u0000&src/common/infrastructure/event_bus.py\u0000\u0000\u0000\u0000j]��3���j]��3�'�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0005��1���ظ�=��:P\u0001�v}�:*\u0000'src/common/infrastructure/generators.py\u0000\u0000\u0000j]��3�I<j]��3�I<\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u00001src/common/infrastructure/persistence/__init__.py\u0000j]��3���j]��3���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004�0\u0019�0^)�F�W�g��Ж��k�\u0000<src/common/infrastructure/persistence/sqlite_unit_of_work.py\u0000\u0000\u0000\u0000\u0000\u0000j]��4\u0005�(j]��4\u0005�(\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000)src/common/infrastructure/web/__init__.py\u0000j^`�1�3�j^`�\u0007�v�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0004W��րl*u�\u001f�\u0017�\u0015�ToϪû\u0000,src/common/infrastructure/web/idempotency.py\u0000\u0000\u0000\u0000\u0000\u0000j?�I\f��\\j?�I\f��\\\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0018src/identity/__init__.py\u0000\u0000j?�I\fՠPj?�I\fՠP\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000$src/identity/application/__init__.py\u0000\u0000\u0000\u0000\u0000\u0000j?�I\f��dj?�I\f��d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000-src/identity/application/commands/__init__.py\u0000\u0000\u0000\u0000\u0000j?�I",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 172,
-            "content": "Tl\u0014\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0011tests/__init__.py\u0000j?�I\u00126�pj^N�7k��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001d׼�B���\t2�j��������`\u001b\u0000\u0007todo.md\u0000\u0000\u0000j@�.SB�j^`�\u0014.n�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\btodo1.md\u0000\u0000TREE\u0000\u0000",
-            "type": "MODIFIED"
-          }
-        ]
+        "modifiedLines": []
       }
     },
     "docs/backend/checkout/CheckoutModule.md": {
@@ -7497,6 +7641,174 @@
       "id": "fed182e3-155c-4bc5-9c71-b8eecde1b86e",
       "filePath": "fix2.txt",
       "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff": null
+    },
+    ".git/objects/9c/7da6172137461096c7635391574a3d2bb75be4": {
+      "id": "1b3a990f-b945-43ea-a641-674c8143f54a",
+      "filePath": ".git/objects/9c/7da6172137461096c7635391574a3d2bb75be4",
+      "hashValue": "82b0e972dd61496b545e308a16baf4d0f981ecad64b15ac107827e8ba0853635",
+      "diff": null
+    },
+    ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack": {
+      "id": "15a19481-e879-44cd-b795-30af4501f9fd",
+      "filePath": ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack",
+      "hashValue": "af0593c6e2fdb7ebfe766ff15c35d16df23f7685463a2efef4cb515f407160ee",
+      "diff": null
+    },
+    ".git/objects/d9/87a1a5092911547f66e2564ac6ed87dcd0544c": {
+      "id": "79a87660-90ed-4c66-94ae-a0056eeccd97",
+      "filePath": ".git/objects/d9/87a1a5092911547f66e2564ac6ed87dcd0544c",
+      "hashValue": "84dfd0f7c9e4590fa74a66a65dec832f9d72a57fa89446d8d1b96ad7cee5ef9f",
+      "diff": null
+    },
+    ".git/objects/6e/c5593bfe3c03714b62b6edc3095a23dfa147e4": {
+      "id": "4155a280-11ed-4317-9b5d-96b3c0fc2d3c",
+      "filePath": ".git/objects/6e/c5593bfe3c03714b62b6edc3095a23dfa147e4",
+      "hashValue": "b81e01befe66869237eb7abb88776fa06816e0f60bda6d1597d420a5a22befa2",
+      "diff": null
+    },
+    ".git/objects/52/5b9273748decb5bac431451be1e44e6373a8a5": {
+      "id": "26b10a14-e5bf-4340-ad29-dc759c12a586",
+      "filePath": ".git/objects/52/5b9273748decb5bac431451be1e44e6373a8a5",
+      "hashValue": "b4ce7f9720ccb186bfe5ac7eec3013b75cbfa4f8ac12382950e166d232dd43a2",
+      "diff": null
+    },
+    ".git/objects/6f/6037bc2c2e784726848b4f32800f5db2a1ac9b": {
+      "id": "044a0a22-4c77-40a3-b37b-f4a825110856",
+      "filePath": ".git/objects/6f/6037bc2c2e784726848b4f32800f5db2a1ac9b",
+      "hashValue": "c5d73dce5163ff0051b80aa08da105d9062bd2461147abc31f90e1fee6918216",
+      "diff": null
+    },
+    ".git/objects/a7/158cb7cb4b567f7927d1a3ad408be6ca9fa456": {
+      "id": "962452bf-6b68-4a1a-b6cb-a78136634220",
+      "filePath": ".git/objects/a7/158cb7cb4b567f7927d1a3ad408be6ca9fa456",
+      "hashValue": "3a835d125b0cb293f890b983370a5df4cfbe3171a2caa59766469a5afe6dd625",
+      "diff": null
+    },
+    ".git/objects/46/f7970954a055f317f2e5de5aa9a17e796ddcd4": {
+      "id": "b84c3bd4-e1b8-47f6-b09f-0f488951df0d",
+      "filePath": ".git/objects/46/f7970954a055f317f2e5de5aa9a17e796ddcd4",
+      "hashValue": "f1c68aeddbee7d337ad344f5c3409013b33572c9d1d8018d24f634f98af23482",
+      "diff": null
+    },
+    ".git/objects/61/95e35be34b2c11fda96090bd5df4509087cff4": {
+      "id": "d79fe3b7-d174-4597-ace6-d2c280b64b21",
+      "filePath": ".git/objects/61/95e35be34b2c11fda96090bd5df4509087cff4",
+      "hashValue": "1e13ba2fb65bec784425081fa7b45e648d7baaede9029988dcddb1dd4d2ff537",
+      "diff": null
+    },
+    ".git/objects/a3/7218acb5b8d553c73effb04a13bb404d4bd0d3": {
+      "id": "59356b1b-bf50-4474-8a1a-357a42123bd5",
+      "filePath": ".git/objects/a3/7218acb5b8d553c73effb04a13bb404d4bd0d3",
+      "hashValue": "eed0f83fd71ed572efa7d06c7f18231580c3991d34ad6bb16c4859e580868edc",
+      "diff": null
+    },
+    ".git/objects/ee/5576079823e27de08ab3cc05265d333c018a41": {
+      "id": "539ae162-dc2b-4cad-8631-c501de6a7910",
+      "filePath": ".git/objects/ee/5576079823e27de08ab3cc05265d333c018a41",
+      "hashValue": "699912a63bab7bd9ac74f07f23d093e7caf88bcfc5b2df51c2a1053a70ad4bc1",
+      "diff": null
+    },
+    ".git/objects/0b/b012d3f37e7a2028616e6452d0cf8bfc5d7b68": {
+      "id": "404f887e-2ec0-43e5-98dc-ac597e6152da",
+      "filePath": ".git/objects/0b/b012d3f37e7a2028616e6452d0cf8bfc5d7b68",
+      "hashValue": "112406b3445066bcaa7a2141c7960add04ca1d5ac917cf9f130c436ad2dfa1a7",
+      "diff": null
+    },
+    ".git/objects/ba/8443b562ae8e64085b924cf8851f082ebdb296": {
+      "id": "184bb360-9b7b-4a7c-891e-18ec6cb3c15e",
+      "filePath": ".git/objects/ba/8443b562ae8e64085b924cf8851f082ebdb296",
+      "hashValue": "f68cffd94338693c8f6013db64103cabb5f4bbdc117a41957bed97116596850d",
+      "diff": null
+    },
+    ".git/objects/75/5fc4df4187bf76a99eadc1bdee10222a92953c": {
+      "id": "b99bc774-8e67-4961-bca9-c0652ddb36f3",
+      "filePath": ".git/objects/75/5fc4df4187bf76a99eadc1bdee10222a92953c",
+      "hashValue": "cc489772a1b4abc82a85f017de8565bf848780cc4058da87912151a7bae4fbab",
+      "diff": null
+    },
+    ".git/objects/c0/c04e0332771f3e9d02a0abfd99f6b115fab834": {
+      "id": "3d5edfa7-4e45-42ce-9d59-fd2fcfdd337b",
+      "filePath": ".git/objects/c0/c04e0332771f3e9d02a0abfd99f6b115fab834",
+      "hashValue": "2f27aeee19ae3799edb2008ba088a6fd082c2e4a7dadb191cbde3b8d6c639cf1",
+      "diff": null
+    },
+    ".git/objects/0f/a280a919581d7513da9c75e38c86e469d26e94": {
+      "id": "959704d2-8950-4770-a722-5e1b7ef946e1",
+      "filePath": ".git/objects/0f/a280a919581d7513da9c75e38c86e469d26e94",
+      "hashValue": "25ac6533810f282a7e5130b4bca138b05b28c4bde3df3dbdafd35e944d913738",
+      "diff": null
+    },
+    ".git/objects/15/abff2f92ca47b1145703d9ba63ab3bd99febdb": {
+      "id": "0562eec3-ca64-4f2b-9a6e-2146397e292c",
+      "filePath": ".git/objects/15/abff2f92ca47b1145703d9ba63ab3bd99febdb",
+      "hashValue": "ee9c9f086f5d568b40cc3f9697a51eb0d6624196bbab67c1b448ab103eabb384",
+      "diff": null
+    },
+    ".git/objects/bc/4d2e7e95adc44cfde4a8e2259b62f3cb002cc9": {
+      "id": "6b0dc526-e044-48bd-9637-8fd8c2a95ad8",
+      "filePath": ".git/objects/bc/4d2e7e95adc44cfde4a8e2259b62f3cb002cc9",
+      "hashValue": "63e1ab998c3a15829b87bab6f48bbe0cef5466c0147a11806ec2f865fc64d7c8",
+      "diff": null
+    },
+    ".git/COMMIT_EDITMSG": {
+      "id": "d9fff5a9-0ef0-4529-9b87-e6584d528e16",
+      "filePath": ".git/COMMIT_EDITMSG",
+      "hashValue": "8587fb066b06b0c13bc145ff9ab8d48b2c6c9df0fc337333a2ccb4a57cf4c151",
+      "diff": null
+    },
+    ".git/objects/61/026a59db2b57b3655ca24e0c8898a3b799a1af": {
+      "id": "c3a7c81f-d66c-40d2-9a37-367c37116390",
+      "filePath": ".git/objects/61/026a59db2b57b3655ca24e0c8898a3b799a1af",
+      "hashValue": "0f8fec73b8392b4ce4fc5df029fae1432be16e95bad7ee65f91e87b75c7917be",
+      "diff": null
+    },
+    ".git/logs/HEAD": {
+      "id": "c5724ffa-e8a6-4a18-95a8-66caf8735061",
+      "filePath": ".git/logs/HEAD",
+      "hashValue": "3520fa70f70089e81f87aca8e650fd81ed21c58e23441ec7f453e4435a91e47e",
+      "diff": null
+    },
+    ".git/logs/refs/heads/dev": {
+      "id": "5d89ec08-249b-409f-a703-67b167ccb448",
+      "filePath": ".git/logs/refs/heads/dev",
+      "hashValue": "a3d14362653e4a9c30e275ab71481517fcf44cce86c7b75f427f5bd451044f15",
+      "diff": null
+    },
+    ".git/refs/heads/dev": {
+      "id": "b3b6c19d-3e18-43ff-b416-ff9d1c6e2789",
+      "filePath": ".git/refs/heads/dev",
+      "hashValue": "2fc17b1083adf8fcabdc637a9f2d48fcf8d105f6e4be440f412574dc0d93829c",
+      "diff": null
+    },
+    ".git/objects/14/fb3b462d1e9a919f59eee7dea4dbeefaf81e38": {
+      "id": "59365394-7a39-4889-bf83-da8b2b93461a",
+      "filePath": ".git/objects/14/fb3b462d1e9a919f59eee7dea4dbeefaf81e38",
+      "hashValue": "2d128b5e51f0e363e55f7dfa8ab775e5fd58ba3606d9682f7e8b05cc48ffc65d",
+      "diff": null
+    },
+    ".git/objects/f3/5b13dd9f4e361f6069243e831695405a127b55": {
+      "id": "22196896-7fba-4fd7-98db-b52297f435d0",
+      "filePath": ".git/objects/f3/5b13dd9f4e361f6069243e831695405a127b55",
+      "hashValue": "02956bc8317746876d889d9add1400c2e80c979124ee89d2e2a1ccd4e074f8a2",
+      "diff": null
+    },
+    ".git/objects/10/c626353fec30baff1d08c81cebd731547dd5f0": {
+      "id": "9ba91ebd-5b55-49e0-b859-366710607bd3",
+      "filePath": ".git/objects/10/c626353fec30baff1d08c81cebd731547dd5f0",
+      "hashValue": "a7e23024ec2572d2cb9668a6aa12fc367297c5222210241a9f04ba6fbd15c9c8",
+      "diff": null
+    },
+    ".git/objects/5b/647cf369f25b560255616b930a3c9d096b20d8": {
+      "id": "72119162-df4e-4265-a790-eeedf10deeb4",
+      "filePath": ".git/objects/5b/647cf369f25b560255616b930a3c9d096b20d8",
+      "hashValue": "849347231d8a4ac78bfedd391eb53255ab9cbbfb8920ecfe5902c02802d2d31b",
+      "diff": null
+    },
+    ".git/objects/74/b737d712e4eb1c3386a194cd0bd34787fc46e1": {
+      "id": "ad95c6f4-dbe2-4576-b8f7-f8fd9b825195",
+      "filePath": ".git/objects/74/b737d712e4eb1c3386a194cd0bd34787fc46e1",
+      "hashValue": "e0ecf8df4c7d153f84fa55f73a6de944dd138ff2aeea18d0555f2320ae20fd49",
       "diff": null
     }
   }

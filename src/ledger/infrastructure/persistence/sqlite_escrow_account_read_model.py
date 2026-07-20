@@ -21,6 +21,6 @@ class SqliteEscrowAccountReadModel(EscrowAccountQueryPort):
         return [
             EscrowAccountSummary(
                 id=row['id'], currency_id=row['currency_id'], currency_code=row['currency_code'],
-                account_number=row['account_number'], balance=Decimal(str(row['balance']))
+                account_number=row['account_number'], balance=Decimal(str(row['balance'])) / Decimal(100)
             ) for row in rows
         ]

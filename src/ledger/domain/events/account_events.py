@@ -5,7 +5,7 @@ from src.ledger.domain.value_objects.account_number import AccountNumber
 
 @dataclass(frozen=True)
 class AccountCreatedEvent:
-    account_id: int
+    account_id: str
     user_id: Optional[int]
     merchant_id: Optional[int]
     account_number: AccountNumber

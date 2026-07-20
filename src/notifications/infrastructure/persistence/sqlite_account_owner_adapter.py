@@ -1,4 +1,5 @@
 from typing import Optional
+from decimal import Decimal
 from src.notifications.domain.ports.account_owner_resolver_port import AccountOwnerResolverPort
 from src.notifications.domain.value_objects.account_owner_profile import AccountOwnerProfile
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
@@ -8,7 +9,7 @@ from src.common.domain.value_objects.currency_code import CurrencyCode
 class SqliteAccountOwnerAdapter(AccountOwnerResolverPort):
     """Resolves the Paymenter user profile linked to a specific Ledger account."""
     
-    def get_email_by_account_id(self, account_id: int) -> Optional[str]:
+    def get_email_by_account_id(self, account_id: str) -> Optional[str]:
         uow = SqliteUnitOfWork()
         with uow:
             row = uow.conn.execute("""
@@ -19,7 +20,7 @@ class SqliteAccountOwnerAdapter(AccountOwnerResolverPort):
             """, (account_id,)).fetchone()
             return row['phone_email'] if row else None
 
-    def resolve_profile_by_account_id(self, account_id: int) -> Optional[AccountOwnerProfile]:
+    def resolve_profile_by_account_id(self, account_id: str) -> Optional[AccountOwnerProfile]:
         uow = SqliteUnitOfWork()
         with uow:
             row = uow.conn.execute("""
@@ -34,7 +35,7 @@ class SqliteAccountOwnerAdapter(AccountOwnerResolverPort):
                 return None
                 
             email = row['phone_email']
-            balance_amount = str(row['balance'])
+            balance_amount = Decimal(str(row['balance'])) / Decimal(100)
             currency_code = row['currency_code']
             
             money_vo = Money(balance_amount, CurrencyCode(currency_code))

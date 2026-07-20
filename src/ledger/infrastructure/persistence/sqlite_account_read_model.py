@@ -31,8 +31,8 @@ class SqliteAccountReadModel(AccountQueryPort):
                 currency_code=row['currency_code'],
                 account_number=row['account_number'], 
                 card_number=None,
-                pending_holds=Decimal(str(row['pending_holds'])),
+                pending_holds=Decimal(str(row['pending_holds'])) / Decimal(100),
                 open_authorizations=row['open_authorizations'],
-                balance=Decimal(str(row['balance']))
+                balance=Decimal(str(row['balance'])) / Decimal(100)
             ) for row in rows
         ]

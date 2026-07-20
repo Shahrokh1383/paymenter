@@ -9,8 +9,8 @@
 <div class="form-container">
     <h2>Initiate Manual Transfer</h2>
     <form action="{{ url_for('transactions.create') }}" method="POST">
-        <input type="number" name="from_account_id" placeholder="Source Account ID" required>
-        <input type="number" name="to_account_id" placeholder="Destination Account ID" required>
+        <input type="text" name="from_account_id" placeholder="Source Account UUID" required>
+        <input type="text" name="to_account_id" placeholder="Destination Account UUID" required>
         <input type="number" name="amount" step="0.01" placeholder="Amount" required>
         <button type="submit">Hold Funds</button>
     </form>
@@ -33,7 +33,8 @@
         <td>{{ t.user_email or 'Manual' }}</td>
         <td>{{ t.from_account_number or 'N/A' }}</td>
         <td>{{ t.to_account_number or 'N/A' }}</td>
-        <td>{{ t.amount }}</td>
+        <!-- FIXED: Strict 2 decimal places formatting -->
+        <td>{{ '%.2f' | format(t.amount) }}</td>
         <td>{{ t.currency_code }}</td>
         <td class="status-cell">{{ t.status }}</td>
         <td>{{ t.created_at }}</td>

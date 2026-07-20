@@ -1,4 +1,5 @@
 import sqlite3
+from decimal import Decimal
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.domain.entities.account import Account
 from src.ledger.domain.value_objects.account_number import AccountNumber
@@ -11,19 +12,25 @@ class SqliteAccountRepository(AccountRepository):
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
+    def _to_cents(self, amount: Decimal) -> int:
+        return int(amount * 100)
+
+    def _from_cents(self, cents: int) -> Decimal:
+        return Decimal(str(cents)) / Decimal(100)
+
     def _map_row_to_account(self, row: sqlite3.Row) -> Account:
         return Account(
             id=row['id'],
             user_id=row['user_id'],
             merchant_id=row['merchant_id'],
             account_number=AccountNumber(row['account_number']),
-            balance=Money(str(row['balance']), CurrencyCode(row['currency_code'])),
-            pending_holds=Money(str(row['pending_holds']), CurrencyCode(row['currency_code'])),
+            balance=Money(self._from_cents(row['balance']), CurrencyCode(row['currency_code'])),
+            pending_holds=Money(self._from_cents(row['pending_holds']), CurrencyCode(row['currency_code'])),
             open_authorizations=row['open_authorizations'],
             version=row['version']
         )
 
-    def get_by_id(self, account_id: int) -> Account:
+    def get_by_id(self, account_id: str) -> Account:
         cursor = self._uow.conn.execute("""
             SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.pending_holds, a.open_authorizations, a.version, c.code as currency_code
             FROM accounts a
@@ -46,8 +53,8 @@ class SqliteAccountRepository(AccountRepository):
                SET balance = ?, pending_holds = ?, open_authorizations = ?, currency_id = ?, version = version + 1 
                WHERE id = ? AND version = ?""",
             (
-                str(account.balance.amount), 
-                str(account.pending_holds.amount), 
+                self._to_cents(account.balance.amount), 
+                self._to_cents(account.pending_holds.amount), 
                 account.open_authorizations, 
                 currency_row['id'], 
                 account.id, 
@@ -69,7 +76,7 @@ class SqliteAccountRepository(AccountRepository):
         if not row: return None
         return self._map_row_to_account(row)
 
-    def add(self, account: Account) -> int:
+    def add(self, account: Account) -> None:
         currency_row = self._uow.conn.execute(
             "SELECT id FROM currencies WHERE code = ?", (account.balance.currency.value,)
         ).fetchone()
@@ -79,17 +86,17 @@ class SqliteAccountRepository(AccountRepository):
         
         currency_id = currency_row['id']
         
-        cursor = self._uow.conn.execute(
-            """INSERT INTO accounts (user_id, merchant_id, currency_id, account_number, balance, pending_holds, open_authorizations) 
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        self._uow.conn.execute(
+            """INSERT INTO accounts (id, user_id, merchant_id, currency_id, account_number, balance, pending_holds, open_authorizations, version) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)""",
             (
+                account.id,
                 account.user_id, 
                 account.merchant_id, 
                 currency_id, 
                 account.account_number.value, 
-                str(account.balance.amount),
-                str(account.pending_holds.amount),
+                self._to_cents(account.balance.amount),
+                self._to_cents(account.pending_holds.amount),
                 account.open_authorizations
             )
         )
-        return cursor.lastrowid

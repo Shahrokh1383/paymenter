@@ -8,10 +8,6 @@ from src.ledger.application.dto.transaction_list_item import TransactionListItem
 
 
 class SqliteTransactionReadModel(TransactionQueryPort):
-    """
-    Read-side implementation of TransactionQueryPort.
-    Uses UnitOfWork to respect the Dependency Rule (Rule 1).
-    """
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
@@ -37,7 +33,7 @@ class SqliteTransactionReadModel(TransactionQueryPort):
         return [
             TransactionListItem(
                 id=row['id'],
-                amount=Decimal(str(row['amount'])), # Rule 3: No Primitive Obsession
+                amount=Decimal(str(row['amount'])) / Decimal(100),
                 currency_code=row['currency_code'],
                 status=row['status'],
                 created_at=datetime.fromisoformat(row['created_at']) if isinstance(row['created_at'], str) else row['created_at'],

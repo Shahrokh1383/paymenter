@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from typing import Optional
 from src.common.domain.value_objects.money import Money
@@ -5,9 +6,9 @@ from src.common.domain.exceptions import InvalidTransactionStateError
 
 @dataclass
 class Transaction:
-    id: int
-    from_account_id: int
-    to_account_id: int
+    id: str
+    from_account_id: str
+    to_account_id: str
     amount: Money
     status: str
     merchant_id: Optional[int]
@@ -30,10 +31,10 @@ class Transaction:
         self.status = 'Refunded'
 
     @staticmethod
-    def create_pending(from_account_id: int, to_account_id: int, amount: Money, merchant_id: Optional[int], user_email: Optional[str]) -> 'Transaction':
+    def create_pending(from_account_id: str, to_account_id: str, amount: Money, merchant_id: Optional[int], user_email: Optional[str]) -> 'Transaction':
         """Factory method to create a new valid Pending transaction."""
         return Transaction(
-            id=0,  
+            id=uuid.uuid4().hex,  
             from_account_id=from_account_id,
             to_account_id=to_account_id,
             amount=amount,

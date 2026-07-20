@@ -13,7 +13,7 @@ class HoldFundsHandler:
         self._txn_repo = txn_repo
         self._system_account_resolver = system_account_resolver
 
-    def handle(self, command: HoldFundsCommand) -> int:
+    def handle(self, command: HoldFundsCommand) -> str:
         with self._uow:
             from_acc = self._account_repo.get_by_id(command.from_account_id)
             to_acc = self._account_repo.get_by_id(command.to_account_id)
@@ -48,7 +48,7 @@ class HoldFundsHandler:
             if escrow_acc is not from_acc and escrow_acc is not to_acc:
                 self._account_repo.update(escrow_acc)
                 
-            txn_id = self._txn_repo.add(txn)
+            self._txn_repo.add(txn)
             self._uow.commit()
             
-            return txn_id
+            return txn.id

@@ -11,7 +11,7 @@ from src.ledger.application.commands.fail_and_refund_command import FailAndRefun
 
 transaction_api_bp = Blueprint('transactions_api', __name__, url_prefix='/api/transactions')
 
-@transaction_api_bp.route('/<int:id>/complete', methods=['POST'])
+@transaction_api_bp.route('/<string:id>/complete', methods=['POST'])
 @idempotent
 def complete(id):
     try:
@@ -27,11 +27,10 @@ def complete(id):
     except (InsufficientFundsError, AccountNotFoundError, CurrencyMismatchError) as e:
         return jsonify({"success": False, "message": str(e)}), 409
     except Exception as e:
-        # Bug 3 & Info Leakage Fix: Log internally, hide from client
         current_app.logger.error(f"Unexpected error completing transaction {id}: {str(e)}", exc_info=True)
         return jsonify({"success": False, "message": "An internal server error occurred."}), 500
 
-@transaction_api_bp.route('/<int:id>/fail', methods=['POST'])
+@transaction_api_bp.route('/<string:id>/fail', methods=['POST'])
 @idempotent
 def fail(id):
     try:
@@ -45,9 +44,7 @@ def fail(id):
     except InvalidTransactionStateError as e:
         return jsonify({"success": False, "message": str(e)}), 400
     except (InsufficientFundsError, AccountNotFoundError, CurrencyMismatchError) as e:
-        # Bug 1 Fix: Insufficient funds during refund is now a 409 Conflict, not 500
         return jsonify({"success": False, "message": str(e)}), 409
     except Exception as e:
-        # Bug 3 & Info Leakage Fix: Log internally, hide from client
         current_app.logger.error(f"Unexpected error failing transaction {id}: {str(e)}", exc_info=True)
         return jsonify({"success": False, "message": "An internal server error occurred."}), 500

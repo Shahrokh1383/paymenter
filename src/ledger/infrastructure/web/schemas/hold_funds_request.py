@@ -6,17 +6,19 @@ class HoldFundsRequestSchema:
         errors = []
         data = {}
         
-        # Validate from_account_id
-        try:
-            data['from_account_id'] = int(form_data.get('from_account_id'))
-        except (TypeError, ValueError):
+        # Validate from_account_id (UUID String)
+        from_account_id = form_data.get('from_account_id')
+        if not from_account_id:
             errors.append("Valid 'from_account_id' is required.")
+        else:
+            data['from_account_id'] = str(from_account_id)
 
-        # Validate to_account_id
-        try:
-            data['to_account_id'] = int(form_data.get('to_account_id'))
-        except (TypeError, ValueError):
+        # Validate to_account_id (UUID String)
+        to_account_id = form_data.get('to_account_id')
+        if not to_account_id:
             errors.append("Valid 'to_account_id' is required.")
+        else:
+            data['to_account_id'] = str(to_account_id)
 
         # Validate amount
         amount_str = form_data.get('amount')

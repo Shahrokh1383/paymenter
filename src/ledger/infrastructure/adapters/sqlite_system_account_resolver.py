@@ -1,3 +1,4 @@
+from decimal import Decimal
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.ledger.domain.entities.account import Account
 from src.ledger.domain.value_objects.account_number import AccountNumber
@@ -13,7 +14,6 @@ class SqliteSystemAccountResolver(SystemAccountResolverPort):
         self._uow = uow
 
     def get_escrow_account(self, currency: CurrencyCode) -> Account:
-        # Updated query to fetch the new invariant fields
         cursor = self._uow.conn.execute("""
             SELECT a.id, a.user_id, a.merchant_id, a.account_number, a.balance, a.pending_holds, a.open_authorizations, a.version, c.code as currency_code
             FROM accounts a
@@ -28,14 +28,16 @@ class SqliteSystemAccountResolver(SystemAccountResolverPort):
                 "Please ensure the currency is added via the dashboard first."
             )
             
-        # Updated instantiation to include the new required fields
+        balance_decimal = Decimal(str(row['balance'])) / Decimal(100)
+        holds_decimal = Decimal(str(row['pending_holds'])) / Decimal(100)
+        
         return Account(
             id=row['id'],
             user_id=row['user_id'],
             merchant_id=row['merchant_id'],
             account_number=AccountNumber(row['account_number']),
-            balance=Money(str(row['balance']), CurrencyCode(row['currency_code'])),
-            pending_holds=Money(str(row['pending_holds']), CurrencyCode(row['currency_code'])),
+            balance=Money(balance_decimal, CurrencyCode(row['currency_code'])),
+            pending_holds=Money(holds_decimal, CurrencyCode(row['currency_code'])),
             open_authorizations=row['open_authorizations'],
             version=row['version']
         )

@@ -5,17 +5,14 @@ from src.ledger.domain.entities.currency import Currency
 from src.ledger.domain.repositories import CurrencyRepository
 
 class SqliteCurrencyRepository(CurrencyRepository):
-    """SQLite implementation for Currency Aggregate persistence."""
-    
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
-    def add(self, currency: Currency) -> int:
-        cursor = self._uow.conn.execute(
-            "INSERT INTO currencies (name, code, is_active) VALUES (?, ?, ?)",
-            (currency.name, currency.code.value, int(currency.is_active))
+    def add(self, currency: Currency) -> None:
+        self._uow.conn.execute(
+            "INSERT INTO currencies (id, name, code, is_active) VALUES (?, ?, ?, ?)",
+            (currency.id, currency.name, currency.code.value, int(currency.is_active))
         )
-        return cursor.lastrowid
 
     def update(self, currency: Currency) -> None:
         self._uow.conn.execute(
@@ -23,15 +20,12 @@ class SqliteCurrencyRepository(CurrencyRepository):
             (currency.name, int(currency.is_active), currency.id)
         )
 
-    def get_by_id(self, currency_id: int) -> Optional[Currency]:
+    def get_by_id(self, currency_id: str) -> Optional[Currency]:
         row = self._uow.conn.execute(
             "SELECT id, name, code, is_active FROM currencies WHERE id = ?", 
             (currency_id,)
         ).fetchone()
-        
-        if not row:
-            return None
-            
+        if not row: return None
         return Currency(
             id=row['id'],
             name=row['name'],
@@ -44,10 +38,7 @@ class SqliteCurrencyRepository(CurrencyRepository):
             "SELECT id, name, code, is_active FROM currencies WHERE code = ?", 
             (code.value,)
         ).fetchone()
-        
-        if not row:
-            return None
-            
+        if not row: return None
         return Currency(
             id=row['id'],
             name=row['name'],

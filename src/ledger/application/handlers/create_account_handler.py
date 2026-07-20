@@ -1,3 +1,4 @@
+import uuid
 from src.common.domain.ports.unit_of_work import UnitOfWork
 from src.common.domain.value_objects.money import Money
 from src.common.domain.value_objects.currency_code import CurrencyCode
@@ -15,7 +16,7 @@ class CreateAccountHandler:
         self._account_repo = account_repo
         self._event_bus = event_bus
 
-    def handle(self, cmd: CreateAccountCommand) -> int:
+    def handle(self, cmd: CreateAccountCommand) -> str:
         with self._uow:
             acc_num_str = generate_account_number(
                 lambda num: self._account_repo.get_by_account_number(num) is not None
@@ -24,10 +25,11 @@ class CreateAccountHandler:
             account_number = AccountNumber(acc_num_str)
             currency_code = CurrencyCode(cmd.currency_code)
 
-            # Fix: Added pending_holds and open_authorizations to satisfy Aggregate invariants.
-            # Changed id=None to id=0 for codebase consistency.
+            # FIX: Generate UUID in the Application layer before hitting the database
+            account_id = uuid.uuid4().hex
+            
             account = Account(
-                id=0,
+                id=account_id,
                 user_id=cmd.user_id,
                 merchant_id=cmd.merchant_id,
                 account_number=account_number,
@@ -37,7 +39,7 @@ class CreateAccountHandler:
                 version=0
             )
 
-            account_id = self._account_repo.add(account)
+            self._account_repo.add(account)
             self._uow.commit()
 
             self._event_bus.publish(AccountCreatedEvent(

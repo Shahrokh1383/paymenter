@@ -7,7 +7,7 @@ from src.common.domain.value_objects.currency_code import CurrencyCode
 
 class AccountRepository(ABC):
     @abstractmethod
-    def get_by_id(self, account_id: int) -> Account: pass
+    def get_by_id(self, account_id: str) -> Account: pass
 
     @abstractmethod
     def get_by_account_number(self, account_number: str) -> Account: pass
@@ -16,27 +16,27 @@ class AccountRepository(ABC):
     def update(self, account: Account) -> None: pass
     
     @abstractmethod
-    def add(self, account: Account) -> int: pass
+    def add(self, account: Account) -> None: pass
 
 class TransactionRepository(ABC):
     @abstractmethod
-    def get_by_id(self, transaction_id: int) -> Transaction: pass
+    def get_by_id(self, transaction_id: str) -> Transaction: pass
     
     @abstractmethod
-    def add(self, transaction: Transaction) -> int: pass
+    def add(self, transaction: Transaction) -> None: pass
     
     @abstractmethod
     def update(self, transaction: Transaction) -> None: pass
 
 class CurrencyRepository(ABC):
     @abstractmethod
-    def get_by_id(self, currency_id: int) -> Optional[Currency]: pass
+    def get_by_id(self, currency_id: str) -> Optional[Currency]: pass
     
     @abstractmethod
     def get_by_code(self, code: CurrencyCode) -> Optional[Currency]: pass
     
     @abstractmethod
-    def add(self, currency: Currency) -> int: pass
+    def add(self, currency: Currency) -> None: pass
     
     @abstractmethod
     def update(self, currency: Currency) -> None: pass

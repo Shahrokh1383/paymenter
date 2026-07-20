@@ -3,8 +3,8 @@ from decimal import Decimal
 
 @dataclass(frozen=True)
 class EscrowAccountSummary:
-    id: int
-    currency_id: int
+    id: str
+    currency_id: str
     currency_code: str
     account_number: str
     balance: Decimal

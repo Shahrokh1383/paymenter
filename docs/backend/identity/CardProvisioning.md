@@ -1,5 +1,5 @@
-# MODULE DOCUMENTATION: CARD PROVISIONING (SSOT)
-**Version:** 2.0.0
+# MODULE DOCUMENTATION: CARD PROVISIONING
+**Version:** 2.1.0
 
 ## Table of Contents
 1. [Overview](#1-overview)
@@ -20,17 +20,18 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
 ## 2. Business Rules
 
 ### 1. Specification (WHAT)
-*   **Trigger Mechanism:** Card provisioning is exclusively triggered by the `AccountCreatedEvent`, which carries `account_id`, `user_id` (optional), `merchant_id` (optional), `account_number`, and `currency_code`.
+*   **Trigger Mechanism:** Card provisioning is exclusively triggered by the `AccountCreatedEvent`, which carries `account_id` (UUID hex string), `user_id` (optional), `merchant_id` (optional), `account_number`, and `currency_code`.
 *   **PAN Generation:** A 16-digit number is generated satisfying the Luhn checksum algorithm. The logic is implemented as a stateless utility function (`generate_card_number`) in the common infrastructure layer.
 *   **Uniqueness Constraint:** The generated PAN must be globally unique. Uniqueness is enforced **solely at the database layer** via a `UNIQUE` constraint on the `user_cards.card_number` column. There is no application-level pre-check (`check_exists_func` is hardcoded to a no-op `lambda _: False`).
 *   **Data Storage:** The raw 16-digit PAN is stored in plaintext in both `user_cards` and `user_summaries`.
-*   **Ownership Linking:** The card is linked to either a `user_id` or a `merchant_id` and strictly tied to an `account_id`.
+*   **Ownership Linking:** The card is linked to either a `user_id` or a `merchant_id` and strictly tied to an `account_id` (UUID string).
 
 ### 2. Rationale & Trade-offs (WHY)
 *   **Why Luhn validation?** Card numbers simulate real-world payment instruments. A Luhn-valid PAN ensures realistic behavior in integration testing and external gateway simulations.
 *   **Why react to `AccountCreatedEvent`?** Strictly preserves Bounded Context isolation. Identity has no knowledge of Ledger's internal account creation logic; it only reacts to the fact that an account now exists.
 *   **Why rely purely on DB constraints for uniqueness?** Given the 16-digit PAN space (with Luhn check digit), the probability of a collision is statistically negligible ($< 10^{-15}$). Skipping an application-level `SELECT` lookup avoids an extra database round-trip on every issuance, optimizing for MVP speed.
 *   **Why Plaintext Storage?** Application-level encryption (e.g., AES-256) was rejected because it breaks the database's ability to enforce the `UNIQUE` constraint on the underlying PAN. Furthermore, the dashboard UI requires the plain card number for display. This is an acknowledged, deliberate deviation from PCI-DSS compliance for the sake of MVP delivery speed.
+*   **Why Application-Layer UUIDs for `account_id`?** Generating the `account_id` as a UUID hex string in the application layer prior to persistence ensures that the identifier is deterministically known before the database transaction commits. This perfectly aligns with event-driven choreography, allowing the ID to be safely propagated through domain events without relying on database auto-increment return values.
 
 ### 3. Rejected Alternatives
 *   **Rejected:** *Application-level uniqueness pre-check via Repository before insert.*
@@ -47,12 +48,12 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
     *   `OnAccountCreatedHandler`: Consumes `AccountCreatedEvent`, generates PAN, executes raw SQL `INSERT` via `self._uow.conn.execute()`, commits, and publishes `CardAssignedEvent`.
     *   `CardAssignedReadModelHandler`: Consumes `CardAssignedEvent`, executes raw SQL `UPDATE` on `user_summaries`.
 *   **Domain Layer:**
-    *   `CardAssignedEvent`: Dataclass containing `account_id`, `user_id`, `merchant_id`, and `card_number`.
+    *   `CardAssignedEvent`: Dataclass containing `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, and `card_number: str`.
     *   *Note:* No dedicated `Card` aggregate or `CardRepository` interface exists in the domain layer.
 *   **Infrastructure Layer:**
     *   `generate_card_number`: Pure function in `src/common/infrastructure/generators.py`.
     *   `SqliteUnitOfWork`: Provides the `conn` (sqlite3.Connection) object used directly by handlers.
-    *   `user_cards` table schema includes `UNIQUE` constraint on `card_number` and Foreign Keys to `users`, `merchants`, and `accounts`.
+    *   `user_cards` table schema includes `account_id TEXT NOT NULL`, a `UNIQUE` constraint on `card_number`, and Foreign Keys to `users`, `merchants`, and `accounts(id)`.
 
 ### 2. Architectural Decisions (WHY)
 *   **Why Raw SQL instead of the Repository Pattern?** The `user_cards` and `user_summaries` tables are treated as denormalized query models and simple side-effect logs, not domain aggregates. Creating a full `CardRepository` interface for a trivial `INSERT` violates the KISS principle and slows down MVP delivery. The raw SQL is strictly contained within the handler files.
@@ -72,16 +73,16 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
 ### 1. Exact Endpoints/Schemas (WHAT)
 *   **Contract Type:** Passive Event Consumer (No REST/RPC endpoints).
 *   **Subscribed Event:** `AccountCreatedEvent` (Published by Ledger Context).
-    *   *Payload:* `account_id: int`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `account_number: AccountNumber`, `currency_code: CurrencyCode`.
+    *   *Payload:* `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `account_number: AccountNumber`, `currency_code: CurrencyCode`.
 *   **Published Event:** `CardAssignedEvent` (Consumed by Read Model Projections).
-    *   *Payload:* `account_id: int`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `card_number: str`.
+    *   *Payload:* `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `card_number: str`.
 *   **Database Schema (`user_cards`):**
     ```sql
     CREATE TABLE IF NOT EXISTS user_cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         user_id INTEGER, 
         merchant_id INTEGER,
-        account_id INTEGER NOT NULL, 
+        account_id TEXT NOT NULL, 
         card_number TEXT NOT NULL UNIQUE, 
         FOREIGN KEY (user_id) REFERENCES users(id), 
         FOREIGN KEY (merchant_id) REFERENCES merchants(id),
@@ -105,13 +106,13 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
 ## 5. Execution Flows
 
 ### 1. Step-by-step Sequence (WHAT)
-1.  **Trigger:** Ledger's `CreateAccountHandler` commits the new account to the DB and publishes `AccountCreatedEvent` to the `InMemoryEventBus`.
+1.  **Trigger:** Ledger's `CreateAccountHandler` generates a UUID hex string for `account_id`, creates the Account aggregate, commits the new account to the DB, and publishes `AccountCreatedEvent` to the `InMemoryEventBus`.
 2.  **Routing:** The synchronous bus routes the event to subscribers in the exact order they were registered in `identity_di.py`.
 3.  **Read Model Update 1:** `AccountCreatedReadModelHandler` executes an `INSERT` or `UPDATE` on `user_summaries` to set the `account_id` and `balance`.
 4.  **Card Provisioning:** `OnAccountCreatedHandler` receives the event.
     *   Validates that `user_id` or `merchant_id` is present.
     *   Calls `generate_card_number(lambda _: False)`.
-    *   Executes raw SQL `INSERT` into `user_cards` via `uow.conn`.
+    *   Executes raw SQL `INSERT` into `user_cards` via `uow.conn`, utilizing the string `account_id`.
     *   Commits the UoW transaction.
     *   Publishes `CardAssignedEvent`.
 5.  **Read Model Update 2:** `CardAssignedReadModelHandler` receives `CardAssignedEvent` and executes an `UPDATE` on `user_summaries` to set the `card_number`.
@@ -154,6 +155,7 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
 ### 1. Current Implementation (WHAT)
 *   **Modular Monolith:** The entire system runs in a single Python/Flask process. Bounded contexts (Identity, Ledger) are separated by folders and domain rules, but share the same SQLite database and memory space.
 *   **Infrastructure as a Plugin:** The `EventBus` and `UnitOfWork` are defined as ABCs in `common/domain/ports`. The current implementations (`InMemoryEventBus`, `SqliteUnitOfWork`) are injected via `DIContainer`.
+*   **Application-Layer ID Generation:** The `account_id` is generated as a UUID hex string in the Application layer (`uuid.uuid4().hex`) rather than relying on database auto-increment, ensuring deterministic event payloads.
 *   **No `CardNumber` Value Object:** The domain relies on a primitive `str` for the card number, violating the "Primitive Obsession Forbidden" rule, but compensated by the strict Luhn generation logic.
 
 ### 2. Discarded Alternatives & Reasons (WHY)
@@ -161,6 +163,8 @@ The Card Provisioning module is a reactive, event-driven sub-component of the Id
 *   **Why skip the `CardNumber` Value Object?** Creating a Value Object requires mapping it through the Repository pattern. Since the team chose raw SQL for speed, a Value Object would just be an unused domain artifact. The decision prioritizes shipping speed over strict Domain-Driven Design purity.
 
 ### 3. Rejected Alternatives
+*   **Rejected:** *Relying on Database Auto-Increment for `account_id`.*
+    *   **Reason:** Requires a post-insert fetch to retrieve the generated ID before publishing the `AccountCreatedEvent`. This tightly couples the event publishing to the database transaction lifecycle and complicates the Unit of Work pattern. Generating the UUID in the application layer simplifies the event-driven architecture.
 *   **Rejected:** *Using a Database Trigger to generate and insert cards automatically upon account creation.*
     *   **Reason:** Triggers are opaque, bypass domain events (`CardAssignedEvent`), and make the system impossible to test via standard Python unit/integration tests.
 *   **Rejected:** *Strict adherence to the Repository Pattern for all database writes.*

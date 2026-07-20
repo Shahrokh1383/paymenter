@@ -6,7 +6,7 @@ from typing import Optional
 @dataclass(frozen=True)
 class TransactionListItem:
     """Read Model DTO for the UI list view. Prevents N+1 queries."""
-    id: int
+    id: str
     amount: Decimal
     currency_code: str
     status: str

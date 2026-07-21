@@ -10,13 +10,27 @@ This system eliminates the dependency on external SaaS payment sandboxes, ensuri
 
 ## Architecture and Principles
 
-The codebase is engineered with maintainability and scalability in mind. It strictly adheres to the following software design principles:
+The system follows a strict **Clean Architecture** with four concentric layers, enforcing the **Dependency Rule** – source code dependencies must point only inward, toward higher‑level policies. Every layer is fully decoupled from the frameworks and infrastructure that drive it.
 
-*   **SOLID:** Dependencies are injected rather than hardcoded, and modules are designed for extension but closed for modification.
-*   **Single Responsibility Principle (SRP):** Components are strictly segregated. The architecture uses a 3-tier layering system: **Controllers** (handling HTTP and routing), **Services** (handling business logic and orchestration), and **Repositories** (handling raw SQL and data access). Email dispatch, Gateway UI, and the webhook dispatch worker are completely isolated from the Admin Dashboard.
-*   **Domain-Driven Design (DDD) Alignment:** Core business processes (payment authorisation, fund capture, refund) are implemented as domain events. Side effects such as webhook delivery are triggered by these events, keeping the write‑side pure and decoupled.
-*   **KISS (Keep It Simple, Stupid):** The execution flow is straightforward, avoiding unnecessary abstractions. Raw SQL is used over heavy ORMs for transparency and performance in a simulator.
-*   **DRY (Don't Repeat Yourself):** Database connections, transaction management, utility generators, SMTP configurations, and webhook cryptographic signing are centralized and reused across the application.
+- **Domain Layer (Core):** Pure Python, completely free of any framework or infrastructure imports. This layer contains **Entities**, **Value Objects** (e.g., `Money`, `CardNumber`, `EmailAddress`), **Aggregate Roots** that protect their own business invariants, **Domain Events**, and repository interfaces (**Ports**). It is the single source of truth for all business logic.
+
+- **Application Layer:** Implements use cases as **Commands**, **Queries**, and their **Handlers**. It orchestrates Domain objects, invokes Ports, and emits Domain Events. This layer knows nothing about HTTP, databases, or email servers – it contains pure orchestration logic.
+
+- **Infrastructure Layer:** Houses concrete adapters (e.g., SQLite repositories, SMTP mailers, HTTP webhook dispatchers) that implement the Ports defined in the Domain/Application layers. All framework‑specific wiring, including the **dependency‑injection container**, resides here. Infrastructure is treated as a **plugin** – you could swap SQLite for PostgreSQL by providing a new adapter without modifying a single line of business logic.
+
+- **Framework / Delivery Layer:** The thinnest possible layer. It hosts Flask route definitions, blueprints, and configuration. Its only job is to translate incoming HTTP requests into application commands and return HTTP responses.
+
+This structure guarantees **100% testability** and prevents the business core from being contaminated by accidental framework details. The codebase is built upon the following concrete principles, all mandated by the project’s immutable **Constitution**:
+
+- **SOLID & Strict OCP:** New capabilities are added exclusively by creating **new files** (Command, Handler, Adapter, etc.). Existing files are never modified to extend behaviour, ensuring the system is truly open for extension but closed for modification.
+- **No Primitive Obsession:** Domain concepts such as monetary amounts, card numbers, and email addresses are always encapsulated in dedicated **Value Objects**. Raw `float`, `str`, or `int` never cross a layer boundary.
+- **Aggregate‑Driven Invariants:** Financial rules (e.g., holding, capturing, refunding) are enforced inside the `Transaction` Aggregate Root. Application handlers only coordinate; they contain no business logic.
+- **Bounded Contexts & Domain Events:** The system is split into distinct contexts (`ledger`, `checkout`, `notifications`, `identity`). Cross‑context communication happens exclusively via **Domain Events**, guaranteeing loose coupling and independent deployability. In development an in‑memory EventBus is used, replaceable by a message broker (e.g., Kafka) in production.
+- **Infrastructure as Plugin:** Flask, SQLite, and SMTP are implementation details. They are injected into the application at the outermost layer, respecting the Dependency Inversion Principle at every architectural boundary.
+- **Database Schema Isolation:** Tables are defined per Bounded Context in isolated schema files, never in a monolithic SQL script. The database orchestrator merely aggregates these context schemas and executes them atomically, mirroring domain boundaries in the persistence layer.
+- **KISS / DRY:** The execution flow remains straightforward. Raw SQL is preferred over heavy ORMs for transparency and performance. Shared utilities (SMTP configuration, webhook signing, event bus, DI container) are centralised without leaking abstraction boundaries.
+
+This architecture enables the project to faithfully simulate a production‑grade payment gateway while remaining simple to understand, test, extend, and operate locally.
 
 ## Core Features
 

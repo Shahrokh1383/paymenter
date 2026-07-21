@@ -43,3 +43,8 @@ class SqliteUnitOfWork(UnitOfWork):
     def rollback(self):
         if self.conn:
             self.conn.rollback()
+
+    @staticmethod
+    def get_current_connection():
+        """Return the active ambient connection, or None if outside a UoW."""
+        return _current_conn.get()

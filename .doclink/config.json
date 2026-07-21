@@ -29,7 +29,9 @@
     "__init__.py",
     "__pycache__",
     ".pytest_cache",
-    "start_worker.bat"
+    "start_worker.bat",
+    ".git",
+    "src/common/infrastructure/database/storage"
   ],
   "schemaVersion": "1.0",
   "docFolder": {

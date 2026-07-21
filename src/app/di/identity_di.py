@@ -13,29 +13,37 @@ from src.identity.application.handlers.read_model_handlers import (
     UserRegisteredReadModelHandler, AccountCreatedReadModelHandler, CardAssignedReadModelHandler
 )
 from src.identity.application.handlers.merchant_read_model_handlers import (
-    MerchantOnboardedReadModelHandler, MerchantToggledReadModelHandler
+    MerchantOnboardedReadModelHandler, 
+    MerchantToggledReadModelHandler, 
+    MerchantWebhookConfiguredReadModelHandler
 )
 from src.identity.application.handlers.webhook_handlers import ConfigureWebhookHandler, GenerateWebhookSecretHandler
-from src.identity.application.commands.webhook_commands import ConfigureWebhookCommand, GenerateWebhookSecretCommand
 
 # Identity Domain Events
 from src.identity.domain.events.user_events import UserRegisteredEvent
 from src.ledger.domain.events.account_events import AccountCreatedEvent
 from src.identity.domain.events.card_events import CardAssignedEvent
 from src.identity.domain.events.merchant_events import (
-    MerchantOnboardedEvent, MerchantActivatedEvent, MerchantDeactivatedEvent
+    MerchantOnboardedEvent, 
+    MerchantActivatedEvent, 
+    MerchantDeactivatedEvent, 
+    MerchantWebhookConfiguredEvent
 )
 
 def register_identity(container):
     bus = container.event_bus
 
-    # --- Event Subscribers ---
+    # --- Event Subscribers (Read Model Projections) ---
     bus.subscribe(UserRegisteredEvent, lambda event: UserRegisteredReadModelHandler(SqliteUnitOfWork()).handle(event))
     bus.subscribe(AccountCreatedEvent, lambda event: AccountCreatedReadModelHandler(SqliteUnitOfWork()).handle(event))
     bus.subscribe(CardAssignedEvent, lambda event: CardAssignedReadModelHandler(SqliteUnitOfWork()).handle(event))
-    bus.subscribe(AccountCreatedEvent, lambda event: OnAccountCreatedHandler(SqliteUnitOfWork(), bus).handle(event))
     bus.subscribe(MerchantOnboardedEvent, lambda event: MerchantOnboardedReadModelHandler(SqliteUnitOfWork()).handle(event))
+    bus.subscribe(MerchantWebhookConfiguredEvent, lambda event: MerchantWebhookConfiguredReadModelHandler(SqliteUnitOfWork()).handle(event))
     
+    # --- Cross-Context Event Subscribers ---
+    bus.subscribe(AccountCreatedEvent, lambda event: OnAccountCreatedHandler(SqliteUnitOfWork(), bus).handle(event))
+
+    # --- Merchant State Toggle Projections ---
     toggled_handler = MerchantToggledReadModelHandler(SqliteUnitOfWork())
     bus.subscribe(MerchantActivatedEvent, lambda event: toggled_handler.handle_activated(event))
     bus.subscribe(MerchantDeactivatedEvent, lambda event: toggled_handler.handle_deactivated(event))
@@ -60,10 +68,10 @@ def register_identity(container):
         return RegisterUserHandler(uow, SqliteUserRepository(uow), bus)
     
     def get_configure_webhook_handler(uow: SqliteUnitOfWork) -> ConfigureWebhookHandler:
-        return ConfigureWebhookHandler(uow, SqliteMerchantRepository(uow))
+        return ConfigureWebhookHandler(uow, SqliteMerchantRepository(uow), bus)
 
     def get_generate_webhook_secret_handler(uow: SqliteUnitOfWork) -> GenerateWebhookSecretHandler:
-        return GenerateWebhookSecretHandler(uow, SqliteMerchantRepository(uow))
+        return GenerateWebhookSecretHandler(uow, SqliteMerchantRepository(uow), bus)
 
     # Bind factories to container
     container.get_all_users_handler = get_all_users_handler

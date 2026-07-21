@@ -76,11 +76,11 @@ class SqliteMerchantRepository(MerchantRepository):
 
     def get_webhook_status(self, merchant_id: int) -> Optional[WebhookStatusDTO]:
         cursor = self._uow.conn.execute(
-            "SELECT webhook_url, webhook_enabled FROM merchant_summaries WHERE id = ?", (merchant_id,)
+            "SELECT webhook_url, webhook_enabled FROM merchants WHERE id = ?", (merchant_id,)
         )
         row = cursor.fetchone()
         if not row: return None
         return WebhookStatusDTO(
             webhook_url=row['webhook_url'], 
-            webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False
+            webhook_enabled=bool(row['webhook_enabled'])
         )

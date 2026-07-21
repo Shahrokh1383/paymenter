@@ -43,7 +43,7 @@
       "path": "docs/backend/identity/MerchantManagement.md",
       "title": "MerchantManagement",
       "lastModified": "2026-07-19T00:41:21.351Z",
-      "linkCount": 15,
+      "linkCount": 19,
       "isOrphaned": false,
       "deleted": false
     },
@@ -99,25 +99,25 @@
       "lastModified": "2026-07-20T18:38:46.241Z",
       "linkCount": 35,
       "isOrphaned": false,
-      "deleted": false
+      "deleted": true
     },
     {
       "id": "58eaeb16-fc9d-44dd-ae8d-135907b008a2",
       "path": "docs/backend/common/docCommon.md",
       "title": "DocCommon",
       "lastModified": "2026-07-20T18:43:12.585Z",
-      "linkCount": 12,
+      "linkCount": 13,
       "isOrphaned": false,
-      "deleted": false
+      "deleted": true
     },
     {
-      "id": "fd8b43ad-6d14-4853-bcfb-d13002b51f06",
-      "path": "docs/backend/guideline/laravel2.md",
-      "title": "Laravel2",
-      "lastModified": "2026-07-20T21:08:46.101Z",
+      "id": "a2acde09-a254-4451-b1b7-a34cbd2f298c",
+      "path": "docs/backend/guideline/HowToTest.md",
+      "title": "HowToTest",
+      "lastModified": "2026-07-21T13:20:29.746Z",
       "linkCount": 0,
       "isOrphaned": true,
-      "deleted": false
+      "deleted": true
     }
   ]
 }

@@ -18,11 +18,13 @@
     "src\\checkout",
     "start_worker.bat",
     "src\\ledger",
-    "src\\identity"
+    "src\\identity",
+    "static",
+    "templates"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-21T11:27:32.557Z",
+  "lastModified": "2026-07-21T13:24:33.337Z",
   "version": 1
 }

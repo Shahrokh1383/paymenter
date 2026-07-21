@@ -75,65 +75,30 @@
     "src/app/flask_app.py": {
       "id": "906175f7-073a-48f8-8cdd-3bf1442f2e66",
       "filePath": "src/app/flask_app.py",
-      "hashValue": "972ab26d0f501a8a8fee14750efb7eeea0d518d6ceb079dfeb73539d35544207",
+      "hashValue": "c958c0ef31a4026a202308be738a11d96bb6e95ddfb346433a3f528e082d0b8a",
       "diff": {
         "filePath": "src/app/flask_app.py",
-        "oldHash": "972ab26d0f501a8a8fee14750efb7eeea0d518d6ceb079dfeb73539d35544207",
-        "newHash": "972ab26d0f501a8a8fee14750efb7eeea0d518d6ceb079dfeb73539d35544207",
-        "addedLines": [
-          {
-            "lineNumber": 2,
-            "content": "import click",
-            "type": "ADDED"
-          },
+        "oldHash": "c958c0ef31a4026a202308be738a11d96bb6e95ddfb346433a3f528e082d0b8a",
+        "newHash": "c958c0ef31a4026a202308be738a11d96bb6e95ddfb346433a3f528e082d0b8a",
+        "addedLines": [],
+        "removedLines": [],
+        "modifiedLines": [
           {
             "lineNumber": 29,
-            "content": "    from src.notifications.infrastructure.web.webhook_dashboard_controller import webhook_bp # NEW",
-            "type": "ADDED"
+            "content": "    from src.webhook.infrastructure.web.webhook_dashboard_controller import webhook_bp  # Updated",
+            "type": "MODIFIED"
           },
           {
             "lineNumber": 36,
-            "content": "    app.register_blueprint(webhook_bp) # NEW",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 38,
-            "content": "    # 4. Register CLI Commands",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 39,
-            "content": "    @app.cli.command(\"webhook-worker\")",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 40,
-            "content": "    def run_webhook_worker():",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 41,
-            "content": "        \"\"\"Runs the webhook background worker.\"\"\"",
-            "type": "ADDED"
+            "content": "    app.register_blueprint(webhook_bp)",
+            "type": "MODIFIED"
           },
           {
             "lineNumber": 42,
-            "content": "        from src.notifications.infrastructure.web.webhook_worker import run_worker",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 43,
-            "content": "        run_worker()",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 44,
-            "content": "",
-            "type": "ADDED"
+            "content": "        from src.webhook.infrastructure.web.webhook_worker import run_worker  # Updated",
+            "type": "MODIFIED"
           }
-        ],
-        "removedLines": [],
-        "modifiedLines": []
+        ]
       }
     },
     "src/app/main.py": {
@@ -10088,32 +10053,421 @@
     ".git/index": {
       "id": "ea3800d5-9f4d-410a-ae34-fc6b9901fae6",
       "filePath": ".git/index",
-      "hashValue": "480145ccfa4edb50344d1c999c2b6ab5a1f83a072233a8d0045953820d5cdabe",
+      "hashValue": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "480145ccfa4edb50344d1c999c2b6ab5a1f83a072233a8d0045953820d5cdabe",
-        "newHash": "480145ccfa4edb50344d1c999c2b6ab5a1f83a072233a8d0045953820d5cdabe",
+        "oldHash": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
+        "newHash": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
         "addedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a�P����m39��F\\��KT��\u000e",
+            "lineNumber": 191,
+            "content": "�\u0000315 7",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 192,
+            "content": "JO�h��*�B�i�1�8s@`)�src\u0000251 7",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 193,
+            "content": "��:��^[�B{������\u0006�\u0017app\u000010 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 194,
+            "content": "�\u0014V\u0006S��v�$‸և����di\u00006 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 195,
+            "content": "J�Gȅ.Bs\u001c\u0012��Q�l>��_�common\u000030 2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 196,
+            "content": "3-·[յ\b�x?=�&�ԔWedomain\u00009 2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 201,
+            "content": "�q�}Z�W�%�^nO�`\u000binfrastructure\u000020 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 202,
+            "content": "h\u0002\t��fNu\u000f_���^�&=�E\u0014web\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 203,
+            "content": "Ú��5�\u0012�\u0010����\u001e\u0006n\tz�database\u000013 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 204,
+            "content": "���'\u0017>�<&K�P�Q���[�schemas\u000012 5",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 205,
+            "content": "q~���-��\u0019��|��\u001f,��(&ledger\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 206,
+            "content": "�)\u0006��Y�*6Ҥ�br�S�q(�webhook\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 207,
+            "content": "\u001a\u0002�So��\u000e������a�\u0015r{`checkout\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 209,
+            "content": "\u0006��g$\u0013աH��$\u0016s\u00149�\u000f�\u0011notifications\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 210,
+            "content": "�&���Nu҄v���q7��\b�persistence\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 232,
+            "content": "�\u001a��a*C\u0013���Y:�iܜ�webhook\u000033 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 233,
+            "content": "�\u000e�cko\u0016r h� 0�Ld\u001e[��domain\u00009 2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 234,
+            "content": "و���(@\"�B�`�A�\u0004JF�?ports\u00006 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 235,
+            "content": "��s�ap�;\u0016�7�\"��&%�%services\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 236,
+            "content": ";] �j��:�K����*Q��K^application\u000011 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 237,
+            "content": "���*\u001d�\u001d�[`��\u001f�$p��\u0000#dto\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 238,
+            "content": "\"W�bG�E�rݎc\u0010�k-|=AHqueries\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 239,
+            "content": "�j",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 240,
+            "content": "��\u001a���6o\u0004}Џe��\u0006*commands\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 241,
+            "content": "y��jH�\u0010E���#�(��)r\t�handlers\u00004 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 242,
+            "content": "8�s�Y��|n����c�\u0006sf��infrastructure\u000012 4",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 243,
+            "content": "�\u0005#�ӛ&�e@��f�\u001aF��4web\u00003 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 244,
+            "content": "U\u0007���N2\u001d\u0000hi4&\u0016�CwK��utils\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 245,
+            "content": "���+\u0000F6y�\u0002s�Z���\u0010�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 246,
+            "content": "�adapters\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 247,
+            "content": "d�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 248,
+            "content": "1��\u001bL���0����ٛ�persistence\u00004 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 249,
+            "content": "��7?-\u0011hI��\u0006�`�\u0000���ccheckout\u000044 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 280,
+            "content": "�贈�\u00152\u0000' o��'notifications\u000020 3",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 281,
+            "content": "\fd���'�җ�d���QWPax�domain\u00008 2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 282,
+            "content": "��\u001d �\u0002\u0016��@�d[IL�9�ports\u00005 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 283,
+            "content": "�\u0011Q���\\�f��:�M�e$\u0004b�value_objects\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 284,
+            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u00004 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 285,
+            "content": "��U��h�̞�%���[m)���handlers\u00003 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 286,
+            "content": "��s�E|��\u0019�C�+#S��yinfrastructure\u00007 2",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 287,
+            "content": "Yw��\u001e�M\f������勦�bsmtp\u00002 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 288,
+            "content": "@���\u000b�g�m����w�(Ch�persistence\u00004 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 289,
+            "content": ":s@$�\u0001��\u0015��K�zO\u0015���\u0014docs\u000013 1",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 314,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u000010 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 315,
+            "content": "p\u0016��^��\u000e�>��]\"�����rtemplates\u000010 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 316,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a��\u001f��ѱF����H�{�q`S",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001af��\\�H\u0006����C\u0015I���\u0003�",
+            "lineNumber": 191,
+            "content": "�\u0000-1 7",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 192,
+            "content": "src\u0000-1 6",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 193,
+            "content": "app\u0000-1 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 194,
+            "content": "di\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 195,
+            "content": "common\u0000-1 2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 196,
+            "content": "domain\u00009 2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 201,
+            "content": "�q�}Z�W�%�^nO�`\u000binfrastructure\u0000-1 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 202,
+            "content": "web\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 203,
+            "content": "Ú��5�\u0012�\u0010����\u001e\u0006n\tz�database\u0000-1 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 204,
+            "content": "schemas\u0000-1 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 205,
+            "content": "ledger\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 206,
+            "content": "�)\u0006��Y�*6Ҥ�br�S�q(�checkout\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 208,
+            "content": "\u0006��g$\u0013աH��$\u0016s\u00149�\u000f�\u0011notifications\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 209,
+            "content": "persistence\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 231,
+            "content": "�\u001a��a*C\u0013���Y:�iܜ�checkout\u000044 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 262,
+            "content": "�贈�\u00152\u0000' o��'notifications\u0000-1 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 263,
+            "content": "domain\u0000-1 3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 264,
+            "content": "ports\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 265,
+            "content": "services\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 266,
+            "content": "value_objects\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 267,
+            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u0000-1 4",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 268,
+            "content": "dto\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 269,
+            "content": "queries\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 270,
+            "content": "commands\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 271,
+            "content": "handlers\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 272,
+            "content": "infrastructure\u0000-1 5",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 273,
+            "content": "web\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 274,
+            "content": "smtp\u00002 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 275,
+            "content": "@���\u000b�g�m����w�(Ch�utils\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 276,
+            "content": "adapters\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 277,
+            "content": "persistence\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 278,
+            "content": "docs\u000013 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 303,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 304,
+            "content": "templates\u000010 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 305,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a�J�ݏ�3p�|H���}Q8:�",
             "type": "REMOVED"
           }
         ],
-        "modifiedLines": [
-          {
-            "lineNumber": 7,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_U�\u001fd�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
-            "type": "MODIFIED"
-          }
-        ]
+        "modifiedLines": []
       }
     },
     ".git/objects/ab/d70cf378e38af0644a03350b61c2097d8766a6": {
@@ -10179,20 +10533,110 @@
     ".git/COMMIT_EDITMSG": {
       "id": "0b0e8a0e-48cc-45f7-80af-42086d7cfdf1",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "a780b56ef0d11db8726c7afe6f177d76197e0a3cd45f7716756c808672aa9590",
-      "diff": null
+      "hashValue": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
+      "diff": {
+        "filePath": ".git/COMMIT_EDITMSG",
+        "oldHash": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
+        "newHash": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "refactor: extract webhook bounded context into standalone webhook module",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "- Moved all webhook-related application, domain, and infrastructure code from notifications to new src/webhook context (strict SRP and OCP)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "- Created separate database schema for webhooks (src/common/infrastructure/database/schemas/webhook/)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "- Registered webhooks DI module and event subscriptions in di_container",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "- Cleaned up notifications context to only contain email/OTP delivery",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "- Deleted old webhook files from notifications to prevent dead code",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "- No behavioral changes; all existing tests should pass",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "BREAKING CHANGE: Webhook dashboard URL and worker imports must now use the new module paths.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "added start_worker.bat for webhook starter in cmd terminal",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/logs/HEAD": {
       "id": "4cf9ce1f-5ed7-4dfd-817d-ba3ed25f032b",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "7c75264b3a7811610da29dbdc69af96bc0d850db93026e2f47f24b93bb4b4ae8",
-      "diff": null
+      "hashValue": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
+      "diff": {
+        "filePath": ".git/logs/HEAD",
+        "oldHash": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
+        "newHash": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
+        "addedLines": [
+          {
+            "lineNumber": 178,
+            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f 6731827b412e2c741ca97b0cb321684df38ae0dd Shahrokh <shahrokh.hatami2004@gmail.com> 1784636872 +0330\tcommit: refactor: extract webhook bounded context into standalone webhook module",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/logs/refs/heads/dev": {
       "id": "96a173e8-ee36-4ec2-8ee1-9b770a388d23",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "3e283b3f759ca2db003b0a8d37cbebbd55a61c38465ba6218c46eb3231c39ed3",
-      "diff": null
+      "hashValue": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
+      "diff": {
+        "filePath": ".git/logs/refs/heads/dev",
+        "oldHash": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
+        "newHash": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
+        "addedLines": [
+          {
+            "lineNumber": 11,
+            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f 6731827b412e2c741ca97b0cb321684df38ae0dd Shahrokh <shahrokh.hatami2004@gmail.com> 1784636872 +0330\tcommit: refactor: extract webhook bounded context into standalone webhook module",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/objects/85/0a0388b103f1b1cb245f594a674f6c42b3c71f": {
       "id": "910394af-1615-413b-ba8f-6ac47fc7e6d6",
@@ -10203,8 +10647,27 @@
     ".git/refs/heads/dev": {
       "id": "886288c5-dc83-4e8f-869a-96c6f70bbc9f",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "739da2499b43ec749b6588aec46abac067bdd4213fa118b277c19fb4e96fadfa",
-      "diff": null
+      "hashValue": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
+      "diff": {
+        "filePath": ".git/refs/heads/dev",
+        "oldHash": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
+        "newHash": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "6731827b412e2c741ca97b0cb321684df38ae0dd",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/objects/3c/5eeb5081608e270f6873deeafd88d3fda07770": {
       "id": "a8ec5578-af12-4cf2-8afd-206dc5b0f260",
@@ -10224,2621 +10687,416 @@
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "src\\identity\\domain\\entities\\merchant.py :",
+            "content": "src\\app\\flask_app.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 2,
-            "content": "from dataclasses import dataclass",
+            "content": "import os",
             "type": "REMOVED"
           },
           {
             "lineNumber": 3,
-            "content": "from typing import Optional",
+            "content": "import click",
             "type": "REMOVED"
           },
           {
             "lineNumber": 4,
-            "content": "from src.identity.domain.value_objects.api_key import ApiKey",
+            "content": "from flask import Flask, redirect, url_for",
             "type": "REMOVED"
           },
           {
             "lineNumber": 5,
-            "content": "from src.identity.domain.value_objects.webhook_url import WebhookUrl",
+            "content": "from src.common.infrastructure.database import Database",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "",
+            "content": "from src.app.di_container import DIContainer",
             "type": "REMOVED"
           },
           {
             "lineNumber": 7,
-            "content": "@dataclass",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 8,
-            "content": "class Merchant:",
+            "content": "def create_app():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 9,
-            "content": "    id: int",
+            "content": "    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 10,
-            "content": "    name: str",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 11,
-            "content": "    api_key: ApiKey",
+            "content": "    app = Flask(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 12,
-            "content": "    is_active: bool",
+            "content": "        __name__,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 13,
-            "content": "    webhook_url: Optional[WebhookUrl] = None",
+            "content": "        template_folder=os.path.join(base_dir, 'templates'),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 14,
-            "content": "    webhook_secret: Optional[str] = None",
+            "content": "        static_folder=os.path.join(base_dir, 'static')",
             "type": "REMOVED"
           },
           {
             "lineNumber": 15,
-            "content": "    webhook_enabled: bool = False",
+            "content": "    )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 16,
-            "content": "    ",
+            "content": "    app.secret_key = \"super_secret_simulator_key\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 17,
-            "content": "    def toggle(self) -> None: ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 18,
-            "content": "        self.is_active = not self.is_active",
+            "content": "    # 1. Initialize Database Schema",
             "type": "REMOVED"
           },
           {
             "lineNumber": 19,
-            "content": "",
+            "content": "    Database.initialize()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 20,
-            "content": "    def configure_webhook(self, url: Optional[str], enabled: bool) -> None:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 21,
-            "content": "        \"\"\"Protects the invariant: Webhook cannot be enabled without a valid URL.\"\"\"",
+            "content": "    # 2. Initialize DI Container and attach to App Context",
             "type": "REMOVED"
           },
           {
             "lineNumber": 22,
-            "content": "        if enabled and not url:",
+            "content": "    app.di_container = DIContainer()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 23,
-            "content": "            raise ValueError(\"Cannot enable webhook without providing a valid URL.\")",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 24,
-            "content": "        ",
+            "content": "    # 3. Register Hexagonal Blueprints",
             "type": "REMOVED"
           },
           {
             "lineNumber": 25,
-            "content": "        self.webhook_url = WebhookUrl(url) if url else None",
+            "content": "    from src.identity.infrastructure.web.dashboard_controller import dashboard_bp",
             "type": "REMOVED"
           },
           {
             "lineNumber": 26,
-            "content": "        self.webhook_enabled = enabled if self.webhook_url else False",
+            "content": "    from src.ledger.infrastructure.web.transaction_controller import transaction_bp",
             "type": "REMOVED"
           },
           {
             "lineNumber": 27,
-            "content": "",
+            "content": "    from src.checkout.infrastructure.web.gateway_controller import gateway_bp",
             "type": "REMOVED"
           },
           {
             "lineNumber": 28,
-            "content": "    def set_webhook_secret(self, secret: str) -> None:",
+            "content": "    from src.checkout.infrastructure.web.api_controller import api_bp",
             "type": "REMOVED"
           },
           {
             "lineNumber": 29,
-            "content": "        \"\"\"Sets the generated secret. In a real system, this would be hashed before storage.\"\"\"",
+            "content": "    from src.ledger.infrastructure.web.transaction_api_controller import transaction_api_bp",
             "type": "REMOVED"
           },
           {
             "lineNumber": 30,
-            "content": "        if not secret or len(secret) < 20:",
+            "content": "    from src.notifications.infrastructure.web.webhook_dashboard_controller import webhook_bp # NEW",
             "type": "REMOVED"
           },
           {
             "lineNumber": 31,
-            "content": "            raise ValueError(\"Webhook secret must be at least 20 characters long.\")",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 32,
-            "content": "        self.webhook_secret = secret",
+            "content": "    app.register_blueprint(dashboard_bp)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 33,
-            "content": "",
+            "content": "    app.register_blueprint(transaction_bp)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 34,
-            "content": "src\\identity\\application\\dto\\merchant_summary.py :",
+            "content": "    app.register_blueprint(gateway_bp)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 35,
-            "content": "from dataclasses import dataclass",
+            "content": "    app.register_blueprint(api_bp)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 36,
-            "content": "from typing import Optional",
+            "content": "    app.register_blueprint(transaction_api_bp)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 37,
-            "content": "",
+            "content": "    app.register_blueprint(webhook_bp) # NEW",
             "type": "REMOVED"
           },
           {
             "lineNumber": 38,
-            "content": "@dataclass",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 39,
-            "content": "class MerchantSummaryDTO:",
+            "content": "    # 4. Register CLI Commands",
             "type": "REMOVED"
           },
           {
             "lineNumber": 40,
-            "content": "    id: int",
+            "content": "    @app.cli.command(\"webhook-worker\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 41,
-            "content": "    name: str",
+            "content": "    def run_webhook_worker():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 42,
-            "content": "    api_key: str",
+            "content": "        \"\"\"Runs the webhook background worker.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 43,
-            "content": "    is_active: bool",
+            "content": "        from src.notifications.infrastructure.web.webhook_worker import run_worker",
             "type": "REMOVED"
           },
           {
             "lineNumber": 44,
-            "content": "    webhook_url: Optional[str] = None",
+            "content": "        run_worker()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 45,
-            "content": "    webhook_enabled: bool = False",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 46,
-            "content": "",
+            "content": "    @app.route('/')",
             "type": "REMOVED"
           },
           {
             "lineNumber": 47,
-            "content": "src\\identity\\infrastructure\\persistence\\sqlite_merchant_repository.py :",
+            "content": "    def index():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 48,
-            "content": "import sqlite3",
+            "content": "        return redirect(url_for('dashboard.currencies'))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 49,
-            "content": "from typing import List, Optional",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 50,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
+            "content": "    return app",
             "type": "REMOVED"
           },
           {
             "lineNumber": 51,
-            "content": "from src.identity.domain.entities.merchant import Merchant",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 52,
-            "content": "from src.identity.domain.value_objects.api_key import ApiKey",
+            "content": "src\\app\\main.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 53,
-            "content": "from src.identity.domain.value_objects.webhook_url import WebhookUrl",
+            "content": "import os",
             "type": "REMOVED"
           },
           {
             "lineNumber": 54,
-            "content": "from src.identity.domain.repositories import MerchantRepository",
+            "content": "import socket",
             "type": "REMOVED"
           },
           {
             "lineNumber": 55,
-            "content": "from src.identity.application.dto.merchant_summary import MerchantSummaryDTO",
+            "content": "import threading",
             "type": "REMOVED"
           },
           {
             "lineNumber": 56,
-            "content": "from src.identity.application.dto.webhook_status_dto import WebhookStatusDTO",
+            "content": "import webbrowser",
             "type": "REMOVED"
           },
           {
             "lineNumber": 57,
-            "content": "",
+            "content": "from src.app.flask_app import create_app",
             "type": "REMOVED"
           },
           {
             "lineNumber": 58,
-            "content": "class SqliteMerchantRepository(MerchantRepository):",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 59,
-            "content": "    def __init__(self, uow: UnitOfWork):",
+            "content": "def find_available_port(start_port=5000, max_port=5100):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 60,
-            "content": "        self._uow = uow",
+            "content": "    for port in range(start_port, max_port):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 61,
-            "content": "",
+            "content": "        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 62,
-            "content": "    def _map_row_to_merchant(self, row: sqlite3.Row) -> Merchant:",
+            "content": "            try:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 63,
-            "content": "        webhook_url = WebhookUrl(row['webhook_url']) if row['webhook_url'] else None",
+            "content": "                s.bind((\"127.0.0.1\", port))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 64,
-            "content": "        return Merchant(",
+            "content": "                return port",
             "type": "REMOVED"
           },
           {
             "lineNumber": 65,
-            "content": "            id=row['id'], ",
+            "content": "            except OSError:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 66,
-            "content": "            name=row['name'],",
+            "content": "                continue",
             "type": "REMOVED"
           },
           {
             "lineNumber": 67,
-            "content": "            api_key=ApiKey(row['api_key']), ",
+            "content": "    return start_port",
             "type": "REMOVED"
           },
           {
             "lineNumber": 68,
-            "content": "            is_active=bool(row['is_active']),",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 69,
-            "content": "            webhook_url=webhook_url,",
+            "content": "def open_browser(url):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 70,
-            "content": "            webhook_secret=row['webhook_secret'],",
+            "content": "    webbrowser.open_new_tab(url)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 71,
-            "content": "            webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 72,
-            "content": "        )",
+            "content": "if __name__ == '__main__':",
             "type": "REMOVED"
           },
           {
             "lineNumber": 73,
-            "content": "",
+            "content": "    app = create_app()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 74,
-            "content": "    def add(self, merchant: Merchant) -> int:",
+            "content": "    port = find_available_port()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 75,
-            "content": "        cursor = self._uow.conn.execute(",
+            "content": "    url = f\"http://127.0.0.1:{port}\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 76,
-            "content": "            \"\"\"INSERT INTO merchants (name, api_key, is_active, webhook_url, webhook_secret, webhook_enabled) ",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 77,
-            "content": "               VALUES (?, ?, ?, ?, ?, ?)\"\"\",",
+            "content": "    if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':",
             "type": "REMOVED"
           },
           {
             "lineNumber": 78,
-            "content": "            (",
+            "content": "        threading.Timer(1.5, open_browser, args=[url]).start()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 79,
-            "content": "                merchant.name, merchant.api_key.value, merchant.is_active,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 80,
-            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
+            "content": "    print(f\"Starting Paymenter (Hexagonal Architecture) on {url}\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 81,
-            "content": "                merchant.webhook_secret,",
+            "content": "    app.run(debug=True, port=port)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 82,
-            "content": "                merchant.webhook_enabled",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 83,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 84,
-            "content": "        )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 85,
-            "content": "        return cursor.lastrowid",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 86,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 87,
-            "content": "    def update(self, merchant: Merchant) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 88,
-            "content": "        self._uow.conn.execute(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 89,
-            "content": "            \"\"\"UPDATE merchants ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 90,
-            "content": "               SET is_active = ?, webhook_url = ?, webhook_secret = ?, webhook_enabled = ? ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 91,
-            "content": "               WHERE id = ?\"\"\",",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 92,
-            "content": "            (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 93,
-            "content": "                merchant.is_active, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 94,
-            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 95,
-            "content": "                merchant.webhook_secret,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 96,
-            "content": "                merchant.webhook_enabled,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 97,
-            "content": "                merchant.id",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 98,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 99,
-            "content": "        )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 100,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 101,
-            "content": "    def get_by_id(self, merchant_id: int) -> Optional[Merchant]:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 102,
-            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE id = ?\", (merchant_id,))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 103,
-            "content": "        row = cursor.fetchone()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 104,
-            "content": "        return self._map_row_to_merchant(row) if row else None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 105,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 106,
-            "content": "    def get_all_summaries(self) -> List[MerchantSummaryDTO]:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 107,
-            "content": "        rows = self._uow.conn.execute(\"SELECT * FROM merchant_summaries\").fetchall()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 108,
-            "content": "        return [",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 109,
-            "content": "            MerchantSummaryDTO(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 110,
-            "content": "                id=row['id'], ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 111,
-            "content": "                name=row['name'], ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 112,
-            "content": "                api_key=row['api_key'], ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 113,
-            "content": "                is_active=bool(row['is_active']),",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 114,
-            "content": "                webhook_url=row['webhook_url'],",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 115,
-            "content": "                webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 116,
-            "content": "            ) for row in rows",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 117,
-            "content": "        ]",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 118,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 119,
-            "content": "    def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 120,
-            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE api_key = ?\", (api_key.value,))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 121,
-            "content": "        row = cursor.fetchone()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 122,
-            "content": "        return self._map_row_to_merchant(row) if row else None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 123,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 124,
-            "content": "    def get_webhook_status(self, merchant_id: int) -> Optional[WebhookStatusDTO]:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 125,
-            "content": "        cursor = self._uow.conn.execute(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 126,
-            "content": "            \"SELECT webhook_url, webhook_enabled FROM merchant_summaries WHERE id = ?\", (merchant_id,)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 127,
-            "content": "        )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 128,
-            "content": "        row = cursor.fetchone()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 129,
-            "content": "        if not row: return None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 130,
-            "content": "        return WebhookStatusDTO(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 131,
-            "content": "            webhook_url=row['webhook_url'], ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 132,
-            "content": "            webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 133,
-            "content": "        )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 134,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 135,
-            "content": "src\\identity\\infrastructure\\web\\dashboard_controller.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 136,
-            "content": "from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 137,
-            "content": "from decimal import Decimal",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 138,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 139,
-            "content": "# Ledger Application Commands & Queries",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 140,
-            "content": "from src.ledger.application.commands.create_currency_command import CreateCurrencyCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 141,
-            "content": "from src.ledger.application.commands.toggle_currency_command import ToggleCurrencyCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 142,
-            "content": "from src.ledger.application.commands.create_account_command import CreateAccountCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 143,
-            "content": "from src.ledger.application.commands.topup_account_command import TopupAccountCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 144,
-            "content": "from src.ledger.application.commands.update_account_currency_command import UpdateAccountCurrencyCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 145,
-            "content": "from src.ledger.application.queries.get_all_accounts_query import GetAllAccountsQuery",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 146,
-            "content": "from src.ledger.application.queries.get_all_escrow_accounts_query import GetAllEscrowAccountsQuery",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 147,
-            "content": "from src.ledger.application.queries.get_all_currencies_query import GetAllCurrenciesQuery",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 148,
-            "content": "from src.ledger.application.queries.get_active_currencies_query import GetActiveCurrenciesQuery",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 149,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 150,
-            "content": "# Identity Application Commands & Queries",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 151,
-            "content": "from src.identity.application.commands.identity_commands import OnboardMerchantCommand, ToggleMerchantCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 152,
-            "content": "from src.identity.application.commands.register_user_command import RegisterUserCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 153,
-            "content": "from src.identity.application.queries.identity_queries import GetAllUsersQuery, SearchUsersQuery, GetAllMerchantsQuery",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 154,
-            "content": "from src.identity.application.commands.webhook_commands import ConfigureWebhookCommand, GenerateWebhookSecretCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 155,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 156,
-            "content": "# UoW (Transaction Boundary)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 157,
-            "content": "from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 158,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 159,
-            "content": "dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 160,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 161,
-            "content": "@dashboard_bp.route('/currencies', methods=['GET'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 162,
-            "content": "def currencies():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 163,
-            "content": "    uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 164,
-            "content": "    with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 165,
-            "content": "        handler = current_app.di_container.get_all_currencies_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 166,
-            "content": "        currencies_list = handler.handle(GetAllCurrenciesQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 167,
-            "content": "    return render_template('currencies.html', currencies=currencies_list)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 168,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 169,
-            "content": "@dashboard_bp.route('/currencies/add', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 170,
-            "content": "def add_currency():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 171,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 172,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 173,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 174,
-            "content": "            handler = current_app.di_container.get_create_currency_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 175,
-            "content": "            handler.handle(CreateCurrencyCommand(name=request.form['name'], code=request.form['code']))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 176,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 177,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 178,
-            "content": "    return redirect(url_for('dashboard.currencies'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 179,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 180,
-            "content": "@dashboard_bp.route('/currencies/toggle/<string:id>', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 181,
-            "content": "def toggle_currency(id):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 182,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 183,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 184,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 185,
-            "content": "            handler = current_app.di_container.get_toggle_currency_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 186,
-            "content": "            handler.handle(ToggleCurrencyCommand(currency_id=id))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 187,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 188,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 189,
-            "content": "    return redirect(url_for('dashboard.currencies'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 190,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 191,
-            "content": "@dashboard_bp.route('/users', methods=['GET'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 192,
-            "content": "def users():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 193,
-            "content": "    query = request.args.get('query', '')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 194,
-            "content": "    uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 195,
-            "content": "    with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 196,
-            "content": "        active_currencies = current_app.di_container.get_active_currencies_handler(uow).handle(GetActiveCurrenciesQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 197,
-            "content": "        if query:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 198,
-            "content": "            users_list = current_app.di_container.get_search_users_handler(uow).handle(SearchUsersQuery(query))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 199,
-            "content": "        else:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 200,
-            "content": "            users_list = current_app.di_container.get_all_users_handler(uow).handle(GetAllUsersQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 201,
-            "content": "    return render_template('users.html', users=users_list, query=query, currencies=active_currencies)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 202,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 203,
-            "content": "@dashboard_bp.route('/users/add', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 204,
-            "content": "def add_user():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 205,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 206,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 207,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 208,
-            "content": "            handler = current_app.di_container.get_register_user_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 209,
-            "content": "            handler.handle(RegisterUserCommand(name=request.form['name'], phone_email=request.form['phone_email']))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 210,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 211,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 212,
-            "content": "    return redirect(url_for('dashboard.users'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 213,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 214,
-            "content": "@dashboard_bp.route('/accounts', methods=['GET'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 215,
-            "content": "def accounts():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 216,
-            "content": "    uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 217,
-            "content": "    with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 218,
-            "content": "        accounts_list = current_app.di_container.get_all_accounts_handler(uow).handle(GetAllAccountsQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 219,
-            "content": "        active_currencies = current_app.di_container.get_active_currencies_handler(uow).handle(GetActiveCurrenciesQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 220,
-            "content": "        users_list = current_app.di_container.get_all_users_handler(uow).handle(GetAllUsersQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 221,
-            "content": "        merchants_list = current_app.di_container.get_all_merchants_handler(uow).handle(GetAllMerchantsQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 222,
-            "content": "    return render_template('accounts.html', accounts=accounts_list, currencies=active_currencies, users=users_list, merchants=merchants_list)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 223,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 224,
-            "content": "@dashboard_bp.route('/accounts/create', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 225,
-            "content": "def create_account():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 226,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 227,
-            "content": "        owner_id_str = request.form['owner_id']",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 228,
-            "content": "        currency_code = request.form['currency_code']",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 229,
-            "content": "        ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 230,
-            "content": "        owner_type, owner_id = owner_id_str.split('_')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 231,
-            "content": "        user_id = int(owner_id) if owner_type == 'user' else None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 232,
-            "content": "        merchant_id = int(owner_id) if owner_type == 'merchant' else None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 233,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 234,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 235,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 236,
-            "content": "            handler = current_app.di_container.get_create_account_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 237,
-            "content": "            account_id = handler.handle(CreateAccountCommand(user_id=user_id, merchant_id=merchant_id, currency_code=currency_code))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 238,
-            "content": "        flash(f\"Account created with ID {account_id}.\", 'success')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 239,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 240,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 241,
-            "content": "    return redirect(url_for('dashboard.accounts'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 242,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 243,
-            "content": "@dashboard_bp.route('/accounts/update-currency', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 244,
-            "content": "def update_account_currency():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 245,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 246,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 247,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 248,
-            "content": "            handler = current_app.di_container.get_update_account_currency_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 249,
-            "content": "            handler.handle(UpdateAccountCurrencyCommand(account_id=request.form['account_id'], currency_code=request.form['currency_code']))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 250,
-            "content": "        flash(\"Account currency updated successfully.\", 'success')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 251,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 252,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 253,
-            "content": "    return redirect(url_for('dashboard.accounts'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 254,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 255,
-            "content": "@dashboard_bp.route('/accounts/topup', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 256,
-            "content": "def topup_account():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 257,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 258,
-            "content": "        amount = Decimal(str(request.form['amount']))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 259,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 260,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 261,
-            "content": "            handler = current_app.di_container.get_topup_account_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 262,
-            "content": "            handler.handle(TopupAccountCommand(account_id=request.form['account_id'], amount=amount))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 263,
-            "content": "        flash(\"Topup successful.\", 'success')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 264,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 265,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 266,
-            "content": "    return redirect(request.referrer or url_for('dashboard.accounts'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 267,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 268,
-            "content": "@dashboard_bp.route('/escrow', methods=['GET'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 269,
-            "content": "def escrow_accounts():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 270,
-            "content": "    uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 271,
-            "content": "    with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 272,
-            "content": "        handler = current_app.di_container.get_all_escrow_accounts_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 273,
-            "content": "        escrow_list = handler.handle(GetAllEscrowAccountsQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 274,
-            "content": "    return render_template('escrow_accounts.html', accounts=escrow_list)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 275,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 276,
-            "content": "@dashboard_bp.route('/merchants', methods=['GET'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 277,
-            "content": "def merchants():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 278,
-            "content": "    uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 279,
-            "content": "    with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 280,
-            "content": "        merchants_list = current_app.di_container.get_all_merchants_handler(uow).handle(GetAllMerchantsQuery())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 281,
-            "content": "    return render_template('merchants.html', merchants=merchants_list)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 282,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 283,
-            "content": "@dashboard_bp.route('/merchants/add', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 284,
-            "content": "def add_merchant():",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 285,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 286,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 287,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 288,
-            "content": "            handler = current_app.di_container.get_onboard_merchant_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 289,
-            "content": "            handler.handle(OnboardMerchantCommand(name=request.form['name']))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 290,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 291,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 292,
-            "content": "    return redirect(url_for('dashboard.merchants'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 293,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 294,
-            "content": "@dashboard_bp.route('/merchants/toggle/<int:id>', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 295,
-            "content": "def toggle_merchant(id):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 296,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 297,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 298,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 299,
-            "content": "            handler = current_app.di_container.get_toggle_merchant_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 300,
-            "content": "            handler.handle(ToggleMerchantCommand(merchant_id=id))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 301,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 302,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 303,
-            "content": "    return redirect(url_for('dashboard.merchants'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 304,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 305,
-            "content": "@dashboard_bp.route('/merchants/<int:id>/webhook/configure', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 306,
-            "content": "def configure_webhook(id):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 307,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 308,
-            "content": "        url = request.form.get('webhook_url')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 309,
-            "content": "        enabled = request.form.get('webhook_enabled') == 'on'",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 310,
-            "content": "        ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 311,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 312,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 313,
-            "content": "            handler = current_app.di_container.get_configure_webhook_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 314,
-            "content": "            handler.handle(ConfigureWebhookCommand(merchant_id=id, webhook_url=url, webhook_enabled=enabled))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 315,
-            "content": "        flash(\"Webhook configuration updated successfully.\", 'success')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 316,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 317,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 318,
-            "content": "    return redirect(url_for('dashboard.merchants'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 319,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 320,
-            "content": "@dashboard_bp.route('/merchants/<int:id>/webhook/generate-secret', methods=['POST'])",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 321,
-            "content": "def generate_webhook_secret(id):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 322,
-            "content": "    try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 323,
-            "content": "        uow = SqliteUnitOfWork()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 324,
-            "content": "        with uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 325,
-            "content": "            handler = current_app.di_container.get_generate_webhook_secret_handler(uow)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 326,
-            "content": "            secret = handler.handle(GenerateWebhookSecretCommand(merchant_id=id))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 327,
-            "content": "        # In a real app, this would be displayed via a secure temporary view. ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 328,
-            "content": "        # Flashing is acceptable for the simulator.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 329,
-            "content": "        flash(f\"New Webhook Secret (shown once): {secret}\", 'success')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 330,
-            "content": "    except Exception as e:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 331,
-            "content": "        flash(str(e), 'error')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 332,
-            "content": "    return redirect(url_for('dashboard.merchants'))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 333,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 334,
-            "content": "src\\common\\infrastructure\\database\\schemas\\identity\\identity.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 335,
-            "content": "from src.common.infrastructure.database.schemas.identity.merchant_summaries_schema import MERCHANT_SUMMARIES_SCHEMA",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 336,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 337,
-            "content": "IDENTITY_SCHEMA = \"\"\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 338,
-            "content": "CREATE TABLE IF NOT EXISTS users (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 339,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 340,
-            "content": "    name TEXT NOT NULL, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 341,
-            "content": "    phone_email TEXT NOT NULL UNIQUE",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 342,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 343,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 344,
-            "content": "CREATE TABLE IF NOT EXISTS merchants (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 345,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 346,
-            "content": "    name TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 347,
-            "content": "    api_key TEXT NOT NULL UNIQUE,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 348,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 349,
-            "content": "    webhook_url TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 350,
-            "content": "    webhook_secret TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 351,
-            "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 352,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 353,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 354,
-            "content": "CREATE TABLE IF NOT EXISTS user_cards (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 355,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 356,
-            "content": "    user_id INTEGER, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 357,
-            "content": "    merchant_id INTEGER,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 358,
-            "content": "    account_id TEXT NOT NULL, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 359,
-            "content": "    card_number TEXT NOT NULL UNIQUE, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 360,
-            "content": "    FOREIGN KEY (user_id) REFERENCES users(id), ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 361,
-            "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id),",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 362,
-            "content": "    FOREIGN KEY (account_id) REFERENCES accounts(id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 363,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 364,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 365,
-            "content": "CREATE TABLE IF NOT EXISTS user_summaries (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 366,
-            "content": "    user_id INTEGER PRIMARY KEY,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 367,
-            "content": "    name TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 368,
-            "content": "    phone_email TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 369,
-            "content": "    account_id TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 370,
-            "content": "    account_number TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 371,
-            "content": "    card_number TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 372,
-            "content": "    balance TEXT DEFAULT '0.00',",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 373,
-            "content": "    currency_code TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 374,
-            "content": "    FOREIGN KEY (user_id) REFERENCES users(id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 375,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 376,
-            "content": "\"\"\" + MERCHANT_SUMMARIES_SCHEMA",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 377,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 378,
-            "content": "src\\common\\infrastructure\\database\\schemas\\identity\\merchant_summaries_schema.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 379,
-            "content": "MERCHANT_SUMMARIES_SCHEMA = \"\"\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 380,
-            "content": "CREATE TABLE IF NOT EXISTS merchant_summaries (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 381,
-            "content": "    id INTEGER PRIMARY KEY,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 382,
-            "content": "    name TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 383,
-            "content": "    api_key TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 384,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 385,
-            "content": "    webhook_url TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 386,
-            "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 387,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 388,
-            "content": "\"\"\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 389,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 390,
-            "content": "src\\app\\di\\identity_di.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 391,
-            "content": "from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 392,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 393,
-            "content": "# Identity Infrastructure Adapters",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 394,
-            "content": "from src.identity.infrastructure.persistence.sqlite_user_repository import SqliteUserRepository",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 395,
-            "content": "from src.identity.infrastructure.persistence.sqlite_merchant_repository import SqliteMerchantRepository",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 396,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 397,
-            "content": "# Identity Application Handlers",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 398,
-            "content": "from src.identity.application.handlers.identity_handlers import OnboardMerchantHandler, ToggleMerchantHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 399,
-            "content": "from src.identity.application.handlers.identity_query_handlers import GetAllUsersHandler, SearchUsersHandler, GetAllMerchantsHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 400,
-            "content": "from src.identity.application.handlers.register_user_handler import RegisterUserHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 401,
-            "content": "from src.identity.application.handlers.on_account_created_handler import OnAccountCreatedHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 402,
-            "content": "from src.identity.application.handlers.read_model_handlers import (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 403,
-            "content": "    UserRegisteredReadModelHandler, AccountCreatedReadModelHandler, CardAssignedReadModelHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 404,
-            "content": ")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 405,
-            "content": "from src.identity.application.handlers.merchant_read_model_handlers import (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 406,
-            "content": "    MerchantOnboardedReadModelHandler, MerchantToggledReadModelHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 407,
-            "content": ")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 408,
-            "content": "from src.identity.application.handlers.webhook_handlers import ConfigureWebhookHandler, GenerateWebhookSecretHandler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 409,
-            "content": "from src.identity.application.commands.webhook_commands import ConfigureWebhookCommand, GenerateWebhookSecretCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 410,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 411,
-            "content": "# Identity Domain Events",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 412,
-            "content": "from src.identity.domain.events.user_events import UserRegisteredEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 413,
-            "content": "from src.ledger.domain.events.account_events import AccountCreatedEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 414,
-            "content": "from src.identity.domain.events.card_events import CardAssignedEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 415,
-            "content": "from src.identity.domain.events.merchant_events import (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 416,
-            "content": "    MerchantOnboardedEvent, MerchantActivatedEvent, MerchantDeactivatedEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 417,
-            "content": ")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 418,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 419,
-            "content": "def register_identity(container):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 420,
-            "content": "    bus = container.event_bus",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 421,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 422,
-            "content": "    # --- Event Subscribers ---",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 423,
-            "content": "    bus.subscribe(UserRegisteredEvent, lambda event: UserRegisteredReadModelHandler(SqliteUnitOfWork()).handle(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 424,
-            "content": "    bus.subscribe(AccountCreatedEvent, lambda event: AccountCreatedReadModelHandler(SqliteUnitOfWork()).handle(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 425,
-            "content": "    bus.subscribe(CardAssignedEvent, lambda event: CardAssignedReadModelHandler(SqliteUnitOfWork()).handle(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 426,
-            "content": "    bus.subscribe(AccountCreatedEvent, lambda event: OnAccountCreatedHandler(SqliteUnitOfWork(), bus).handle(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 427,
-            "content": "    bus.subscribe(MerchantOnboardedEvent, lambda event: MerchantOnboardedReadModelHandler(SqliteUnitOfWork()).handle(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 428,
-            "content": "    ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 429,
-            "content": "    toggled_handler = MerchantToggledReadModelHandler(SqliteUnitOfWork())",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 430,
-            "content": "    bus.subscribe(MerchantActivatedEvent, lambda event: toggled_handler.handle_activated(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 431,
-            "content": "    bus.subscribe(MerchantDeactivatedEvent, lambda event: toggled_handler.handle_deactivated(event))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 432,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 433,
-            "content": "    # --- Handler Factories (Enforces Strict DIP in Delivery Layer) ---",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 434,
-            "content": "    def get_all_users_handler(uow: SqliteUnitOfWork) -> GetAllUsersHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 435,
-            "content": "        return GetAllUsersHandler(SqliteUserRepository(uow))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 436,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 437,
-            "content": "    def get_search_users_handler(uow: SqliteUnitOfWork) -> SearchUsersHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 438,
-            "content": "        return SearchUsersHandler(SqliteUserRepository(uow))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 439,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 440,
-            "content": "    def get_all_merchants_handler(uow: SqliteUnitOfWork) -> GetAllMerchantsHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 441,
-            "content": "        return GetAllMerchantsHandler(SqliteMerchantRepository(uow))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 442,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 443,
-            "content": "    def get_onboard_merchant_handler(uow: SqliteUnitOfWork) -> OnboardMerchantHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 444,
-            "content": "        return OnboardMerchantHandler(uow, SqliteMerchantRepository(uow), bus)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 445,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 446,
-            "content": "    def get_toggle_merchant_handler(uow: SqliteUnitOfWork) -> ToggleMerchantHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 447,
-            "content": "        return ToggleMerchantHandler(uow, SqliteMerchantRepository(uow), bus)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 448,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 449,
-            "content": "    def get_register_user_handler(uow: SqliteUnitOfWork) -> RegisterUserHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 450,
-            "content": "        return RegisterUserHandler(uow, SqliteUserRepository(uow), bus)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 451,
-            "content": "    ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 452,
-            "content": "    def get_configure_webhook_handler(uow: SqliteUnitOfWork) -> ConfigureWebhookHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 453,
-            "content": "        return ConfigureWebhookHandler(uow, SqliteMerchantRepository(uow))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 454,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 455,
-            "content": "    def get_generate_webhook_secret_handler(uow: SqliteUnitOfWork) -> GenerateWebhookSecretHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 456,
-            "content": "        return GenerateWebhookSecretHandler(uow, SqliteMerchantRepository(uow))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 457,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 458,
-            "content": "    # Bind factories to container",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 459,
-            "content": "    container.get_all_users_handler = get_all_users_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 460,
-            "content": "    container.get_search_users_handler = get_search_users_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 461,
-            "content": "    container.get_all_merchants_handler = get_all_merchants_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 462,
-            "content": "    container.get_onboard_merchant_handler = get_onboard_merchant_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 463,
-            "content": "    container.get_toggle_merchant_handler = get_toggle_merchant_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 464,
-            "content": "    container.get_register_user_handler = get_register_user_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 465,
-            "content": "    container.get_configure_webhook_handler = get_configure_webhook_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 466,
-            "content": "    container.get_generate_webhook_secret_handler = get_generate_webhook_secret_handler",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 467,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 468,
-            "content": "src\\ledger\\application\\handlers\\complete_funds_handler.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 469,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 470,
-            "content": "from src.common.domain.ports.event_bus import EventBus",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 471,
-            "content": "from src.common.domain.exceptions import AccountNotFoundError, InvalidTransactionStateError",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 472,
-            "content": "from src.ledger.domain.repositories import AccountRepository, TransactionRepository",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 473,
-            "content": "from src.ledger.domain.ports.system_account_resolver_port import SystemAccountResolverPort",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 474,
-            "content": "from src.ledger.domain.services.double_entry_ledger import DoubleEntryLedger",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 475,
-            "content": "from src.ledger.domain.events.transaction_events import TransactionCompletedEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 476,
-            "content": "from src.ledger.application.commands.complete_funds_command import CompleteFundsCommand",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 477,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 478,
-            "content": "class CompleteFundsHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 479,
-            "content": "    def __init__(self, uow: UnitOfWork, account_repo: AccountRepository, txn_repo: TransactionRepository, event_bus: EventBus, system_account_resolver: SystemAccountResolverPort):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 480,
-            "content": "        self._uow = uow",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 481,
-            "content": "        self._account_repo = account_repo",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 482,
-            "content": "        self._txn_repo = txn_repo",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 483,
-            "content": "        self._event_bus = event_bus",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 484,
-            "content": "        self._system_account_resolver = system_account_resolver",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 485,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 486,
-            "content": "    def handle(self, command: CompleteFundsCommand) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 487,
-            "content": "        with self._uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 488,
-            "content": "            txn = self._txn_repo.get_by_id(command.transaction_id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 489,
-            "content": "            if not txn:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 490,
-            "content": "                raise InvalidTransactionStateError(\"Transaction not found.\")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 491,
-            "content": "                ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 492,
-            "content": "            from_acc = self._account_repo.get_by_id(txn.from_account_id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 493,
-            "content": "            to_acc = self._account_repo.get_by_id(txn.to_account_id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 494,
-            "content": "            if not from_acc or not to_acc:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 495,
-            "content": "                raise AccountNotFoundError(\"Associated accounts not found.\")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 496,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 497,
-            "content": "            escrow_acc = self._system_account_resolver.get_escrow_account(txn.amount.currency)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 498,
-            "content": "            ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 499,
-            "content": "            if from_acc.id == escrow_acc.id:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 500,
-            "content": "                from_acc = escrow_acc",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 501,
-            "content": "            if to_acc.id == escrow_acc.id:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 502,
-            "content": "                to_acc = escrow_acc",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 503,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 504,
-            "content": "            DoubleEntryLedger.complete_funds(txn, from_acc, to_acc, escrow_acc)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 505,
-            "content": "            ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 506,
-            "content": "            self._txn_repo.update(txn)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 507,
-            "content": "            self._account_repo.update(from_acc)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 508,
-            "content": "            if to_acc is not from_acc:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 509,
-            "content": "                self._account_repo.update(to_acc)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 510,
-            "content": "            if escrow_acc is not from_acc and escrow_acc is not to_acc:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 511,
-            "content": "                self._account_repo.update(escrow_acc)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 512,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 513,
-            "content": "            event_to_publish = TransactionCompletedEvent(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 514,
-            "content": "                transaction_id=txn.id,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 515,
-            "content": "                payer_account_id=txn.from_account_id,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 516,
-            "content": "                amount=txn.amount,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 517,
-            "content": "                merchant_id=txn.merchant_id",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 518,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 519,
-            "content": "            ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 520,
-            "content": "            # MOVED INSIDE UoW: Event handlers will now join this transaction",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 521,
-            "content": "            self._event_bus.publish(event_to_publish)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 522,
-            "content": "            # Commit is handled automatically by __exit__",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 523,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 524,
             "content": "",
             "type": "REMOVED"
           }
@@ -12849,32 +11107,32 @@
     ".git/gk/config": {
       "id": "860a8dbb-366e-4226-bfb7-9bdca84ca2c2",
       "filePath": ".git/gk/config",
-      "hashValue": "d4584efc9316df9f3882823ae17d0dcbcd6c03dfd4af565c6d3f7ed04494dbb0",
+      "hashValue": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "d4584efc9316df9f3882823ae17d0dcbcd6c03dfd4af565c6d3f7ed04494dbb0",
-        "newHash": "d4584efc9316df9f3882823ae17d0dcbcd6c03dfd4af565c6d3f7ed04494dbb0",
+        "oldHash": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
+        "newHash": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
         "addedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T11:28:34.801Z",
+            "content": "\tgk-last-accessed = 2026-07-21T12:30:45.165Z",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T11:28:34.801Z",
+            "content": "\tgk-last-modified = 2026-07-21T12:30:45.165Z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T11:21:36.952Z",
+            "content": "\tgk-last-accessed = 2026-07-21T11:28:34.801Z",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T11:21:36.952Z",
+            "content": "\tgk-last-modified = 2026-07-21T11:28:34.801Z",
             "type": "REMOVED"
           }
         ],
@@ -15614,6 +13872,378 @@
       "id": "515a858c-6238-4a04-94fd-a3337f02ea82",
       "filePath": "fix.txt",
       "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff": null
+    },
+    ".git/objects/ee/95ece0b6842edf2dcf81a1a74aebb7884e4a1e": {
+      "id": "34696ae4-8320-454a-844d-6f81e0c60a1d",
+      "filePath": ".git/objects/ee/95ece0b6842edf2dcf81a1a74aebb7884e4a1e",
+      "hashValue": "d0fff407123f9ab894352bd13fcc76c858e338287b3f82d342b0519dcdf94a82",
+      "diff": null
+    },
+    ".git/objects/fa/71ebcd99f8946a82cedb8c461c69368d926f25": {
+      "id": "2a2a3f69-0d2e-40b9-bbdb-668cfb6168a9",
+      "filePath": ".git/objects/fa/71ebcd99f8946a82cedb8c461c69368d926f25",
+      "hashValue": "95d02984780d0c5d5c3367cd78eec449fb12cdaa9ec857c083d18a4af7b98eb6",
+      "diff": null
+    },
+    ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack": {
+      "id": "d763e6dc-4192-4324-bccb-28c4ec048b58",
+      "filePath": ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack",
+      "hashValue": "af0593c6e2fdb7ebfe766ff15c35d16df23f7685463a2efef4cb515f407160ee",
+      "diff": null
+    },
+    ".git/objects/0f/7d8bb460316c13e1c8f4deb71a8f82006d36c8": {
+      "id": "b4c1d57f-706a-4f2e-ba1a-bc43328168d3",
+      "filePath": ".git/objects/0f/7d8bb460316c13e1c8f4deb71a8f82006d36c8",
+      "hashValue": "9620465d5e52103231f2cf165b1922949f1bb5fd09cecd1df86d16a897592813",
+      "diff": null
+    },
+    ".git/objects/8b/560cb24f658780c53802ce53f7a8a768855f94": {
+      "id": "d17e6be4-1e0f-43ae-95bd-8c68ddc4d840",
+      "filePath": ".git/objects/8b/560cb24f658780c53802ce53f7a8a768855f94",
+      "hashValue": "e4522e492c24422125a1080d5284ce4f2314741ce81d38e4aa619d7984ad586f",
+      "diff": null
+    },
+    ".git/objects/31/28920d9417ed90005917b4f5631d03327b5dc6": {
+      "id": "49f15a8c-686f-40b4-b7b5-ed1b9912e0ae",
+      "filePath": ".git/objects/31/28920d9417ed90005917b4f5631d03327b5dc6",
+      "hashValue": "1b63bd5397ae89a9d0f5f63c9d5c3dec7881a8e4b91de023b8175772fe5c627d",
+      "diff": null
+    },
+    ".git/objects/d3/6891c24e26cbfc85808d4b98c8d47838eac507": {
+      "id": "9c34ea00-60c2-4673-946b-85641a5ce45d",
+      "filePath": ".git/objects/d3/6891c24e26cbfc85808d4b98c8d47838eac507",
+      "hashValue": "4f4ec6c89f57eb1f379cf18bd3eec57cf1a3101917ab6a75081894c7cdc056c8",
+      "diff": null
+    },
+    ".git/objects/63/c1812ef80fe779bb7837ca3ab2255cf642d01d": {
+      "id": "e3bceee8-d26b-4439-9232-d89386ab6b02",
+      "filePath": ".git/objects/63/c1812ef80fe779bb7837ca3ab2255cf642d01d",
+      "hashValue": "a843f2e2af7621d75bbe2bfe527e11d5812aa57f02dca127068808ecf631d0f2",
+      "diff": null
+    },
+    ".git/objects/9f/44c3b449b298b37805e2d2cc1ae65b4cca6acb": {
+      "id": "282d4597-8ed8-4c3b-a904-907d029c7878",
+      "filePath": ".git/objects/9f/44c3b449b298b37805e2d2cc1ae65b4cca6acb",
+      "hashValue": "ad8dbb0f4e2ab0ae297504204777888fc93bef69ad52d14598a815533d12b345",
+      "diff": null
+    },
+    ".git/objects/7e/bf20c2892d38153210e9252cf39720c70f0b48": {
+      "id": "669f74f8-d9fc-4841-b821-1d14bc15bc5f",
+      "filePath": ".git/objects/7e/bf20c2892d38153210e9252cf39720c70f0b48",
+      "hashValue": "826b67cd759c5735056644a3622ecdb1c3e931d9539d323af2e896971252ed28",
+      "diff": null
+    },
+    ".git/objects/df/8b7567e75a667b1bcdab4e0df1401431c39a61": {
+      "id": "0da7a00b-908c-4c4f-8d8e-a367384730a0",
+      "filePath": ".git/objects/df/8b7567e75a667b1bcdab4e0df1401431c39a61",
+      "hashValue": "c154ea874eeca21f9a4c3e7e0dcd2fb6170c0439852408bf1d06993f7930d2c3",
+      "diff": null
+    },
+    ".git/objects/b5/975f8b03d49897b1fdf33cc9ebcb3a30df720e": {
+      "id": "2fbac76a-ba0e-4f9f-b28e-b4f926b4d4c8",
+      "filePath": ".git/objects/b5/975f8b03d49897b1fdf33cc9ebcb3a30df720e",
+      "hashValue": "3fbffa701902de96eb7a2f7dc4fda6760b7e52dfedef8c2e5d11a844ae8733d0",
+      "diff": null
+    },
+    ".git/objects/d4/59bd148cccb9dc3953b172d9a708f7e1590c6e": {
+      "id": "3de01c01-ca2a-4c95-9854-3cd5cd5e237f",
+      "filePath": ".git/objects/d4/59bd148cccb9dc3953b172d9a708f7e1590c6e",
+      "hashValue": "8388870492e3da06cc8d76babbca76887ef094ebcb738e8f75ea385f0d1bd978",
+      "diff": null
+    },
+    ".git/objects/69/00cae3a0ef2df2164ef55fe55773f67a4b6d25": {
+      "id": "f61f6bdd-69e7-4d61-99e2-98c28983eecf",
+      "filePath": ".git/objects/69/00cae3a0ef2df2164ef55fe55773f67a4b6d25",
+      "hashValue": "3f5379253953744e893db5ec01c5964386174a3e416f8dab4a91183ba993ee63",
+      "diff": null
+    },
+    ".git/objects/8c/623423826ebd233f9087807cc998428cea4d40": {
+      "id": "d98cfff0-718e-4edc-9a78-bd7e20c0be30",
+      "filePath": ".git/objects/8c/623423826ebd233f9087807cc998428cea4d40",
+      "hashValue": "86c7d55ebf2d39c0a26ae53e5574239f6f0668d9b783ead38e9fb6c0026f2e54",
+      "diff": null
+    },
+    ".git/objects/25/d5b342e983b980d09fa61d8a0874bee36f1a6c": {
+      "id": "274be4a6-5835-45bb-af38-cc244e1a2f54",
+      "filePath": ".git/objects/25/d5b342e983b980d09fa61d8a0874bee36f1a6c",
+      "hashValue": "02583cb72a4fa45fdf02218dcf54c0cc491ba617556736f9958fb6408193e72a",
+      "diff": null
+    },
+    ".git/objects/2e/abef2c4e9f91c31e4f456057200380bcc70668": {
+      "id": "a6b65ad6-deed-48b1-8c87-1c3cd6c15b71",
+      "filePath": ".git/objects/2e/abef2c4e9f91c31e4f456057200380bcc70668",
+      "hashValue": "f7f16f1c68cd6ee378ef91aca45bd9d9955eba2c92234488659e06c29084845e",
+      "diff": null
+    },
+    ".git/objects/1c/c007576bcec0901e06b6c73c6caed86082777e": {
+      "id": "20df9a29-73a5-47bd-8c5b-64e6cc9ed460",
+      "filePath": ".git/objects/1c/c007576bcec0901e06b6c73c6caed86082777e",
+      "hashValue": "8a917a29692b1b875d09f4662839b3556432050a47afe6c784c380cecda27770",
+      "diff": null
+    },
+    ".git/objects/a5/6c54736ecefdd7c26cda4d8876075c25c205b5": {
+      "id": "274f1d28-fd79-4b4d-95e3-5ac78867228a",
+      "filePath": ".git/objects/a5/6c54736ecefdd7c26cda4d8876075c25c205b5",
+      "hashValue": "151f0ba5afb85b9dba8af30d3e30485e1747bf110eb503f4ecad63e046838eae",
+      "diff": null
+    },
+    ".git/objects/a5/7e640848a6f7b08cffbce682868f90068650ce": {
+      "id": "0196990a-79d5-452a-9ca4-358dc8008dea",
+      "filePath": ".git/objects/a5/7e640848a6f7b08cffbce682868f90068650ce",
+      "hashValue": "072a3e3c2d19320b09d55f0e16aa8d8953ad376b8df99d7e638d382ca8a8e808",
+      "diff": null
+    },
+    ".git/objects/70/953edc82cbb9b6597b661452ca43207bf33269": {
+      "id": "d01526b4-5feb-4d4f-a581-0b65334a35a9",
+      "filePath": ".git/objects/70/953edc82cbb9b6597b661452ca43207bf33269",
+      "hashValue": "1fd05c49329cde7a1eb3d8cb523def35299622eb8c933a4a73753cd9d4e9ecc1",
+      "diff": null
+    },
+    ".git/objects/a0/3ab26a64bee4d6c1613a285863c71cee151d4a": {
+      "id": "6bb6d196-9d36-4249-8432-e8f9d322205a",
+      "filePath": ".git/objects/a0/3ab26a64bee4d6c1613a285863c71cee151d4a",
+      "hashValue": "aa616437ab657e57afb2256235edadefb24ead28927ccebc0b2164af732e8b99",
+      "diff": null
+    },
+    ".git/objects/ee/0f333f5f76fcbfaaa6f2bd9191a99b8d8e3a5c": {
+      "id": "f053168e-69cb-4b36-a696-206bde10a9ad",
+      "filePath": ".git/objects/ee/0f333f5f76fcbfaaa6f2bd9191a99b8d8e3a5c",
+      "hashValue": "2003c4a46115c5ed1c1c38ed6117a8839b3d299a8bd44a3afb96df8648edc709",
+      "diff": null
+    },
+    ".git/objects/94/8041981279b8d209f74dbcd04374850d469531": {
+      "id": "3850810d-00bf-4668-92c5-0843cae4a812",
+      "filePath": ".git/objects/94/8041981279b8d209f74dbcd04374850d469531",
+      "hashValue": "28cb8f17b17e70b212c98158ff24656452dca89ca970f4668e861eb8641b3870",
+      "diff": null
+    },
+    ".git/objects/2d/9a67222c9a26d85e4aaac03dfd0ec53a3f4897": {
+      "id": "b6b23d9d-7a01-4e4b-b1c3-b576aa60901a",
+      "filePath": ".git/objects/2d/9a67222c9a26d85e4aaac03dfd0ec53a3f4897",
+      "hashValue": "642d82d3d8c1ae8e14afa417db359a5e43f7c3c6f8310052b9c31568454951e2",
+      "diff": null
+    },
+    ".git/objects/f5/8cfacb43db6526b3ff0e4217db61ff7d9bd311": {
+      "id": "c1a61d11-6ee3-49b8-a49c-ef43575f135b",
+      "filePath": ".git/objects/f5/8cfacb43db6526b3ff0e4217db61ff7d9bd311",
+      "hashValue": "a89659717ebf45a001fe02055a850aeb1363c794d8403c0312a584d8f62c94f1",
+      "diff": null
+    },
+    ".git/objects/7f/26d7d5ce0312284129a0fb1944955a1169d454": {
+      "id": "1cca6c4a-ee74-49b4-9370-179579197007",
+      "filePath": ".git/objects/7f/26d7d5ce0312284129a0fb1944955a1169d454",
+      "hashValue": "de4f6b806bededefe90ada589935a979e4087455e5a96d82dec8153bfd6a9273",
+      "diff": null
+    },
+    ".git/objects/82/e098ce90406c77708e420b0994e4765792a0e4": {
+      "id": "fc88511a-764a-4cd5-adbe-18dcfb356dc3",
+      "filePath": ".git/objects/82/e098ce90406c77708e420b0994e4765792a0e4",
+      "hashValue": "873308b9c92a929fe9234fe55c93a8447e6f73901aed291239ba4e06aa8e0a15",
+      "diff": null
+    },
+    ".git/objects/c3/de838042121315c759b7fc910f30afd69ced67": {
+      "id": "e3c3e138-c450-44c3-b77f-c91488a9825f",
+      "filePath": ".git/objects/c3/de838042121315c759b7fc910f30afd69ced67",
+      "hashValue": "6ce521bd25f72eeb5a034135d8d6cc1c5c879f6af02d268ddedc142fe90910ff",
+      "diff": null
+    },
+    ".git/objects/d2/3cd7b48722990a6abcb58a8c26e724151e3c95": {
+      "id": "a9dc1165-6af3-46d4-90bb-f913678b569b",
+      "filePath": ".git/objects/d2/3cd7b48722990a6abcb58a8c26e724151e3c95",
+      "hashValue": "6d8d052b2b3a32c9727d35387dd3fb8b792682d49822dd32cf57065cf558af97",
+      "diff": null
+    },
+    ".git/objects/70/16ccf65ee4c10ecd3eb9b95d22b5959ef6b672": {
+      "id": "242c3a1c-e0b0-479b-aa92-08e39b70b900",
+      "filePath": ".git/objects/70/16ccf65ee4c10ecd3eb9b95d22b5959ef6b672",
+      "hashValue": "33be6f6aaae1437ab5336f402b1c7fbd4efd02b9de259e02d3a39d1aa7baf463",
+      "diff": null
+    },
+    ".git/objects/4a/9347c8852e42731c128b9e51876c3e97825fe9": {
+      "id": "c1feaada-5bf4-4b46-939e-e26f0d732bd0",
+      "filePath": ".git/objects/4a/9347c8852e42731c128b9e51876c3e97825fe9",
+      "hashValue": "bae26920de8306fd7a6d44a7714278d62322192929a3dcb03d170c18bfb89765",
+      "diff": null
+    },
+    ".git/objects/f9/1456065385ae76b77f24e280b8d68783f8e9fb": {
+      "id": "90b78d18-8622-4fb1-861f-6ba8853cbca9",
+      "filePath": ".git/objects/f9/1456065385ae76b77f24e280b8d68783f8e9fb",
+      "hashValue": "961a9b49693a000be6b686d72e006b6579743042a7fad9ba9e65e6aeba824446",
+      "diff": null
+    },
+    ".git/objects/ee/26e3a9ebd54e75d28476b0e9f27137c7c208c8": {
+      "id": "fb1a9c6a-2750-4226-8e6e-6097ee3da232",
+      "filePath": ".git/objects/ee/26e3a9ebd54e75d28476b0e9f27137c7c208c8",
+      "hashValue": "6729a39c985171e712a8823e0c50b3b04f975efe2ba8cd3e5d5aa902d518d3af",
+      "diff": null
+    },
+    ".git/objects/1a/02e8536fd2cd0ecefca0ff8ce261f715727b60": {
+      "id": "a7c8d8a6-d0a2-4361-a8f5-b944be2ac84e",
+      "filePath": ".git/objects/1a/02e8536fd2cd0ecefca0ff8ce261f715727b60",
+      "hashValue": "24bc6baf20132e72d90f089de88ed72e2cbbd96248ce11428853afb8cc0ac29e",
+      "diff": null
+    },
+    ".git/objects/68/0209a2f5664e750f5fdeedfc5e93263dd34514": {
+      "id": "b2aabeaf-029e-4fb8-b2d3-0c5353e7882c",
+      "filePath": ".git/objects/68/0209a2f5664e750f5fdeedfc5e93263dd34514",
+      "hashValue": "b94b85688a24639e5913a9d8cad0f365583e6e90623b4b18942876f493098ee6",
+      "diff": null
+    },
+    ".git/objects/33/2dc2b75bd5b5087ff5783f3da326cad4945765": {
+      "id": "27ada0fd-cbc9-49e9-b3d9-94612212e8d1",
+      "filePath": ".git/objects/33/2dc2b75bd5b5087ff5783f3da326cad4945765",
+      "hashValue": "e1e90e2e7de7b19b51300453ed26b305ee8c2745f52e4838efeb33b6c8eacd91",
+      "diff": null
+    },
+    ".git/objects/bd/a51d20e59d0216c0ad40eb645b494cf239f1a9": {
+      "id": "ae67fa6b-e500-457f-9f0c-d84413747f1d",
+      "filePath": ".git/objects/bd/a51d20e59d0216c0ad40eb645b494cf239f1a9",
+      "hashValue": "77f34eb9e651a784fafc7dd6693b8e4637c095c9057c04e335172d404a81a0e9",
+      "diff": null
+    },
+    ".git/objects/79/90da6a48c21045d5c19e23a72899f3297209c4": {
+      "id": "87dd8df3-e37e-459e-b3fd-5d84eb3f6560",
+      "filePath": ".git/objects/79/90da6a48c21045d5c19e23a72899f3297209c4",
+      "hashValue": "a775411c7211ac8322830b390e36c9de94c510925c6454e820d60e0616723581",
+      "diff": null
+    },
+    ".git/objects/22/57dd62479945f372dd8e6310f66b2d7c3d4148": {
+      "id": "dc614d4d-518d-4c8f-becf-4cd1dcfc05fc",
+      "filePath": ".git/objects/22/57dd62479945f372dd8e6310f66b2d7c3d4148",
+      "hashValue": "0832706adea9c2d358c7c131bba10fcb9ae4f1b038f5d256bd29e5f71006522d",
+      "diff": null
+    },
+    ".git/objects/ea/6a0aaea11ae9fcbf366f047dd08f65cac9062a": {
+      "id": "2c602c15-ee08-45b9-ae16-67e76d4cc3bb",
+      "filePath": ".git/objects/ea/6a0aaea11ae9fcbf366f047dd08f65cac9062a",
+      "hashValue": "bea92d0e253d579902ff1f962c310556391eb1bd2a4e4794c215ab15ea8e71c8",
+      "diff": null
+    },
+    ".git/objects/71/7edac2d02df6f419acc27c96871f2c948a2826": {
+      "id": "96764cf2-6a38-4b14-a166-00bf0ae677b8",
+      "filePath": ".git/objects/71/7edac2d02df6f419acc27c96871f2c948a2826",
+      "hashValue": "c52a7f4854f97412cf95d1a0503ffb2f4e593141949f487e6f4fefbc61ae61d0",
+      "diff": null
+    },
+    ".git/objects/38/b773c259d2cd7c6ed2dbc8e863dd06736687da": {
+      "id": "68425470-e4ae-49f7-9af4-fd3bd66d8dca",
+      "filePath": ".git/objects/38/b773c259d2cd7c6ed2dbc8e863dd06736687da",
+      "hashValue": "4d74de17f7bbdf25becb4009bcd77878f385a7a4345cd29752226e7be127a4fe",
+      "diff": null
+    },
+    ".git/objects/fa/fbbf2a1de31d945b609de81ff12470b6b00023": {
+      "id": "5f7c9260-7157-4d3f-a30a-eaa67a6c6a7a",
+      "filePath": ".git/objects/fa/fbbf2a1de31d945b609de81ff12470b6b00023",
+      "hashValue": "17e1d126e9038a9551ec79aafb7d67d4e1de5998d0e227b2cb7b27cab159a4af",
+      "diff": null
+    },
+    ".git/objects/c1/f0c527173eba3c264bf750d751eadbf0ba5bb8": {
+      "id": "cc2bcc63-836d-4f8f-b8c5-df3ce3b878aa",
+      "filePath": ".git/objects/c1/f0c527173eba3c264bf750d751eadbf0ba5bb8",
+      "hashValue": "17175b820f9308811f22d3b2c3bbb8bbba463cced5c822215dcd4a58a23f8968",
+      "diff": null
+    },
+    ".git/objects/a5/9c738c6170f37f3b16b337e1229ffe2625e125": {
+      "id": "71f8193c-7ffe-4c53-8743-f4c39fe9ae6c",
+      "filePath": ".git/objects/a5/9c738c6170f37f3b16b337e1229ffe2625e125",
+      "hashValue": "161a7403160bd76ad93f4a9f7acc86da76446c41cbbc89c64575adee076f8f20",
+      "diff": null
+    },
+    ".git/objects/3b/5d209c6ac0ec3ace4b9aeda9872a51e2c64b5e": {
+      "id": "73b644ed-02ae-4fb7-89f7-4945d55f0d41",
+      "filePath": ".git/objects/3b/5d209c6ac0ec3ace4b9aeda9872a51e2c64b5e",
+      "hashValue": "e3d8761599a2761cf30f88366fd32642ce7ec7290fbf5f6a71b309cd8b6d01a7",
+      "diff": null
+    },
+    ".git/objects/0c/6483b7f127b2d297b4649bbbcb5157506178e5": {
+      "id": "f97aeb0e-db57-4f36-bf87-afe298d44378",
+      "filePath": ".git/objects/0c/6483b7f127b2d297b4649bbbcb5157506178e5",
+      "hashValue": "bc2ef670dbec167a54ed46aa050f5921ba626979143d02d3c0e2fe95af50ac4e",
+      "diff": null
+    },
+    ".git/objects/d9/88d4e0cc28402299429060c241e5044a46cc3f": {
+      "id": "cd79f312-1d7a-4d95-908c-7d691663915d",
+      "filePath": ".git/objects/d9/88d4e0cc28402299429060c241e5044a46cc3f",
+      "hashValue": "15c17277af662881b0ea132a38e725bc14aececb07f4761adc942da195fc40a0",
+      "diff": null
+    },
+    ".git/objects/64/a20d31a8cf1b4cdefd9b30acb3d7fbd99bb07f": {
+      "id": "dbdfb712-21c1-45b2-aab8-9e2807906298",
+      "filePath": ".git/objects/64/a20d31a8cf1b4cdefd9b30acb3d7fbd99bb07f",
+      "hashValue": "2019af08923cab559e025e335ef85116fe5a596dada75dd16746ff862266ccb5",
+      "diff": null
+    },
+    ".git/objects/ab/d1f32b00463679da0273a15aa3fde410ea0ae9": {
+      "id": "f430a5fb-9e03-45c8-b295-7f1007e9f0e2",
+      "filePath": ".git/objects/ab/d1f32b00463679da0273a15aa3fde410ea0ae9",
+      "hashValue": "631edd61556a72ded0cbd69f463d94e4010e4116154cf1c813d2fb4becf31caf",
+      "diff": null
+    },
+    ".git/objects/f9/0523c7d39b26d9654083eb7f66851a46c09234": {
+      "id": "e2e34d8b-f0fd-4be4-8e77-c255323651b8",
+      "filePath": ".git/objects/f9/0523c7d39b26d9654083eb7f66851a46c09234",
+      "hashValue": "8f094510fb64014acbdc02e255daef93eff41810994c02b5074698b02ef1bc8a",
+      "diff": null
+    },
+    ".git/objects/d2/0ea8636b6f16722068972030d44c641e5ba7da": {
+      "id": "a1fda4b7-2a24-4606-a989-8bf658a10af8",
+      "filePath": ".git/objects/d2/0ea8636b6f16722068972030d44c641e5ba7da",
+      "hashValue": "dc653760d78658d3ec3f1d1e233570d97efb484e071436647ef082e98b80a12f",
+      "diff": null
+    },
+    ".git/objects/94/e1ac3abbfd5e5be8427b9eaef1e6e7c006fb17": {
+      "id": "68d3429e-edb5-493d-be91-1a00c8e21fa4",
+      "filePath": ".git/objects/94/e1ac3abbfd5e5be8427b9eaef1e6e7c006fb17",
+      "hashValue": "eb1fb55a47005dfa888b492efa8ccad6275f5a7bffbbcf91cda8777c3804f025",
+      "diff": null
+    },
+    ".git/objects/4a/4fd668aab22af542b769e93199387340602991": {
+      "id": "14861a03-d4cf-40a5-bf58-2ef292704be9",
+      "filePath": ".git/objects/4a/4fd668aab22af542b769e93199387340602991",
+      "hashValue": "76388eaaaba2e14d825543e2c7977c1649d9212d17e0657e747a887618a3279c",
+      "diff": null
+    },
+    ".git/objects/67/31827b412e2c741ca97b0cb321684df38ae0dd": {
+      "id": "75e913da-f122-4702-ba15-676bbece8579",
+      "filePath": ".git/objects/67/31827b412e2c741ca97b0cb321684df38ae0dd",
+      "hashValue": "4cc263ea66c6c58d6d2369076730d9e9986325b45dadc89e7027b78f042e81b2",
+      "diff": null
+    },
+    ".git/objects/55/07e5e0e04e321d006869342616b543774be1e9": {
+      "id": "599f7bff-27e8-4aea-afdf-1c97fdb7f3d5",
+      "filePath": ".git/objects/55/07e5e0e04e321d006869342616b543774be1e9",
+      "hashValue": "4c650121b1a4b2f90610e511e8c5c7f92206ee12f3d776b9ba7dd6a1308c6ab5",
+      "diff": null
+    },
+    ".git/objects/96/f384373f2d1168498c9a06a360ee0091f9ef63": {
+      "id": "02800244-8b04-4c64-bc5d-317d890f50b5",
+      "filePath": ".git/objects/96/f384373f2d1168498c9a06a360ee0091f9ef63",
+      "hashValue": "8fb5d4a7580a10e1c316a6dcb19cad652278b2068677fe197fb2cca91b62d432",
+      "diff": null
+    },
+    "tests/integration/notifications/test_webhook_delivery.py": {
+      "id": "79213a10-36a0-4411-8101-b10c2842e3f6",
+      "filePath": "tests/integration/notifications/test_webhook_delivery.py",
+      "hashValue": "d17a05473c984ac9ff994664318d8776c8504f89befd79d12bc77e092955d880",
+      "diff": null
+    },
+    "tests/integration/notifications/test_webhook_outbox.py": {
+      "id": "0ebbea24-68b3-42af-a1f1-b3007d522573",
+      "filePath": "tests/integration/notifications/test_webhook_outbox.py",
+      "hashValue": "f2bcea8c797a2bf4b38fbe3c8f6a7d764da72344c8f7d6446fb8735cf822220c",
+      "diff": null
+    },
+    "tests/unit/notifications/test_webhook_signer.py": {
+      "id": "4a817882-fda4-4e02-bc96-1148764c02c6",
+      "filePath": "tests/unit/notifications/test_webhook_signer.py",
+      "hashValue": "db36f3218a29164eb27a51d22dda52431675c036d5c6acd9ed8a2ee0bb5b32e6",
+      "diff": null
+    },
+    ".pytest_cache/v/cache/nodeids": {
+      "id": "411837b1-af29-4411-ada4-5c15acb54654",
+      "filePath": ".pytest_cache/v/cache/nodeids",
+      "hashValue": "1b1d22209acb51ee0c2fd192ebcee5bbc3c83d7e7873373a22bf6905c18adfc1",
       "diff": null
     }
   }

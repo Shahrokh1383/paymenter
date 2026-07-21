@@ -2570,6 +2570,454 @@
       "lastModified": "2026-07-21T12:23:33.858Z",
       "size": 0,
       "isDirectory": false
+    },
+    ".git/objects/ee/95ece0b6842edf2dcf81a1a74aebb7884e4a1e": {
+      "id": "6aa78523-18a9-48b7-a8fa-fef0bb515349",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:46.961Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/fa/71ebcd99f8946a82cedb8c461c69368d926f25": {
+      "id": "39c24216-ffaa-4271-b47e-5613e622431a",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.060Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack": {
+      "id": "ed9bffe3-7a5c-48c8-affe-4d11fa358c87",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.239Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/0f/7d8bb460316c13e1c8f4deb71a8f82006d36c8": {
+      "id": "d0f04072-7cd0-4dc8-a373-095e5287ba78",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.320Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d3/tmp_obj_XiKkk5": {
+      "id": "fc1d94da-9cce-4826-9922-1e08baf9df72",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.361Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/8b/560cb24f658780c53802ce53f7a8a768855f94": {
+      "id": "a92daeb6-2549-4bee-8068-eab7c22386d5",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.418Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/31/28920d9417ed90005917b4f5631d03327b5dc6": {
+      "id": "1e4f3ed8-4b9e-4183-bda7-2b262fb65d4d",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.528Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d3/6891c24e26cbfc85808d4b98c8d47838eac507": {
+      "id": "e58d4e35-7662-4aec-ae23-6f6d9dfaeecf",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.613Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/63/c1812ef80fe779bb7837ca3ab2255cf642d01d": {
+      "id": "4cd5111a-ae53-4597-9bca-28e86d5af013",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.693Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/9f/44c3b449b298b37805e2d2cc1ae65b4cca6acb": {
+      "id": "efa86aff-d040-4158-aeb7-c114747fc97d",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.813Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/7e/bf20c2892d38153210e9252cf39720c70f0b48": {
+      "id": "27ef52c0-5697-46a8-a694-49fa2c934b49",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:47.916Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/df/8b7567e75a667b1bcdab4e0df1401431c39a61": {
+      "id": "3f523b2e-56b8-4706-a496-d5406cff48ea",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.002Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/b5/975f8b03d49897b1fdf33cc9ebcb3a30df720e": {
+      "id": "4cbcf714-c14c-449c-b135-6cc3692d99d3",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.069Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d4/59bd148cccb9dc3953b172d9a708f7e1590c6e": {
+      "id": "544e6a37-a17d-4e6b-a3fc-f40c3c465b32",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.148Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/69/00cae3a0ef2df2164ef55fe55773f67a4b6d25": {
+      "id": "40c0f9d6-abf1-4c35-8e93-db6b678307f4",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.259Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/8c/623423826ebd233f9087807cc998428cea4d40": {
+      "id": "90403e29-b9d4-436f-a83e-9db824cdc7da",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.345Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/25/d5b342e983b980d09fa61d8a0874bee36f1a6c": {
+      "id": "7b50a477-4432-4490-8f09-3417af13a621",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.447Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/2e/abef2c4e9f91c31e4f456057200380bcc70668": {
+      "id": "cf081a7c-4a4d-4fbb-9253-815a30c4fc55",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.560Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/1c/c007576bcec0901e06b6c73c6caed86082777e": {
+      "id": "28ddf86c-b940-4555-a313-f1cbfa1f2c7c",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.646Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a5/6c54736ecefdd7c26cda4d8876075c25c205b5": {
+      "id": "71eb98c1-f503-4902-9f58-72224efcbbc5",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.724Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a5/7e640848a6f7b08cffbce682868f90068650ce": {
+      "id": "e1781d88-435f-4b51-9120-b0721c67bae6",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.835Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/70/953edc82cbb9b6597b661452ca43207bf33269": {
+      "id": "cd058890-4648-43e6-8769-9e8d3a1fc5fe",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:48.919Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a0/3ab26a64bee4d6c1613a285863c71cee151d4a": {
+      "id": "00245e4e-a482-4908-8bb6-e0edf8302d02",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.019Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/ee/0f333f5f76fcbfaaa6f2bd9191a99b8d8e3a5c": {
+      "id": "42bf23c9-8d72-4b8d-a29a-d4c29ae2dca7",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.098Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/94/8041981279b8d209f74dbcd04374850d469531": {
+      "id": "49de9b9c-47b4-4ac8-b513-a62e35034237",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.174Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/2d/9a67222c9a26d85e4aaac03dfd0ec53a3f4897": {
+      "id": "245ed224-3ce2-406c-a197-04910faa92ed",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.252Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/f5/8cfacb43db6526b3ff0e4217db61ff7d9bd311": {
+      "id": "33fdd590-2fd9-49c1-9a46-be97c4fb1e53",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.333Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/7f/26d7d5ce0312284129a0fb1944955a1169d454": {
+      "id": "3f41e9d3-4032-44d4-adfc-11400b11adca",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:49.513Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/82/e098ce90406c77708e420b0994e4765792a0e4": {
+      "id": "2ff4b6d6-08f9-406d-a878-626e9199b7bd",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:50.400Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/c3/de838042121315c759b7fc910f30afd69ced67": {
+      "id": "2a2c43bd-8050-4b43-badc-1ebbf578ba7d",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:50.501Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d2/3cd7b48722990a6abcb58a8c26e724151e3c95": {
+      "id": "ef2fcbcd-58bf-42d9-b1d5-e52a5cccb9aa",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:50.995Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/70/16ccf65ee4c10ecd3eb9b95d22b5959ef6b672": {
+      "id": "998ce7f9-480e-4b26-80b7-4e9f77cdf68d",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.100Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/4a/9347c8852e42731c128b9e51876c3e97825fe9": {
+      "id": "4e8f8cc2-35d0-4d65-b4a8-1014a5fe0992",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.222Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/f9/1456065385ae76b77f24e280b8d68783f8e9fb": {
+      "id": "3a3026b3-71a2-4141-ac1b-c1dc95166b34",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.290Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/ee/26e3a9ebd54e75d28476b0e9f27137c7c208c8": {
+      "id": "0b67a399-6051-4cd8-bf2d-40e11cc0d292",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.387Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/1a/02e8536fd2cd0ecefca0ff8ce261f715727b60": {
+      "id": "751a3181-c227-48fa-b32b-5b0d735b95c4",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.486Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/68/0209a2f5664e750f5fdeedfc5e93263dd34514": {
+      "id": "52dec321-5b70-440f-8597-920b71bf5b4c",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.561Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/33/2dc2b75bd5b5087ff5783f3da326cad4945765": {
+      "id": "bcc9eb58-7618-45a6-8ab9-03df56518a81",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.757Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/bd/a51d20e59d0216c0ad40eb645b494cf239f1a9": {
+      "id": "aa9f5e58-16f0-48b2-a223-45d646d36edf",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.845Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/79/90da6a48c21045d5c19e23a72899f3297209c4": {
+      "id": "1dfac0a0-fe24-4e26-9d27-f2aa520829c8",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:53.933Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/22/57dd62479945f372dd8e6310f66b2d7c3d4148": {
+      "id": "54698a10-083d-4e76-b762-9476bdfd003f",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.002Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/ea/6a0aaea11ae9fcbf366f047dd08f65cac9062a": {
+      "id": "f3c19bc1-5103-40fe-ba02-4afc3d3f653a",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.067Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/71/7edac2d02df6f419acc27c96871f2c948a2826": {
+      "id": "05b129ea-ee0c-4373-8c89-aafba5a48605",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.134Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/38/b773c259d2cd7c6ed2dbc8e863dd06736687da": {
+      "id": "7f14343b-81e9-44a7-bca0-b10f236ede02",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.222Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/fa/fbbf2a1de31d945b609de81ff12470b6b00023": {
+      "id": "1453ec35-e33c-4218-8e9e-03397a88b1a4",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.336Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/c1/f0c527173eba3c264bf750d751eadbf0ba5bb8": {
+      "id": "58621cea-209d-4084-93bf-f7a13524a5d0",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.420Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a5/9c738c6170f37f3b16b337e1229ffe2625e125": {
+      "id": "bafa5ac3-5e81-4cac-8b0b-4a6222e7d921",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.532Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/3b/5d209c6ac0ec3ace4b9aeda9872a51e2c64b5e": {
+      "id": "c970463d-0845-4724-8ba4-85b320e678ce",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.617Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d9/tmp_obj_N8kO6x": {
+      "id": "98f5598a-00f8-4b5f-a5b7-2e3609142443",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.641Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/0c/6483b7f127b2d297b4649bbbcb5157506178e5": {
+      "id": "815af52a-8a73-44bb-bcae-fc854934c4c2",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.715Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d9/88d4e0cc28402299429060c241e5044a46cc3f": {
+      "id": "398fd223-5ed8-4a72-98fe-67fc32afbcdf",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.800Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/64/a20d31a8cf1b4cdefd9b30acb3d7fbd99bb07f": {
+      "id": "471f434a-91e3-44cc-86ed-f2acad1d36e1",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.899Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/ab/d1f32b00463679da0273a15aa3fde410ea0ae9": {
+      "id": "1f9b0182-1fe1-4cea-94be-a6f1dda666ed",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:54.977Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/f9/0523c7d39b26d9654083eb7f66851a46c09234": {
+      "id": "2cfe3255-4767-430a-be2b-839d4cedadd1",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:55.077Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d2/0ea8636b6f16722068972030d44c641e5ba7da": {
+      "id": "f440db48-c41f-4ef1-937b-a4f4d52e8c07",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:55.181Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/94/e1ac3abbfd5e5be8427b9eaef1e6e7c006fb17": {
+      "id": "56cda2c9-250e-4d87-9f67-d1135ab72677",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:55.277Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/4a/4fd668aab22af542b769e93199387340602991": {
+      "id": "a0f35d82-1912-435f-94aa-0c541eb06e5a",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:55.461Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/67/31827b412e2c741ca97b0cb321684df38ae0dd": {
+      "id": "a861527e-5385-4ec0-8a16-019ee37fd487",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:56.901Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/55/07e5e0e04e321d006869342616b543774be1e9": {
+      "id": "0248ac79-0c44-41d5-a096-6ed0047719af",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:57.678Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/96/f384373f2d1168498c9a06a360ee0091f9ef63": {
+      "id": "93b0bd98-69d7-42e5-8bf1-5051b78381b8",
+      "hash": null,
+      "lastModified": "2026-07-21T12:27:58.263Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "tests/integration/notifications/test_webhook_delivery.py": {
+      "id": "fed67829-f7e4-456d-978d-af6c4f822475",
+      "hash": null,
+      "lastModified": "2026-07-21T12:35:15.305Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "tests/integration/notifications/test_webhook_outbox.py": {
+      "id": "596f6e52-fb2f-45f0-a660-fed5a7a66531",
+      "hash": null,
+      "lastModified": "2026-07-21T12:35:28.275Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "tests/unit/notifications/test_webhook_signer.py": {
+      "id": "06dbae61-0aeb-44da-abcc-5efdecb9c429",
+      "hash": null,
+      "lastModified": "2026-07-21T12:35:41.676Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".pytest_cache/v/cache/nodeids": {
+      "id": "dbdd5f68-996b-4a63-9817-42c533a25e57",
+      "hash": null,
+      "lastModified": "2026-07-21T12:41:59.164Z",
+      "size": 0,
+      "isDirectory": false
     }
   }
 }

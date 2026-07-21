@@ -3,8 +3,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from src.common.infrastructure.database import Database, DB_PATH, create_connection
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.notifications.infrastructure.persistence.sqlite_webhook_delivery_repository import SqliteWebhookDeliveryRepository
-from src.notifications.domain.services.webhook_retry_policy import WebhookRetryPolicy
+from src.webhook.infrastructure.persistence.sqlite_webhook_delivery_repository import SqliteWebhookDeliveryRepository
+from src.webhook.domain.services.webhook_retry_policy import WebhookRetryPolicy
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_db():
@@ -38,7 +38,7 @@ def test_retry_policy_calculates_next_attempt():
     assert next_attempt > datetime.now(timezone.utc)
     
     next_attempt_5 = WebhookRetryPolicy.calculate_next_attempt(5)
-    assert next_attempt_5 is None # Max attempts reached
+    assert next_attempt_5 is None  # Max attempts reached
 
 def test_delivery_repo_mark_as_sent(setup_db):
     delivery_id = setup_db

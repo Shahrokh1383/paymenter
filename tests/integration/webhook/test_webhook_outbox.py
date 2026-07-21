@@ -4,9 +4,9 @@ from decimal import Decimal
 from src.common.infrastructure.database import Database, DB_PATH, create_connection
 from src.common.infrastructure.event_bus import InMemoryEventBus
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.notifications.application.handlers.webhook_outbox_event_handler import WebhookOutboxEventHandler
-from src.notifications.infrastructure.persistence.sqlite_webhook_outbox_repository import SqliteWebhookOutboxRepository
-from src.notifications.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter
+from src.webhook.application.handlers.webhook_outbox_event_handler import WebhookOutboxEventHandler
+from src.webhook.infrastructure.persistence.sqlite_webhook_outbox_repository import SqliteWebhookOutboxRepository
+from src.webhook.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter
 from src.common.domain.value_objects.money import Money
 from src.common.domain.value_objects.currency_code import CurrencyCode
 from src.ledger.domain.events.transaction_events import TransactionCompletedEvent
@@ -65,7 +65,7 @@ def test_webhook_outbox_inserts_record_atomically(setup_db):
     assert record['status'] == "pending"
     assert record['attempts'] == 0
     assert "txn_123" in record['payload']
-    assert len(record['signature']) == 64 # SHA256 hex digest length
+    assert len(record['signature']) == 64  # SHA256 hex digest length
 
 def test_webhook_outbox_ignores_disabled_merchants(setup_db):
     merchant_id = setup_db

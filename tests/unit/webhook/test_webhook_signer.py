@@ -1,11 +1,10 @@
 import pytest
-from src.notifications.infrastructure.utils.webhook_signer import WebhookSigner
+from src.webhook.infrastructure.utils.webhook_signer import WebhookSigner
 
 def test_webhook_signer_generates_correct_signature():
     payload = '{"event":"payment.completed","transaction_id":"txn_123"}'
     secret = "whsec_supersecret"
     
-    # Manually compute expected signature to verify
     import hmac
     import hashlib
     expected_signature = hmac.new(
@@ -17,7 +16,7 @@ def test_webhook_signer_generates_correct_signature():
     actual_signature = WebhookSigner.sign(payload, secret)
     
     assert actual_signature == expected_signature
-    assert len(actual_signature) == 64 # SHA256 hex digest length
+    assert len(actual_signature) == 64
 
 def test_webhook_signer_consistent_for_same_input():
     payload = '{"event":"payment.failed"}'

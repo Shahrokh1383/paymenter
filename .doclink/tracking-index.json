@@ -135,11 +135,11 @@
     "docs/backend/identity/AdministraionDashboard.md": {
       "id": "015ac63d-760e-4ac0-92a0-097b9c0d0a23",
       "filePath": "docs/backend/identity/AdministraionDashboard.md",
-      "hashValue": "f178ac40e3a397c228dc0386c84604c135438cb232e7f3eabc12a957f47b1815",
+      "hashValue": "376d8eeabf2ffd64c70d1fe565e34bb4c898b72ac9a8487b30a6969229e0d059",
       "diff": {
         "filePath": "docs/backend/identity/AdministraionDashboard.md",
         "oldHash": "fd5c0a2963bb243a8d8dd04460410a85adda9165fdf509fbedd31cfe5fe285c4",
-        "newHash": "f178ac40e3a397c228dc0386c84604c135438cb232e7f3eabc12a957f47b1815",
+        "newHash": "376d8eeabf2ffd64c70d1fe565e34bb4c898b72ac9a8487b30a6969229e0d059",
         "addedLines": [
           {
             "lineNumber": 1,
@@ -147,383 +147,398 @@
             "type": "ADDED"
           },
           {
-            "lineNumber": 23,
+            "lineNumber": 22,
             "content": "*   **Delivery Mechanism:** Standard HTML forms, server-rendered via `render_template`, strictly utilizing the Post/Redirect/Get (PRG) pattern to prevent duplicate form submissions.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 24,
+            "lineNumber": 23,
             "content": "*   **Authentication:** None at the application layer. Security relies entirely on strict network perimeter controls (Internal VPN, WAF, reverse proxy).",
             "type": "ADDED"
           },
           {
-            "lineNumber": 25,
+            "lineNumber": 24,
             "content": "*   **Nature:** This module operates as a **Closed-Loop Financial Ledger Emulator**. Card numbers are generated locally using the Luhn algorithm to maintain strict deterministic validation parity with external payment networks, without relying on external I/O. Fund movements occur entirely within the in-process Ledger context, guaranteeing absolute mathematical isolation and deterministic state verification.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 26,
-            "content": "*   **v2.3.0 Evolution:** The system now features a complete **Three-Party Escrow Transaction Engine** and a robust **Merchant Webhook Configuration Subsystem**. The infrastructure has been upgraded to utilize Ambient Transaction Management via Python's `contextvars`, allowing deep domain services to participate in atomic transactions without explicit Unit of Work (UoW) injection.",
+            "lineNumber": 25,
+            "content": "*   **v2.4.0 Evolution:** The system now features a complete **Three-Party Escrow Transaction Engine** and a robust **Merchant Webhook Configuration Subsystem**. The infrastructure has been fully standardized around **Ambient Transaction Management** via Python's `contextvars`. Application Handlers no longer explicitly invoke database commits; instead, they rely entirely on the implicit commit boundary of the Unit of Work (UoW) context manager, allowing deep domain services and synchronous event subscribers to participate in strictly atomic transactions.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "",
             "type": "ADDED"
           },
           {
             "lineNumber": 33,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 34,
             "content": "#### Financial Core (Ledger Context)",
             "type": "ADDED"
           },
           {
-            "lineNumber": 35,
+            "lineNumber": 34,
             "content": "*   **Three-Party Escrow Mechanics:** All fund movements utilize a strict double-entry escrow model. ",
             "type": "ADDED"
           },
           {
-            "lineNumber": 36,
+            "lineNumber": 35,
             "content": "    *   *Hold:* Payer's balance decreases, Payer's `pending_holds` increase, System Escrow balance increases.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 37,
+            "lineNumber": 36,
             "content": "    *   *Complete:* Payer's `pending_holds` decrease, System Escrow balance decreases, Payee's balance increases.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 38,
+            "lineNumber": 37,
             "content": "    *   *Fail/Refund:* Reverses the exact mathematical legs depending on whether the transaction was `Pending` or `Success`.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 39,
+            "lineNumber": 38,
             "content": "*   **Deterministic Currency Bootstrap Invariant:** Every time a new Currency is created, the system **must** automatically generate a System Escrow Account. The **Domain Account Number** is deterministically calculated using a **SHA-256 hash of the currency code** (modulo 10 billion, zero-padded to 10 digits) to guarantee absolute idempotency across network retries.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 41,
+            "lineNumber": 40,
             "content": "*   **Zero-State Currency Change:** An account's currency can only be changed if its `balance`, `pending_holds`, and `open_authorizations` are all exactly zero. The `Account.change_currency()` method strictly enforces these domain invariants to prevent catastrophic silent ledger imbalances.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 43,
+            "lineNumber": 42,
             "content": "",
             "type": "ADDED"
           },
           {
-            "lineNumber": 44,
+            "lineNumber": 43,
             "content": "#### Identity & Webhook Context",
             "type": "ADDED"
           },
           {
-            "lineNumber": 45,
+            "lineNumber": 44,
             "content": "*   **Webhook Configuration Invariants:** ",
             "type": "ADDED"
           },
           {
-            "lineNumber": 46,
+            "lineNumber": 45,
             "content": "    *   A webhook cannot be enabled without providing a valid, absolute URL (enforced by the `WebhookUrl` Value Object via `urllib.parse`).",
             "type": "ADDED"
           },
           {
-            "lineNumber": 47,
+            "lineNumber": 46,
             "content": "    *   Webhook secrets must be cryptographically secure (`whsec_` prefix + 32 URL-safe bytes) and minimum 20 characters.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 48,
+            "lineNumber": 47,
             "content": "*   **Automatic Card Provisioning (Event-Driven Chain):** When an Account is created, `CreateAccountHandler` emits `AccountCreatedEvent`. The Identity context's `OnAccountCreatedHandler` intercepts this, generates a 16-digit Luhn-valid Card Number, persists it, and emits `CardAssignedEvent`. **System Escrow accounts are strictly excluded** from card provisioning.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 57,
+            "lineNumber": 56,
             "content": "*   **Why Three-Party Escrow?** Direct wallet-to-wallet transfers cannot safely handle asynchronous merchant fulfillment. Escrow ensures funds are mathematically secured before the merchant is notified, preventing double-spend and insufficient funds race conditions.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 58,
+            "lineNumber": 57,
             "content": "*   **Why purge `LedgerAccountProvisioningAdapter`?** It relied on auto-increment IDs and raw SQL, bypassing the `Money` VO. Removing it ensures 100% of account creation flows through the Ledger bounded context, maintaining the Single Source of Truth (SSOT).",
             "type": "ADDED"
           },
           {
-            "lineNumber": 59,
+            "lineNumber": 58,
             "content": "*   **Why clamp `decrease_holds` at zero?** In an evolving system, legacy transactions might not have initialized holds. Clamping ensures backward compatibility and prevents pipeline crashes without corrupting the ledger.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 67,
+            "lineNumber": 66,
             "content": "*   **Delivery Layer (Controller):** Flask Blueprint registered at `/dashboard`. Catches `DomainException` subclasses and bubbles exact error messages to UI flash alerts.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 68,
-            "content": "*   **Ambient Transaction Management:** The `SqliteUnitOfWork` utilizes Python's `contextvars` to manage nested transactions and ambient connections. This allows deep domain services (like `DoubleEntryLedger`) to participate in atomic transactions without explicit UoW injection, while strictly enforcing `PRAGMA foreign_keys = ON` and `journal_mode=WAL` at the connection boundary.",
+            "lineNumber": 67,
+            "content": "*   **Implicit Ambient Transaction Management:** The `SqliteUnitOfWork` utilizes Python's `contextvars` to manage nested transactions and ambient connections. Application Handlers (e.g., `CreateCurrencyHandler`, `UpdateAccountCurrencyHandler`) **no longer explicitly invoke `commit()`**. They rely entirely on the `__exit__` method of the context manager to automatically commit or rollback the ambient transaction. This strictly enforces `PRAGMA foreign_keys = ON` and `journal_mode=WAL` at the connection boundary.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 69,
+            "lineNumber": 68,
             "content": "*   **Dependency Injection (Composite Container):** Central `DIContainer` instantiates `InMemoryEventBus`, then delegates to context-specific registration functions.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 70,
-            "content": "*   **Event Bus (Synchronous In-Memory):** Subscribers are wired with their own independent `SqliteUnitOfWork` instances to prevent cross-context read-model failures from rolling back core domain transactions.",
+            "lineNumber": 69,
+            "content": "*   **Event Bus (Synchronous In-Memory Atomicity):** Subscribers instantiate their own `SqliteUnitOfWork`, but due to the Ambient Transaction pattern (`contextvars`), they seamlessly detect and **join the parent's active database transaction**. This guarantees strict atomic consistency for synchronous in-memory event chains; if a subscriber fails, the parent transaction rolls back.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 84,
+            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
             "type": "ADDED"
           },
           {
             "lineNumber": 85,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
+            "content": "    webhook_url TEXT,",
             "type": "ADDED"
           },
           {
             "lineNumber": 86,
-            "content": "    webhook_url TEXT,",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 87,
             "content": "    webhook_secret TEXT,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 88,
+            "lineNumber": 87,
             "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 114,
+            "lineNumber": 113,
             "content": "CREATE TABLE IF NOT EXISTS merchant_summaries (",
             "type": "ADDED"
           },
           {
-            "lineNumber": 115,
+            "lineNumber": 114,
             "content": "    id INTEGER PRIMARY KEY,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 116,
+            "lineNumber": 115,
             "content": "    name TEXT NOT NULL,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 117,
+            "lineNumber": 116,
             "content": "    api_key TEXT NOT NULL UNIQUE,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 118,
+            "lineNumber": 117,
             "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 119,
+            "lineNumber": 118,
             "content": "    webhook_url TEXT,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 120,
+            "lineNumber": 119,
             "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 121,
+            "lineNumber": 120,
             "content": "    FOREIGN KEY (id) REFERENCES merchants(id)",
             "type": "ADDED"
           },
           {
-            "lineNumber": 122,
+            "lineNumber": 121,
             "content": ");",
             "type": "ADDED"
           },
           {
-            "lineNumber": 123,
+            "lineNumber": 122,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 162,
             "content": "",
             "type": "ADDED"
           },
           {
             "lineNumber": 163,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 164,
             "content": "-- WEBHOOK SCHEMA",
             "type": "ADDED"
           },
           {
-            "lineNumber": 165,
+            "lineNumber": 164,
             "content": "CREATE TABLE IF NOT EXISTS webhook_outbox (",
             "type": "ADDED"
           },
           {
-            "lineNumber": 166,
+            "lineNumber": 165,
             "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 167,
+            "lineNumber": 166,
             "content": "    merchant_id INTEGER NOT NULL,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 168,
+            "lineNumber": 167,
             "content": "    event_type TEXT NOT NULL,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 169,
+            "lineNumber": 168,
             "content": "    payload TEXT NOT NULL,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 170,
+            "lineNumber": 169,
             "content": "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 171,
+            "lineNumber": 170,
             "content": "    status TEXT NOT NULL DEFAULT 'pending',",
             "type": "ADDED"
           },
           {
-            "lineNumber": 172,
+            "lineNumber": 171,
             "content": "    attempts INTEGER NOT NULL DEFAULT 0,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 173,
+            "lineNumber": 172,
             "content": "    last_attempt_at TIMESTAMP,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 174,
+            "lineNumber": 173,
             "content": "    next_attempt_at TIMESTAMP,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 175,
+            "lineNumber": 174,
             "content": "    signature TEXT NOT NULL,",
             "type": "ADDED"
           },
           {
-            "lineNumber": 176,
+            "lineNumber": 175,
             "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id)",
             "type": "ADDED"
           },
           {
-            "lineNumber": 177,
+            "lineNumber": 176,
             "content": ");",
             "type": "ADDED"
           },
           {
-            "lineNumber": 178,
+            "lineNumber": 177,
             "content": "CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, next_attempt_at);",
             "type": "ADDED"
           },
           {
-            "lineNumber": 193,
+            "lineNumber": 181,
+            "content": "*   **Why `INTEGER` for `balance` and `pending_holds` in SQLite?** SQLite's dynamic typing causes affinity issues with `TEXT` decimals. Storing financial values as exact integer cents guarantees absolute precision. The Repository pattern strictly encapsulates `_to_cents()` and `_from_cents()`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 182,
+            "content": "*   **Why Ambient Transactions for Event Subscribers?** By leveraging `contextvars`, newly instantiated `SqliteUnitOfWork` objects inside event handlers automatically detect and join the active ambient connection. This ensures that if a synchronous subscriber (like the Escrow Bootstrapper) fails, the exception propagates and the **entire parent transaction rolls back**. This prevents partial state mutations (Split Transactions) and guarantees strict ACID compliance for in-process event chains.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 192,
             "content": "*   `UserSummaryDTO(user_id, name, phone_email, account_number, card_number, currency_code)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 194,
+            "lineNumber": 193,
             "content": "*   `MerchantSummaryDTO(id, name, api_key, is_active, webhook_url, webhook_enabled)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 195,
+            "lineNumber": 194,
             "content": "*   `WebhookStatusDTO(webhook_url, webhook_enabled)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 196,
+            "lineNumber": 195,
             "content": "*   `AccountSummary(id, user_id, user_name, currency_id, currency_code, account_number, balance, pending_holds, open_authorizations, card_number)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 197,
+            "lineNumber": 196,
             "content": "*   `CurrencySummaryDTO(id, name, code, is_active)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 198,
+            "lineNumber": 197,
             "content": "*   `EscrowAccountSummary(id, currency_id, currency_code, account_number, balance)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 199,
+            "lineNumber": 198,
             "content": "*   `TransactionListItem(id, amount, currency_code, status, created_at, user_email, from_account_number, to_account_number)`",
             "type": "ADDED"
           },
           {
-            "lineNumber": 207,
+            "lineNumber": 206,
             "content": "#### Flow A: Three-Party Escrow Fund Hold & Completion",
             "type": "ADDED"
           },
           {
+            "lineNumber": 207,
+            "content": "1.  **Hold:** `HoldFundsHandler` invokes `DoubleEntryLedger.hold_funds()`. Payer's balance decreases, Payer's `pending_holds` increase, and the System Escrow account balance increases. A `Pending` Transaction is persisted. The ambient UoW commits upon clean exit.",
+            "type": "ADDED"
+          },
+          {
             "lineNumber": 208,
-            "content": "1.  **Hold:** `HoldFundsHandler` invokes `DoubleEntryLedger.hold_funds()`. Payer's balance decreases, Payer's `pending_holds` increase, and the System Escrow account balance increases. A `Pending` Transaction is persisted.",
+            "content": "2.  **Complete:** `CompleteFundsHandler` invokes `DoubleEntryLedger.complete_funds()`. The Transaction transitions to `Success`. Payer's `pending_holds` decrease, Escrow balance decreases, and Payee's balance increases. `TransactionCompletedEvent` is published inside the UoW block. The ambient UoW commits atomically.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 209,
-            "content": "2.  **Complete:** `CompleteFundsHandler` invokes `DoubleEntryLedger.complete_funds()`. The Transaction transitions to `Success`. Payer's `pending_holds` decrease, Escrow balance decreases, and Payee's balance increases. `TransactionCompletedEvent` is published.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 211,
+            "lineNumber": 210,
             "content": "#### Flow B: Admin Configures Merchant Webhook (Event-Driven Projection)",
             "type": "ADDED"
           },
           {
-            "lineNumber": 212,
+            "lineNumber": 211,
             "content": "1.  Admin submits form to `POST /dashboard/merchants/<id>/webhook/configure`.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 213,
+            "lineNumber": 212,
             "content": "2.  `ConfigureWebhookHandler` loads the `Merchant` aggregate, invokes `merchant.configure_webhook()` (which enforces URL validation via the `WebhookUrl` VO), and persists the state.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 214,
+            "lineNumber": 213,
             "content": "3.  Handler publishes `MerchantWebhookConfiguredEvent`.",
             "type": "ADDED"
           },
           {
+            "lineNumber": 214,
+            "content": "4.  **`MerchantWebhookConfiguredReadModelHandler` intercepts the event:**",
+            "type": "ADDED"
+          },
+          {
             "lineNumber": 215,
-            "content": "4.  **`MerchantWebhookConfiguredReadModelHandler` intercepts the event with its own independent UoW:**",
+            "content": "    *   Joins the ambient transaction and updates the `merchant_summaries` read model table with the new `webhook_url` and `webhook_enabled` state.",
             "type": "ADDED"
           },
           {
             "lineNumber": 216,
-            "content": "    *   Updates the `merchant_summaries` read model table with the new `webhook_url` and `webhook_enabled` state.",
+            "content": "    *   The entire operation (Write Model + Read Model) commits atomically upon exiting the handler's UoW block.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 217,
-            "content": "    *   This ensures the Dashboard UI reflects the change immediately without querying the write model.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 219,
+            "lineNumber": 218,
             "content": "#### Flow C: Admin Creates a Currency (Idempotent UUID + Deterministic VO)",
             "type": "ADDED"
           },
           {
-            "lineNumber": 220,
+            "lineNumber": 219,
             "content": "1.  Admin submits form to `POST /dashboard/currencies/add`.",
             "type": "ADDED"
           },
           {
+            "lineNumber": 220,
+            "content": "2.  `CreateCurrencyHandler` generates a random UUID, persists the `Currency`, and publishes `CurrencyCreatedEvent`. (Commit is deferred to the ambient boundary).",
+            "type": "ADDED"
+          },
+          {
             "lineNumber": 221,
-            "content": "2.  `CreateCurrencyHandler` generates a random UUID, persists the `Currency`, and publishes `CurrencyCreatedEvent`.",
+            "content": "3.  **`EscrowBootstrapperEventHandler` intercepts the event:**",
             "type": "ADDED"
           },
           {
             "lineNumber": 222,
-            "content": "3.  **`EscrowBootstrapperEventHandler` intercepts the event:**",
+            "content": "    *   Joins the ambient transaction.",
             "type": "ADDED"
           },
           {
@@ -542,98 +557,113 @@
             "type": "ADDED"
           },
           {
-            "lineNumber": 227,
-            "content": "#### Flow D: Admin Creates a User Account (Cross-Context UUID & Card Chain)",
+            "lineNumber": 226,
+            "content": "4.  Upon exiting the outer UoW block, the entire chain (Currency + Escrow Account) is committed atomically.",
             "type": "ADDED"
           },
           {
             "lineNumber": 228,
-            "content": "1.  `CreateAccountHandler` generates a UUID, persists the Account, and publishes `AccountCreatedEvent`.",
+            "content": "#### Flow D: Admin Creates a User Account (Cross-Context UUID & Card Chain)",
             "type": "ADDED"
           },
           {
             "lineNumber": 229,
-            "content": "2.  **InMemoryEventBus synchronously triggers Identity subscribers:**",
+            "content": "1.  `CreateAccountHandler` generates a UUID, persists the Account, and publishes `AccountCreatedEvent`.",
             "type": "ADDED"
           },
           {
             "lineNumber": 230,
-            "content": "    *   **Link 1 (Read Model):** `AccountCreatedReadModelHandler` updates `user_summaries`.",
+            "content": "2.  **InMemoryEventBus synchronously triggers Identity subscribers (all joining the ambient transaction):**",
             "type": "ADDED"
           },
           {
             "lineNumber": 231,
-            "content": "    *   **Link 2 (Card Provisioning):** `OnAccountCreatedHandler` generates a Luhn-valid card number, inserts it into `user_cards`, and publishes `CardAssignedEvent`.",
+            "content": "    *   **Link 1 (Read Model):** `AccountCreatedReadModelHandler` updates `user_summaries`.",
             "type": "ADDED"
           },
           {
             "lineNumber": 232,
-            "content": "    *   **Link 3 (Card Read Model):** `CardAssignedReadModelHandler` updates the `card_number` in `user_summaries`.",
+            "content": "    *   **Link 2 (Card Provisioning):** `OnAccountCreatedHandler` generates a Luhn-valid card number, inserts it into `user_cards`, and publishes `CardAssignedEvent`.",
             "type": "ADDED"
           },
           {
             "lineNumber": 233,
+            "content": "    *   **Link 3 (Card Read Model):** `CardAssignedReadModelHandler` updates the `card_number` in `user_summaries`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 234,
+            "content": "3.  The ambient UoW commits all cross-context mutations atomically.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 235,
             "content": "",
             "type": "ADDED"
           },
           {
-            "lineNumber": 241,
-            "content": "    *   Admin creates a Currency. The `CreateCurrencyHandler` commits. The `EscrowBootstrapperEventHandler` encounters a database lock and fails.",
-            "type": "ADDED"
-          },
-          {
             "lineNumber": 242,
-            "content": "    *   **Impact:** The system has a Currency without an Escrow account. Because Event Subscribers use independent UoWs, this is an accepted trade-off for eventual consistency. Manual admin intervention is required.",
+            "content": "*   **Scenario 1: Strict Atomic Rollback on Subscriber Failure**",
             "type": "ADDED"
           },
           {
-            "lineNumber": 246,
-            "content": "*   **Scenario 3: Webhook Secret Flash Exposure**",
+            "lineNumber": 243,
+            "content": "    *   Admin creates a Currency. The `CreateCurrencyHandler` publishes `CurrencyCreatedEvent`. The `EscrowBootstrapperEventHandler` encounters a database constraint violation or error.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 247,
-            "content": "    *   The `GenerateWebhookSecretHandler` returns the plain-text secret, which is flashed to the UI via the PRG pattern.",
+            "lineNumber": 244,
+            "content": "    *   **Impact:** Because the event handler joins the ambient transaction via `contextvars`, the exception propagates to the outer `with self._uow:` block. The entire transaction is rolled back. The Currency is **not** created. This prevents \"Split Transactions\" and ensures the ledger never exists in a state where a Currency lacks its mandatory Escrow account.",
             "type": "ADDED"
           },
           {
             "lineNumber": 248,
-            "content": "    *   **Impact:** In a production environment, secrets should be hashed and shown via a secure, one-time-view mechanism. For this closed-loop environment, flashing is an acceptable, deliberate trade-off for immediate UI verification.",
+            "content": "*   **Scenario 3: Webhook Secret Flash Exposure**",
             "type": "ADDED"
           },
           {
             "lineNumber": 249,
-            "content": "*   **Scenario 4: Legacy Transaction Hold Settlement**",
+            "content": "    *   The `GenerateWebhookSecretHandler` returns the plain-text secret, which is flashed to the UI via the PRG pattern.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 250,
+            "content": "    *   **Impact:** In a production environment, secrets should be hashed and shown via a secure, one-time-view mechanism. For this closed-loop environment, flashing is an acceptable, deliberate trade-off for immediate UI verification.",
             "type": "ADDED"
           },
           {
             "lineNumber": 251,
+            "content": "*   **Scenario 4: Legacy Transaction Hold Settlement**",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 253,
             "content": "    *   **Impact:** The system gracefully clamps the holds at zero (`max(Decimal('0.00'), ...)`) instead of throwing negative holds.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 258,
-            "content": "*   **Ambient Transactions (`contextvars`):** The `SqliteUnitOfWork` uses `contextvars` to track the active connection and nesting level. This allows the `DoubleEntryLedger` domain service to mutate multiple aggregates atomically without requiring the UoW to be explicitly passed through every method signature, preserving domain purity.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 263,
-            "content": "*   **Rejected:** *Direct Wallet-to-Wallet Transfers.* ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 264,
-            "content": "    *   **Reason:** Fails to handle asynchronous merchant fulfillment securely. The Three-Party Escrow model mathematically guarantees funds are secured before external state changes occur.",
+            "lineNumber": 260,
+            "content": "*   **Implicit Ambient Transactions (`contextvars`):** The `SqliteUnitOfWork` uses `contextvars` to track the active connection and nesting level. Application Handlers rely entirely on the `__exit__` context manager boundary for commits. This allows the `DoubleEntryLedger` domain service and synchronous event subscribers to mutate multiple aggregates atomically without requiring the UoW to be explicitly passed through every method signature or explicitly committed, preserving domain purity.",
             "type": "ADDED"
           },
           {
             "lineNumber": 265,
-            "content": "*   **Rejected:** *Explicit UoW Injection in Domain Services.* ",
+            "content": "*   **Rejected:** *Direct Wallet-to-Wallet Transfers.* ",
             "type": "ADDED"
           },
           {
             "lineNumber": 266,
-            "content": "    *   **Reason:** Pollutes domain method signatures with infrastructure concerns. Ambient transactions via `contextvars` provide a cleaner, more orthogonal architecture.",
+            "content": "    *   **Reason:** Fails to handle asynchronous merchant fulfillment securely. The Three-Party Escrow model mathematically guarantees funds are secured before external state changes occur.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 267,
+            "content": "*   **Rejected:** *Explicit UoW Injection and Explicit Commits in Domain Services/Handlers.* ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 268,
+            "content": "    *   **Reason:** Pollutes domain method signatures with infrastructure concerns and risks premature commits before event subscribers finish their work. Ambient transactions via `contextvars` combined with implicit `__exit__` commits provide a cleaner, strictly atomic, and orthogonal architecture.",
             "type": "ADDED"
           }
         ],
@@ -641,6 +671,11 @@
           {
             "lineNumber": 1,
             "content": "# MODULE DOCUMENTATION: CROSS-CONTEXT ADMINISTRATION DASHBOARD",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 15,
+            "content": "8. [Complete File Index (100% Coverage)](#8-complete-file-index)",
             "type": "REMOVED"
           },
           {
@@ -781,6 +816,16 @@
           {
             "lineNumber": 87,
             "content": "    is_active BOOLEAN NOT NULL DEFAULT 1",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 155,
+            "content": "*   **Why `INTEGER` for `balance` and `pending_holds` in SQLite?** SQLite's dynamic typing causes affinity issues with `TEXT` decimals. Storing financial values as exact integer cents guarantees absolute precision. The `SqliteAccountRepository` strictly encapsulates `_to_cents()` and `_from_cents()`, ensuring the Domain layer only ever interacts with `Decimal` via the `Money` VO.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 156,
+            "content": "*   **Why Independent UoW in Event Subscribers?** Subscribers instantiate their own `SqliteUnitOfWork()`. This ensures that if an Identity Read Model update fails, it does not roll back the critical Ledger account creation. This enforces eventual consistency boundaries.",
             "type": "REMOVED"
           },
           {
@@ -944,6 +989,11 @@
             "type": "REMOVED"
           },
           {
+            "lineNumber": 214,
+            "content": "*   **Scenario 1: Event Bus Partial Failure (Split Transaction)**",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 215,
             "content": "    *   Admin creates a Currency. The `CreateCurrencyHandler` commits the Currency to the DB.",
             "type": "REMOVED"
@@ -997,46 +1047,41 @@
         "modifiedLines": [
           {
             "lineNumber": 3,
-            "content": "**Version:** 2.3.0",
+            "content": "**Version:** 2.4.0",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 21,
+            "lineNumber": 20,
             "content": "The Administration Dashboard is a **Server-Side Rendered (SSR) Cross-Context Administration UI** built with Flask Blueprints. It serves as the central back-office control plane for administrators to manage the entire state of the `Paymenter` Modular Monolith. The dashboard directly invokes Application Services across the **`Identity`**, **`Ledger`**, and **`Webhook`** bounded contexts.",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 50,
+            "lineNumber": 49,
             "content": "    *   `users.phone_email` must be globally unique (E.164 or RFC-compliant email).",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 72,
-            "content": "**Complete DDL (Identity + Ledger + Webhook - v2.3.0 Verified):**",
+            "lineNumber": 71,
+            "content": "**Complete DDL (Identity + Ledger + Webhook - v2.4.0 Verified):**",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 95,
+            "lineNumber": 94,
             "content": "    account_id TEXT NOT NULL, ",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 126,
+            "lineNumber": 125,
             "content": "    id TEXT PRIMARY KEY, ",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 133,
+            "lineNumber": 132,
             "content": "    id TEXT PRIMARY KEY, ",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 182,
-            "content": "*   **Why `INTEGER` for `balance` and `pending_holds` in SQLite?** SQLite's dynamic typing causes affinity issues with `TEXT` decimals. Storing financial values as exact integer cents guarantees absolute precision. The Repository pattern strictly encapsulates `_to_cents()` and `_from_cents()`.",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 244,
+            "lineNumber": 246,
             "content": "    *   A developer attempts to add `Money(10.00, 'USD')` to `Money(5.00, 'EUR')`.",
             "type": "MODIFIED"
           }
@@ -3529,414 +3574,174 @@
     "docs/backend/ledger/LedgerKernel.md": {
       "id": "02d60cb4-5d6e-4278-9f59-a25149fe38ab",
       "filePath": "docs/backend/ledger/LedgerKernel.md",
-      "hashValue": "4d86a814d6249123f38ff5bbf08222d90a6dd1fce34c4f9f57c9588c91ee3d57",
+      "hashValue": "e2f5ed16d52e4353faf2a597115e579b07cbb4a0c584bf21b6d4e2dd1973e43b",
       "diff": {
         "filePath": "docs/backend/ledger/LedgerKernel.md",
         "oldHash": "4d86a814d6249123f38ff5bbf08222d90a6dd1fce34c4f9f57c9588c91ee3d57",
-        "newHash": "4d86a814d6249123f38ff5bbf08222d90a6dd1fce34c4f9f57c9588c91ee3d57",
+        "newHash": "e2f5ed16d52e4353faf2a597115e579b07cbb4a0c584bf21b6d4e2dd1973e43b",
         "addedLines": [
           {
-            "lineNumber": 18,
-            "content": "This module enforces critical invariants such as the non-negative balance rule for standard withdrawals, the strict zero-balance/zero-holds/zero-authorizations prerequisite for currency mutation, and strict Bounded Context isolation on the read side. To guarantee deterministic execution and eliminate database-sequence coupling, all Aggregate Root identities are generated as **UUIDs (v4)** in the Application Layer prior to persistence. Financial quantities are strictly persisted as **INTEGER (cents)** to bypass SQLite's lack of native DECIMAL types, ensuring zero precision loss. Furthermore, Optimistic Concurrency Control (OCC) collisions are handled gracefully via **Application-Layer Exponential Backoff**. It utilizes an **Event-Driven Architecture** to deterministically bootstrap System Escrow accounts whenever a new currency is introduced, ensuring Aggregate purity and idempotency.",
+            "lineNumber": 20,
+            "content": "**v2.4.0 Evolution:** The infrastructure has been fully standardized around **Implicit Ambient Transaction Management** via Python's `contextvars`. Application Handlers and synchronous Event Subscribers no longer explicitly invoke database commits; instead, they rely entirely on the implicit commit boundary of the Unit of Work (UoW) context manager. This guarantees strict ACID compliance across in-process event chains, ensuring that domain purity is maintained without sacrificing atomic consistency.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 19,
+            "lineNumber": 21,
             "content": "",
             "type": "ADDED"
           },
           {
-            "lineNumber": 74,
-            "content": "  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, generates a UUID, persists the pure `Currency` aggregate, commits the UoW, and dispatches the `CurrencyCreatedEvent`.",
+            "lineNumber": 76,
+            "content": "  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, generates a UUID, persists the pure `Currency` aggregate, and dispatches the `CurrencyCreatedEvent` strictly *inside* the UoW block. Relies on the implicit commit boundary of the context manager.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 75,
-            "content": "  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency`. **Implements a Retry Mechanism** with exponential backoff (Max 3 retries, base delay 0.1s) to automatically resolve transient `ConcurrencyException` collisions.",
+            "lineNumber": 77,
+            "content": "  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency`. **Implements a Retry Mechanism** with exponential backoff (Max 3 retries, base delay 0.1s) to automatically resolve transient `ConcurrencyException` collisions. Relies on implicit commits.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 84,
-            "content": "  - `AccountSummary` – Contains account metadata. `id` and `currency_id` are strictly typed as `str` (UUIDs). The `card_number` field is strictly hardcoded to `None` to enforce bounded context isolation.",
+            "lineNumber": 116,
+            "content": "   - The handler publishes a `CurrencyCreatedEvent` to the event bus *inside* the UoW block.",
             "type": "ADDED"
           },
           {
-            "lineNumber": 85,
-            "content": "  - `EscrowAccountSummary` – Focused strictly on escrow metadata (`id` and `currency_id` as `str`).",
+            "lineNumber": 117,
+            "content": "3. **Event Handling (Atomic & Idempotent via Ambient UoW):**",
             "type": "ADDED"
           },
           {
-            "lineNumber": 96,
-            "content": "  - `SqliteAccountReadModel` / `SqliteEscrowAccountReadModel` – Materialises summaries. Reconstructs `Decimal` financial quantities by dividing the stored integer cents by `100`. Strictly queries within the `ledger` context.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 111,
-            "content": "2. **Handler execution (UoW 1):**",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 112,
-            "content": "   - A UUID is generated for the `currency_id`.",
+            "lineNumber": 118,
+            "content": "   - `EscrowBootstrapperEventHandler` catches the event synchronously.",
             "type": "ADDED"
           },
           {
             "lineNumber": 119,
-            "content": "   - **Idempotency Check:** It queries `AccountRepository.get_by_account_number()`. If an account already exists, it exits early.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 120,
-            "content": "   - It generates a new UUID for the `account_id`, instantiates the system `Account` (with `user_id=None`, `merchant_id=None`, zero balances), and persists it within a new, separate UoW transaction.",
+            "content": "   - Due to `contextvars`, it seamlessly joins the parent's active ambient transaction.",
             "type": "ADDED"
           },
           {
             "lineNumber": 122,
-            "content": "### Flow 2: Account Currency Change with OCC Retry",
+            "content": "   - It generates a new UUID for the `account_id`, instantiates the system `Account`, and persists it.",
             "type": "ADDED"
           },
           {
             "lineNumber": 123,
-            "content": "1. **Command dispatch:** `UpdateAccountCurrencyCommand` carrying the `account_id` (UUID string) and target `CurrencyCode`.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 124,
-            "content": "2. **Handler execution (Retry Loop):**",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 125,
-            "content": "   - Enters a `while True` loop (max 3 attempts).",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 126,
-            "content": "   - Opens UoW, loads the `Account` aggregate.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 127,
-            "content": "   - Invokes `Account.change_currency(new_currency_code)`. The aggregate strictly checks BR-3.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 129,
-            "content": "   - `SqliteAccountRepository.update()` verifies the currency exists, increments the `version`, and executes the SQL update.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 130,
-            "content": "   - If a concurrent modification occurred, SQLite returns `rowcount == 0`, triggering a `ConcurrencyException`.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 131,
-            "content": "   - **Backoff:** The handler catches the exception, sleeps for `0.1 * (2 ^ (attempt - 1))` seconds, and retries.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 132,
-            "content": "3. **Persistence:** On success, the UoW commits and the loop breaks. Historical transactions remain untouched.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 138,
-            "content": "### Issue 1: Centralized Exception Mapping Required",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 139,
-            "content": "**Description:** The domain and infrastructure layers raise strict, semantic exceptions (`ConcurrencyException`, `CurrencyNotFoundError`, `NonZeroBalanceCurrencyChangeError`, etc.) inheriting from `DomainException`. ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 145,
-            "content": "**Impact:** If a collision occurs, the idempotency check in `EscrowBootstrapperEventHandler` will silently skip creating the new escrow account.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 146,
-            "content": "**Mitigation:** In any realistic financial system, the number of supported currencies will never exceed a few hundred. The probability of a collision at $N < 1000$ is astronomically low. This is an acceptable theoretical trade-off for eliminating database sequence dependencies.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 148,
-            "content": "### Issue 3: SQLite Physical Write Contention & WAL",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 149,
-            "content": "**Description:** While Optimistic Concurrency Control (OCC) handles *logical* conflicts at the application layer, SQLite uses database-level locking for *physical* writes. ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 150,
-            "content": "**Impact:** Under extreme write contention, SQLite may throw `SQLITE_BUSY` errors.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 151,
-            "content": "**Mitigation:** The `SqliteUnitOfWork` is configured with `PRAGMA journal_mode=WAL` and a `10.0s` connection timeout, allowing SQLite to queue physical writes gracefully. Combined with the Application-Layer Exponential Backoff on `ConcurrencyException`, the system is highly resilient. The architecture is designed such that migrating to a row-level locking RDBMS (like PostgreSQL) requires zero domain or application layer refactoring.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 157,
-            "content": "### Application-Layer UUID Generation (Eliminating the Flush Paradox)",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 158,
-            "content": "By generating `uuid.uuid4().hex` in the Application Layer *before* invoking the repository, we completely decoupled the Domain from database auto-increment sequences. This eliminated the \"mid-transaction flush paradox,\" allowing the `CreateCurrencyHandler` to remain pure and strictly adhere to the Unit of Work pattern without requiring partial commits to retrieve generated IDs.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 160,
-            "content": "### Integer Cents Persistence (Zero Precision Loss)",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 161,
-            "content": "SQLite lacks a native `DECIMAL` type, often degrading `NUMERIC` to `REAL` (Float), which introduces catastrophic rounding errors in financial systems. By strictly storing `balance`, `pending_holds`, and `amount` as `INTEGER` (representing cents) in the schema, and utilizing `_to_cents()` / `_from_cents()` mapping in the repositories, we guarantee absolute mathematical precision while allowing the Domain Layer to operate purely on `Decimal` objects.",
+            "content": "4. **Atomic Commit:** Upon clean exit of the outermost `with self._uow:` block, the implicit commit finalizes both the Currency and the Escrow Account atomically. If the bootstrapper fails, the entire transaction rolls back, preventing orphaned currencies.",
             "type": "ADDED"
           },
           {
             "lineNumber": 163,
-            "content": "### Event-Driven Aggregate Provisioning (DDD Purity)",
+            "content": "### Implicit Ambient Transactions & DDD Purity",
             "type": "ADDED"
           },
           {
             "lineNumber": 164,
-            "content": "Strict DDD purity dictates that Aggregates must remain free of side-effects. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates. This prevents the `Currency` aggregate from becoming a \"God object\" and ensures clean domain boundaries.",
+            "content": "Strict DDD purity dictates that Aggregates must remain free of side-effects. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates at the domain level. Furthermore, by leveraging `contextvars` for Ambient Transaction Management, the event handler seamlessly joins the parent's active database transaction. This provides DDD purity at the domain layer while guaranteeing strict ACID compliance at the infrastructure layer, completely eliminating the risk of split transactions or orphaned entities.",
             "type": "ADDED"
           },
           {
             "lineNumber": 165,
             "content": "",
             "type": "ADDED"
-          },
-          {
-            "lineNumber": 176,
-            "content": "The `Account` aggregate employs defensive programming patterns, such as clamping `pending_holds` at zero during a decrease operation (`max(Decimal('0.00'), ...)`). This ensures that eventual consistency issues, legacy data migrations, or out-of-order event processing cannot force the aggregate into an invalid negative-holds state, preserving the mathematical integrity of the ledger.",
-            "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 72,
-            "content": "  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, persists the pure `Currency` aggregate, and dispatches the `CurrencyCreatedEvent`. It strictly adheres to the Single Responsibility Principle by not instantiating other aggregates.",
+            "lineNumber": 74,
+            "content": "  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, generates a UUID, persists the pure `Currency` aggregate, commits the UoW, and dispatches the `CurrencyCreatedEvent`.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 73,
-            "content": "  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency` (which enforces BR-3 via domain exceptions), and persists the state.",
+            "lineNumber": 75,
+            "content": "  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency`. **Implements a Retry Mechanism** with exponential backoff (Max 3 retries, base delay 0.1s) to automatically resolve transient `ConcurrencyException` collisions.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 82,
-            "content": "  - `AccountSummary` – Contains account metadata including `pending_holds` and `open_authorizations`. The `card_number` field is retained in the DTO signature for backward compatibility but is strictly hardcoded to `None` to enforce bounded context isolation.",
+            "lineNumber": 114,
+            "content": "   - The UoW commits the transaction.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 83,
-            "content": "  - `EscrowAccountSummary` – Focused strictly on escrow metadata.",
+            "lineNumber": 115,
+            "content": "   - The handler publishes a `CurrencyCreatedEvent` to the event bus.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 92,
-            "content": "  - `SqliteTransactionRepository` – Persists `Transaction` aggregates with OCC.",
+            "lineNumber": 116,
+            "content": "3. **Event Handling (Decoupled & Idempotent via UoW 2):**",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 95,
-            "content": "  - `SqliteAccountReadModel` – **Isolation Fix:** Strictly queries within the `ledger` context (joining `accounts`, `currencies`, `users`, and `merchants`). The cross-context `LEFT JOIN` on `user_cards` has been entirely removed.",
+            "lineNumber": 117,
+            "content": "   - `EscrowBootstrapperEventHandler` catches the event.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 96,
-            "content": "  - `SqliteEscrowAccountReadModel` – Materialises escrow summaries.",
+            "lineNumber": 120,
+            "content": "   - It generates a new UUID for the `account_id`, instantiates the system `Account` (with `user_id=None`, `merchant_id=None`, zero balances), and persists it within a new, separate UoW transaction.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 111,
-            "content": "2. **Handler execution (UoW):**",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 118,
-            "content": "   - **Idempotency Check:** It queries `AccountRepository.get_by_account_number()`. If an account already exists, it exits early (preventing duplicates on retry).",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 119,
-            "content": "   - It instantiates the system `Account` (with `user_id=None`, `merchant_id=None`, `pending_holds=0`, `open_authorizations=0`) and persists it within a new UoW transaction.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 121,
-            "content": "### Flow 2: Account Currency Change",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 122,
-            "content": "1. **Command dispatch:** `UpdateAccountCurrencyCommand` carrying the account ID and target `CurrencyCode`.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 123,
-            "content": "2. **Handler execution:**",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 124,
-            "content": "   - Loads the `Account` aggregate.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 125,
-            "content": "   - Invokes `Account.change_currency(new_currency_code)`.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 126,
-            "content": "   - The aggregate strictly checks BR-3. If balance > 0, it raises `NonZeroBalanceCurrencyChangeError`. If holds/auths > 0, it raises `PendingHoldsExistError`.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 128,
-            "content": "3. **Persistence:** `SqliteAccountRepository.update()` verifies the currency exists, increments the `version`, and commits via OCC. Historical transactions remain untouched.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 134,
-            "content": "### Issue 1: Unhandled Domain & Concurrency Exceptions",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 135,
-            "content": "**Description:** The repositories enforce Optimistic Concurrency Control (`ConcurrencyException`) and strict referential integrity (`CurrencyNotFoundError`, `AccountNotFoundError`). The domain layer raises strict business rule violations (`NonZeroBalanceCurrencyChangeError`, `PendingHoldsExistError`). ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 141,
-            "content": "**Impact:** If a collision occurs, the idempotency check in `EscrowBootstrapperEventHandler` will silently skip creating the new escrow account, resulting in two currencies sharing the same escrow account.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 142,
-            "content": "**Mitigation:** In any realistic financial system, the number of supported currencies will never exceed a few hundred. The probability of a collision at $N < 1000$ is astronomically low ($< 0.00005\\%$). This is an acceptable theoretical trade-off for eliminating database sequence dependencies.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 144,
-            "content": "### Issue 3: SQLite Physical Write Contention",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 145,
-            "content": "**Description:** While Optimistic Concurrency Control (OCC) handles *logical* conflicts at the application layer, SQLite uses database-level locking for *physical* writes (even in WAL mode). ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 146,
-            "content": "**Impact:** Under extreme write contention on the same aggregate or table, SQLite may throw `SQLITE_BUSY` errors.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 147,
-            "content": "**Mitigation:** Application-layer retry mechanisms with exponential backoff must be implemented for database operational errors. The architecture is designed such that migrating to a row-level locking RDBMS (like PostgreSQL) requires zero domain or application layer refactoring.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 153,
+            "lineNumber": 163,
             "content": "### Event-Driven Aggregate Provisioning (DDD Purity)",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 154,
-            "content": "Strict DDD purity dictates that Aggregates must remain pure and free of side-effects (such as instantiating other Aggregates or accessing external repositories) during their creation. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates. This prevents the `Currency` aggregate from becoming a \"God object\" and ensures clean domain boundaries.",
+            "lineNumber": 164,
+            "content": "Strict DDD purity dictates that Aggregates must remain free of side-effects. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates. This prevents the `Currency` aggregate from becoming a \"God object\" and ensures clean domain boundaries.",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 156,
-            "content": "### Cryptographic Deterministic Numbering & Idempotency",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 157,
-            "content": "The previous reliance on `9000000000 + currency_id` created a hard ceiling and tightly coupled the domain to infrastructure auto-increment sequences. The new SHA-256 modulo approach guarantees that the escrow account number is derived entirely from the domain identity (the currency code). Combined with a read-before-write idempotency check, this makes the system highly resilient to database migrations, sharding, sequence resets, and transient network failures during event processing.",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 169,
-            "content": "The `Account` aggregate employs defensive programming patterns, such as clamping `pending_holds` at zero during a decrease operation. This ensures that eventual consistency issues, legacy data migrations, or out-of-order event processing cannot force the aggregate into an invalid negative-holds state, preserving the mathematical integrity of the ledger.",
+            "lineNumber": 165,
+            "content": "",
             "type": "REMOVED"
           }
         ],
         "modifiedLines": [
           {
             "lineNumber": 3,
-            "content": "**Version:** 2.2.0",
+            "content": "**Version:** 2.4.0 (SSOT)",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 16,
-            "content": "The Account & Currency module is responsible for the lifecycle of financial accounts and the currencies in which they operate. It is a self-contained part of the `ledger` Bounded Context, built on Domain-Driven Design (DDD) and Clean Architecture. ",
+            "lineNumber": 18,
+            "content": "This module enforces critical invariants such as the non-negative balance rule for standard withdrawals, the strict zero-balance/zero-holds/zero-authorizations prerequisite for currency mutation, and strict Bounded Context isolation on the read side. To guarantee deterministic execution and eliminate database-sequence coupling, all Aggregate Root identities are generated as **UUIDs (v4)** in the Application Layer prior to persistence. Financial quantities are strictly persisted as **INTEGER (cents)** to bypass SQLite's lack of native DECIMAL types, ensuring zero precision loss. Furthermore, Optimistic Concurrency Control (OCC) collisions are handled gracefully via **Application-Layer Exponential Backoff**. It utilizes an **Event-Driven Architecture** to deterministically bootstrap System Escrow accounts whenever a new currency is introduced. ",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 35,
-            "content": "  All financial quantities and identifiers crossing layer boundaries are expressed through strict, immutable Value Objects (`@dataclass(frozen=True)`). Balances and amounts use `Money(Decimal, CurrencyCode)`, and account identifiers are represented by `AccountNumber` (10‑digit format) and UUID strings for internal Aggregate routing. Raw primitives such as floats are forbidden in Domain and Application layers.",
+            "lineNumber": 61,
+            "content": "  - `CurrencyCreatedEvent` (Triggers atomic escrow provisioning)",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 48,
-            "content": "  - `Account` – Controls balance mutations (`deposit`, `withdraw`, `topup`, `apply_system_reversal`), hold mutations (`increase_holds`, `decrease_holds`), currency mutation (`change_currency`), and identity via UUID `id` and `AccountNumber`.",
+            "lineNumber": 80,
+            "content": "  - `EscrowBootstrapperEventHandler` – Subscribes to `CurrencyCreatedEvent`. Generates the deterministic 10-digit account number via SHA-256, executes an idempotency check (`get_by_account_number`), instantiates the system `Account` aggregate, and persists it. Due to Ambient Transaction Management, it seamlessly joins the parent's active database transaction, ensuring strict atomic consistency.",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 50,
-            "content": "  - `Transaction` – Manages transaction lifecycle states (`Pending`, `Success`, `Failed`, `Refunded`). Uses UUID strings for `id`, `from_account_id`, and `to_account_id`.",
+            "lineNumber": 104,
+            "content": "  - `SqliteUnitOfWork` – Manages atomic transactions and nesting levels via `contextvars`. Configures SQLite PRAGMAs (`foreign_keys = ON`, `journal_mode=WAL`) and sets a `10.0s` connection timeout to gracefully handle physical write contention (`SQLITE_BUSY`). Automatically commits on a clean `__exit__` or rolls back if an exception propagates.",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 63,
-            "content": "  - Dedicated domain exceptions strictly inherit from a base `DomainException`: `InsufficientFundsError`, `CurrencyMismatchError`, `NonZeroBalanceCurrencyChangeError`, `PendingHoldsExistError`, `InvalidTopupAmountError`, `InvalidTransactionStateError`, `ConcurrencyException`, `CurrencyNotFoundError`, `CurrencyAlreadyExistsError`, `AccountNotFoundError`.",
+            "lineNumber": 113,
+            "content": "2. **Handler execution (Ambient UoW):**",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 67,
-            "content": "  - `UnitOfWork` – Abstract interface for managing atomic database transactions via context managers (`__enter__`, `__exit__`).",
+            "lineNumber": 127,
+            "content": "2. **Handler execution (Retry Loop & Ambient UoW):**",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 78,
-            "content": "  - `EscrowBootstrapperEventHandler` – Subscribes to `CurrencyCreatedEvent`. Generates the deterministic 10-digit account number via SHA-256, executes an idempotency check (`get_by_account_number`), instantiates the system `Account` aggregate, and persists it within its own UoW transaction.",
+            "lineNumber": 129,
+            "content": "   - Opens UoW context manager. Loads the `Account` aggregate.",
             "type": "MODIFIED"
           },
           {
-            "lineNumber": 92,
-            "content": "  - `SqliteAccountRepository` / `SqliteTransactionRepository` – Persists aggregates. Implements **Integer Cents Mapping** via `_to_cents()` and `_from_cents()` helper methods to ensure zero precision loss in SQLite. Implements Optimistic Concurrency Control (OCC) via a `version` column, raising `ConcurrencyException` if `rowcount == 0` during updates.",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 102,
-            "content": "  - `SqliteUnitOfWork` – Manages atomic transactions and nesting levels. Configures SQLite PRAGMAs (`foreign_keys = ON`, `journal_mode=WAL`) and sets a `10.0s` connection timeout to gracefully handle physical write contention (`SQLITE_BUSY`).",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 116,
-            "content": "3. **Event Handling (Decoupled & Idempotent via UoW 2):**",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 167,
-            "content": "The architectural exception allowing a `LEFT JOIN` on the `user_cards` table (from the `checkout`/`identity` context) has been **permanently revoked**. Direct cross-context data access creates tight coupling. The `SqliteAccountReadModel` strictly queries only within the `ledger` and core identity contexts. The `card_number` field in DTOs is hardcoded to `None`. Future integration requiring card data must rely on an Anti-Corruption Layer (ACL) or Integration Events.",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 170,
-            "content": "Generic host-language exceptions (e.g., Python's `ValueError`) have been entirely replaced with dedicated Domain Exceptions inheriting from `DomainException`. This ensures that the Domain layer remains pure, and higher layers can implement precise, semantic error handling and HTTP status code mapping.",
+            "lineNumber": 135,
+            "content": "3. **Implicit Persistence:** On success, the clean exit of the UoW context manager triggers the implicit commit, and the loop breaks. Historical transactions remain untouched.",
             "type": "MODIFIED"
           }
         ]
@@ -12245,68 +12050,72 @@
     ".git/index": {
       "id": "ca7b956e-83dc-4e7a-b3a0-e114c076cb1d",
       "filePath": ".git/index",
-      "hashValue": "1422657d0a5f2d195eadbc95baad08fc289cb2f79b7ec433da45e624a95675f9",
+      "hashValue": "273daa5ca274ceb108dd5538e0880f94c3f2201c12944cfe1d7854929aba3929",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "1422657d0a5f2d195eadbc95baad08fc289cb2f79b7ec433da45e624a95675f9",
-        "newHash": "1422657d0a5f2d195eadbc95baad08fc289cb2f79b7ec433da45e624a95675f9",
+        "oldHash": "273daa5ca274ceb108dd5538e0880f94c3f2201c12944cfe1d7854929aba3929",
+        "newHash": "273daa5ca274ceb108dd5538e0880f94c3f2201c12944cfe1d7854929aba3929",
         "addedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a���1��w\u0010L���*(=B\u00171�",
+            "lineNumber": 7,
+            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�m%�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 311,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001aFJ}V>��\u0004\b��a\u0019GV{[�H�",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a����Y�7�\t",
+            "lineNumber": 7,
+            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�\u0015\te��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 309,
-            "content": "U\u001b��\u0019^:��\\",
+            "lineNumber": 310,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a���Q8Mzق/xa\u0017�!3���",
             "type": "REMOVED"
           }
         ],
-        "modifiedLines": [
-          {
-            "lineNumber": 6,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_��\u0004q_�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
-            "type": "MODIFIED"
-          }
-        ]
+        "modifiedLines": []
       }
     },
     ".git/gk/config": {
       "id": "52d4ed10-3384-49d4-aff1-ba0819a6a94b",
       "filePath": ".git/gk/config",
-      "hashValue": "72cd6e946ce125282714b13fbde5d532f9249bda05b08fab49809451edbdebde",
+      "hashValue": "413d29be402cb7ab8b8e89b35b78b0397705e27daf30348ba18ea82930499915",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "72cd6e946ce125282714b13fbde5d532f9249bda05b08fab49809451edbdebde",
-        "newHash": "72cd6e946ce125282714b13fbde5d532f9249bda05b08fab49809451edbdebde",
+        "oldHash": "413d29be402cb7ab8b8e89b35b78b0397705e27daf30348ba18ea82930499915",
+        "newHash": "413d29be402cb7ab8b8e89b35b78b0397705e27daf30348ba18ea82930499915",
         "addedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T17:18:40.373Z",
+            "content": "\tgk-last-accessed = 2026-07-21T17:26:08.767Z",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T17:18:40.373Z",
+            "content": "\tgk-last-modified = 2026-07-21T17:26:08.767Z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T16:57:34.760Z",
+            "content": "\tgk-last-accessed = 2026-07-21T17:18:40.373Z",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T16:57:34.760Z",
+            "content": "\tgk-last-modified = 2026-07-21T17:18:40.373Z",
             "type": "REMOVED"
           }
         ],
@@ -13716,22 +13525,22 @@
     ".git/COMMIT_EDITMSG": {
       "id": "f06bae2a-b8b5-44a0-9aea-0f8134538c1e",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "60fe8fa269ce9b71925fe2c380eabdf671e8d6d5080159666897cfa45d90f207",
+      "hashValue": "00ff81c1f884dd496566283fda63ee7de10858fcba65b8777ca0b862b1f990c3",
       "diff": {
         "filePath": ".git/COMMIT_EDITMSG",
-        "oldHash": "60fe8fa269ce9b71925fe2c380eabdf671e8d6d5080159666897cfa45d90f207",
-        "newHash": "60fe8fa269ce9b71925fe2c380eabdf671e8d6d5080159666897cfa45d90f207",
+        "oldHash": "00ff81c1f884dd496566283fda63ee7de10858fcba65b8777ca0b862b1f990c3",
+        "newHash": "00ff81c1f884dd496566283fda63ee7de10858fcba65b8777ca0b862b1f990c3",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "updated user management doc",
+            "content": "updated settlement core doc and fixed critical bugs",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "updated card provisioning doc",
+            "content": "updated user management doc",
             "type": "REMOVED"
           }
         ],
@@ -13741,15 +13550,15 @@
     ".git/logs/HEAD": {
       "id": "52f127c3-0ec1-4b1f-a2c1-c14de43afc54",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "51b446e05488d6f6a3af66a3676ab11a72ce196921be08d655741fc04baa7e2f",
+      "hashValue": "d0bbd1f9efe367e2419b8d1a3b03b9c5a8ae8e6ad1ecc2a19b199cbe92c3e3fd",
       "diff": {
         "filePath": ".git/logs/HEAD",
-        "oldHash": "51b446e05488d6f6a3af66a3676ab11a72ce196921be08d655741fc04baa7e2f",
-        "newHash": "51b446e05488d6f6a3af66a3676ab11a72ce196921be08d655741fc04baa7e2f",
+        "oldHash": "d0bbd1f9efe367e2419b8d1a3b03b9c5a8ae8e6ad1ecc2a19b199cbe92c3e3fd",
+        "newHash": "d0bbd1f9efe367e2419b8d1a3b03b9c5a8ae8e6ad1ecc2a19b199cbe92c3e3fd",
         "addedLines": [
           {
-            "lineNumber": 185,
-            "content": "0980c94ca04a5f6f38c4d33a328c08e41d67e1c1 aabce8316fd62a932cee933d548ba48bbb91efb2 Shahrokh <shahrokh.hatami2004@gmail.com> 1784652800 +0330\tcommit: updated user management doc",
+            "lineNumber": 186,
+            "content": "aabce8316fd62a932cee933d548ba48bbb91efb2 9757223bb9fc948de2c70f267bda70ce42df3d68 Shahrokh <shahrokh.hatami2004@gmail.com> 1784654488 +0330\tcommit: updated settlement core doc and fixed critical bugs",
             "type": "ADDED"
           }
         ],
@@ -13760,15 +13569,15 @@
     ".git/logs/refs/heads/dev": {
       "id": "0f651d09-0dc1-4827-9abc-c7782d0d1f02",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "b9b340d4d0ee31df7f5ac11543d4d06647299e754c0b17e98c5f5d1186c5e554",
+      "hashValue": "9be848d5295b73be44a2e457368116f559424247a50de8218d9911b9b09048e4",
       "diff": {
         "filePath": ".git/logs/refs/heads/dev",
-        "oldHash": "b9b340d4d0ee31df7f5ac11543d4d06647299e754c0b17e98c5f5d1186c5e554",
-        "newHash": "b9b340d4d0ee31df7f5ac11543d4d06647299e754c0b17e98c5f5d1186c5e554",
+        "oldHash": "9be848d5295b73be44a2e457368116f559424247a50de8218d9911b9b09048e4",
+        "newHash": "9be848d5295b73be44a2e457368116f559424247a50de8218d9911b9b09048e4",
         "addedLines": [
           {
-            "lineNumber": 18,
-            "content": "0980c94ca04a5f6f38c4d33a328c08e41d67e1c1 aabce8316fd62a932cee933d548ba48bbb91efb2 Shahrokh <shahrokh.hatami2004@gmail.com> 1784652800 +0330\tcommit: updated user management doc",
+            "lineNumber": 19,
+            "content": "aabce8316fd62a932cee933d548ba48bbb91efb2 9757223bb9fc948de2c70f267bda70ce42df3d68 Shahrokh <shahrokh.hatami2004@gmail.com> 1784654488 +0330\tcommit: updated settlement core doc and fixed critical bugs",
             "type": "ADDED"
           }
         ],
@@ -13779,22 +13588,22 @@
     ".git/refs/heads/dev": {
       "id": "89943f45-244d-45c9-9d9f-634cd6c164a0",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "35b51f3a957c6a7dd1a76eb5a3a92dfaa06e65edbdb0bb7fc7577673bfa436be",
+      "hashValue": "56bf4232759fdc63c38fffbb0aa9075cb92f457615a33d714a53d1d49250b469",
       "diff": {
         "filePath": ".git/refs/heads/dev",
-        "oldHash": "35b51f3a957c6a7dd1a76eb5a3a92dfaa06e65edbdb0bb7fc7577673bfa436be",
-        "newHash": "35b51f3a957c6a7dd1a76eb5a3a92dfaa06e65edbdb0bb7fc7577673bfa436be",
+        "oldHash": "56bf4232759fdc63c38fffbb0aa9075cb92f457615a33d714a53d1d49250b469",
+        "newHash": "56bf4232759fdc63c38fffbb0aa9075cb92f457615a33d714a53d1d49250b469",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "aabce8316fd62a932cee933d548ba48bbb91efb2",
+            "content": "9757223bb9fc948de2c70f267bda70ce42df3d68",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "0980c94ca04a5f6f38c4d33a328c08e41d67e1c1",
+            "content": "aabce8316fd62a932cee933d548ba48bbb91efb2",
             "type": "REMOVED"
           }
         ],
@@ -14157,6 +13966,108 @@
           }
         ]
       }
+    },
+    ".git/objects/7b/10cb214216b0aa3d2fd14c289f94ef84b7266a": {
+      "id": "62b9c57f-74ea-4ef6-85d4-73f007d624ae",
+      "filePath": ".git/objects/7b/10cb214216b0aa3d2fd14c289f94ef84b7266a",
+      "hashValue": "a1fa289689e8aa138c11ca56928c70b1b7955488eee3855f95461f23189289dd",
+      "diff": null
+    },
+    ".git/objects/18/fbc6854804e2dfd8dc9b083eb95ad300ed061c": {
+      "id": "8c316beb-c3b7-49e5-9f6b-82918d826600",
+      "filePath": ".git/objects/18/fbc6854804e2dfd8dc9b083eb95ad300ed061c",
+      "hashValue": "6353d121f5ae5ac08e3f3d19d0f47e463e752308ccdcb696bf4851f453075882",
+      "diff": null
+    },
+    ".git/objects/ca/01f6383d624a70508df27c44e43259e9e8f578": {
+      "id": "4a6aadfa-b44c-4e48-89c1-928920f61b6f",
+      "filePath": ".git/objects/ca/01f6383d624a70508df27c44e43259e9e8f578",
+      "hashValue": "78b6d741e95385b9919e762bdab542db2dab4022607386c61f874db804c8b887",
+      "diff": null
+    },
+    ".git/objects/97/a7138067f3f9d354e012ff899235b9bb78a4d9": {
+      "id": "4542188a-1901-4412-9879-8af22e0728ca",
+      "filePath": ".git/objects/97/a7138067f3f9d354e012ff899235b9bb78a4d9",
+      "hashValue": "f176fda77c5c414c1ed17ab52d232a2ed4f830372331ad0d410512a19c3f7993",
+      "diff": null
+    },
+    ".git/objects/93/139f22ebe0bd5c9f402fddd68a9c5827bc2e09": {
+      "id": "d07c5091-bb2c-4b71-9e84-2b7e5e958f8b",
+      "filePath": ".git/objects/93/139f22ebe0bd5c9f402fddd68a9c5827bc2e09",
+      "hashValue": "e6e6f3853bf8e5df11f8a821557d6279082e21477fd3d92167b203823cc5f7da",
+      "diff": null
+    },
+    ".git/objects/27/f5f63d4fa49c6434f3e6809d76c16130783884": {
+      "id": "d453fce1-1019-4d3f-b70c-95610b05e9b6",
+      "filePath": ".git/objects/27/f5f63d4fa49c6434f3e6809d76c16130783884",
+      "hashValue": "e0a281c765018d454f744dc155b734e322803eb76f5e33adbe768c9b41fa734c",
+      "diff": null
+    },
+    ".git/objects/fe/81f49acbdaa4041253b5ef043160d7c3594e97": {
+      "id": "296a74f5-2197-4e21-a09a-727a4c3da529",
+      "filePath": ".git/objects/fe/81f49acbdaa4041253b5ef043160d7c3594e97",
+      "hashValue": "b685d7f4d7666fce6ac11732835fefa349db1878009c221e9e8ca4cc269756ce",
+      "diff": null
+    },
+    ".git/objects/af/9321d710966a00bec2654438021368c1a9091d": {
+      "id": "06158c7d-749b-4af8-96a1-58760bb20809",
+      "filePath": ".git/objects/af/9321d710966a00bec2654438021368c1a9091d",
+      "hashValue": "99c43b6dea929358cb7c2511fa6536ff6020f574f3bfa010b7d6dd0b6d0ab29a",
+      "diff": null
+    },
+    ".git/objects/7c/ece323b27d29e99f1f8065ca31b70a48a987e2": {
+      "id": "10c2ef9c-eb5a-4757-b155-432147c7aed1",
+      "filePath": ".git/objects/7c/ece323b27d29e99f1f8065ca31b70a48a987e2",
+      "hashValue": "2170bf1f5632ed30a13d135bfea198fab015af7924fa97a8e0e8765c68fe31ae",
+      "diff": null
+    },
+    ".git/objects/e7/7e268bf23910d1793d5b1a01776e5956896c67": {
+      "id": "d2dd33a2-8622-4c06-ba3d-d5fef1057915",
+      "filePath": ".git/objects/e7/7e268bf23910d1793d5b1a01776e5956896c67",
+      "hashValue": "3b63113435c8c770aaf73ab04e934f2216628b92cfd06c0ed729e60a2dd68576",
+      "diff": null
+    },
+    ".git/objects/ed/66495fcbd9d7916e042d8e398e1ea00a76fe25": {
+      "id": "8a555e1d-16fc-4977-9dad-f6bb3cf5d499",
+      "filePath": ".git/objects/ed/66495fcbd9d7916e042d8e398e1ea00a76fe25",
+      "hashValue": "3a88de79d1de9ecfb86ee37f49c8b9dc2e634c70a4dd15cbd39b07c26a15cbe9",
+      "diff": null
+    },
+    ".git/objects/cd/3a636db9f21a89cbcb368c69e662e79094228f": {
+      "id": "6c3f12bd-cec2-4f69-aba7-4d5fa7170051",
+      "filePath": ".git/objects/cd/3a636db9f21a89cbcb368c69e662e79094228f",
+      "hashValue": "f7e61be002b445c810334e174c4eb038197a543416997f8372b81dff2847d7db",
+      "diff": null
+    },
+    ".git/objects/a7/18c2ea0e99ab31b2027cef4f2103b99579968b": {
+      "id": "fe67c903-061b-42c8-aa49-dc953cc1e8b6",
+      "filePath": ".git/objects/a7/18c2ea0e99ab31b2027cef4f2103b99579968b",
+      "hashValue": "0332b4ae0d8da5c02187dfb1bc7d638fbeea261874352cdb5918d307edb7c817",
+      "diff": null
+    },
+    ".git/objects/bf/617813f77e56f07c0a6dc55a57b51cf7e7f4c6": {
+      "id": "2fa74297-5365-4216-86d7-672b8cc98d38",
+      "filePath": ".git/objects/bf/617813f77e56f07c0a6dc55a57b51cf7e7f4c6",
+      "hashValue": "f89534b4394160682304cabc27f5e88de0d5b450a767e9678b59511a67d714f9",
+      "diff": null
+    },
+    ".git/objects/04/fef1d80a24bb6417b0d6d95a093c21eac352dc": {
+      "id": "bb62e532-05fc-467c-b959-661c4ba429b7",
+      "filePath": ".git/objects/04/fef1d80a24bb6417b0d6d95a093c21eac352dc",
+      "hashValue": "cb28695032803b48e967ecfed08a8f5d8652ab1058b5faf54b58f5a964d1a788",
+      "diff": null
+    },
+    ".git/objects/f3/9457abf9ad537088327dc8423fea1bfca3aa65": {
+      "id": "2e97e22f-4128-4e98-94a9-e6ce07749d81",
+      "filePath": ".git/objects/f3/9457abf9ad537088327dc8423fea1bfca3aa65",
+      "hashValue": "eadf12c935623958a903f3b1957edca9006d435b35d2165cd965bdd7b1998cd8",
+      "diff": null
+    },
+    ".git/objects/97/57223bb9fc948de2c70f267bda70ce42df3d68": {
+      "id": "a9e9ad11-4915-439e-a193-6bc23b2eff7a",
+      "filePath": ".git/objects/97/57223bb9fc948de2c70f267bda70ce42df3d68",
+      "hashValue": "0fafdc569f70b1322e2404a127629da9b2381d590e5bd450fd5ed4a8668248fd",
+      "diff": null
     }
   }
 }

@@ -1,6 +1,6 @@
 # MODULE DOCUMENTATION: CROSS-CONTEXT ADMINISTRATION DASHBOARD & FINANCIAL CORE
 
-**Version:** 2.3.0
+**Version:** 2.4.0
 
 ---
 
@@ -12,7 +12,6 @@
 5. [Execution Flows](#5-execution-flows)
 6. [Edge Cases & Known Issues](#6-edge-cases--known-issues)
 7. [Architectural Notes & Rejected Decisions](#7-architectural-notes--rejected-decisions)
-8. [Complete File Index (100% Coverage)](#8-complete-file-index)
 
 ---
 
@@ -23,7 +22,7 @@ The Administration Dashboard is a **Server-Side Rendered (SSR) Cross-Context Adm
 *   **Delivery Mechanism:** Standard HTML forms, server-rendered via `render_template`, strictly utilizing the Post/Redirect/Get (PRG) pattern to prevent duplicate form submissions.
 *   **Authentication:** None at the application layer. Security relies entirely on strict network perimeter controls (Internal VPN, WAF, reverse proxy).
 *   **Nature:** This module operates as a **Closed-Loop Financial Ledger Emulator**. Card numbers are generated locally using the Luhn algorithm to maintain strict deterministic validation parity with external payment networks, without relying on external I/O. Fund movements occur entirely within the in-process Ledger context, guaranteeing absolute mathematical isolation and deterministic state verification.
-*   **v2.3.0 Evolution:** The system now features a complete **Three-Party Escrow Transaction Engine** and a robust **Merchant Webhook Configuration Subsystem**. The infrastructure has been upgraded to utilize Ambient Transaction Management via Python's `contextvars`, allowing deep domain services to participate in atomic transactions without explicit Unit of Work (UoW) injection.
+*   **v2.4.0 Evolution:** The system now features a complete **Three-Party Escrow Transaction Engine** and a robust **Merchant Webhook Configuration Subsystem**. The infrastructure has been fully standardized around **Ambient Transaction Management** via Python's `contextvars`. Application Handlers no longer explicitly invoke database commits; instead, they rely entirely on the implicit commit boundary of the Unit of Work (UoW) context manager, allowing deep domain services and synchronous event subscribers to participate in strictly atomic transactions.
 
 ---
 
@@ -65,11 +64,11 @@ The Administration Dashboard is a **Server-Side Rendered (SSR) Cross-Context Adm
 ### 1. Technical Details & Structure (WHAT)
 
 *   **Delivery Layer (Controller):** Flask Blueprint registered at `/dashboard`. Catches `DomainException` subclasses and bubbles exact error messages to UI flash alerts.
-*   **Ambient Transaction Management:** The `SqliteUnitOfWork` utilizes Python's `contextvars` to manage nested transactions and ambient connections. This allows deep domain services (like `DoubleEntryLedger`) to participate in atomic transactions without explicit UoW injection, while strictly enforcing `PRAGMA foreign_keys = ON` and `journal_mode=WAL` at the connection boundary.
+*   **Implicit Ambient Transaction Management:** The `SqliteUnitOfWork` utilizes Python's `contextvars` to manage nested transactions and ambient connections. Application Handlers (e.g., `CreateCurrencyHandler`, `UpdateAccountCurrencyHandler`) **no longer explicitly invoke `commit()`**. They rely entirely on the `__exit__` method of the context manager to automatically commit or rollback the ambient transaction. This strictly enforces `PRAGMA foreign_keys = ON` and `journal_mode=WAL` at the connection boundary.
 *   **Dependency Injection (Composite Container):** Central `DIContainer` instantiates `InMemoryEventBus`, then delegates to context-specific registration functions.
-*   **Event Bus (Synchronous In-Memory):** Subscribers are wired with their own independent `SqliteUnitOfWork` instances to prevent cross-context read-model failures from rolling back core domain transactions.
+*   **Event Bus (Synchronous In-Memory Atomicity):** Subscribers instantiate their own `SqliteUnitOfWork`, but due to the Ambient Transaction pattern (`contextvars`), they seamlessly detect and **join the parent's active database transaction**. This guarantees strict atomic consistency for synchronous in-memory event chains; if a subscriber fails, the parent transaction rolls back.
 
-**Complete DDL (Identity + Ledger + Webhook - v2.3.0 Verified):**
+**Complete DDL (Identity + Ledger + Webhook - v2.4.0 Verified):**
 ```sql
 -- IDENTITY SCHEMA
 CREATE TABLE IF NOT EXISTS users (
@@ -180,7 +179,7 @@ CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, n
 
 ### 2. Architectural Decisions (WHY)
 *   **Why `INTEGER` for `balance` and `pending_holds` in SQLite?** SQLite's dynamic typing causes affinity issues with `TEXT` decimals. Storing financial values as exact integer cents guarantees absolute precision. The Repository pattern strictly encapsulates `_to_cents()` and `_from_cents()`.
-*   **Why Independent UoW in Event Subscribers?** Subscribers instantiate their own `SqliteUnitOfWork()`. This ensures that if an Identity Read Model update fails, it does not roll back the critical Ledger account creation. This enforces eventual consistency boundaries.
+*   **Why Ambient Transactions for Event Subscribers?** By leveraging `contextvars`, newly instantiated `SqliteUnitOfWork` objects inside event handlers automatically detect and join the active ambient connection. This ensures that if a synchronous subscriber (like the Escrow Bootstrapper) fails, the exception propagates and the **entire parent transaction rolls back**. This prevents partial state mutations (Split Transactions) and guarantees strict ACID compliance for in-process event chains.
 
 ---
 
@@ -205,31 +204,34 @@ CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, n
 ### 1. Step-by-step Sequence (WHAT)
 
 #### Flow A: Three-Party Escrow Fund Hold & Completion
-1.  **Hold:** `HoldFundsHandler` invokes `DoubleEntryLedger.hold_funds()`. Payer's balance decreases, Payer's `pending_holds` increase, and the System Escrow account balance increases. A `Pending` Transaction is persisted.
-2.  **Complete:** `CompleteFundsHandler` invokes `DoubleEntryLedger.complete_funds()`. The Transaction transitions to `Success`. Payer's `pending_holds` decrease, Escrow balance decreases, and Payee's balance increases. `TransactionCompletedEvent` is published.
+1.  **Hold:** `HoldFundsHandler` invokes `DoubleEntryLedger.hold_funds()`. Payer's balance decreases, Payer's `pending_holds` increase, and the System Escrow account balance increases. A `Pending` Transaction is persisted. The ambient UoW commits upon clean exit.
+2.  **Complete:** `CompleteFundsHandler` invokes `DoubleEntryLedger.complete_funds()`. The Transaction transitions to `Success`. Payer's `pending_holds` decrease, Escrow balance decreases, and Payee's balance increases. `TransactionCompletedEvent` is published inside the UoW block. The ambient UoW commits atomically.
 
 #### Flow B: Admin Configures Merchant Webhook (Event-Driven Projection)
 1.  Admin submits form to `POST /dashboard/merchants/<id>/webhook/configure`.
 2.  `ConfigureWebhookHandler` loads the `Merchant` aggregate, invokes `merchant.configure_webhook()` (which enforces URL validation via the `WebhookUrl` VO), and persists the state.
 3.  Handler publishes `MerchantWebhookConfiguredEvent`.
-4.  **`MerchantWebhookConfiguredReadModelHandler` intercepts the event with its own independent UoW:**
-    *   Updates the `merchant_summaries` read model table with the new `webhook_url` and `webhook_enabled` state.
-    *   This ensures the Dashboard UI reflects the change immediately without querying the write model.
+4.  **`MerchantWebhookConfiguredReadModelHandler` intercepts the event:**
+    *   Joins the ambient transaction and updates the `merchant_summaries` read model table with the new `webhook_url` and `webhook_enabled` state.
+    *   The entire operation (Write Model + Read Model) commits atomically upon exiting the handler's UoW block.
 
 #### Flow C: Admin Creates a Currency (Idempotent UUID + Deterministic VO)
 1.  Admin submits form to `POST /dashboard/currencies/add`.
-2.  `CreateCurrencyHandler` generates a random UUID, persists the `Currency`, and publishes `CurrencyCreatedEvent`.
+2.  `CreateCurrencyHandler` generates a random UUID, persists the `Currency`, and publishes `CurrencyCreatedEvent`. (Commit is deferred to the ambient boundary).
 3.  **`EscrowBootstrapperEventHandler` intercepts the event:**
+    *   Joins the ambient transaction.
     *   Generates the deterministic 10-digit `AccountNumber` using SHA-256.
     *   **Idempotency Guard:** If the account number exists, the handler safely aborts.
     *   If it doesn't exist, it creates the System Escrow Account and persists it.
+4.  Upon exiting the outer UoW block, the entire chain (Currency + Escrow Account) is committed atomically.
 
 #### Flow D: Admin Creates a User Account (Cross-Context UUID & Card Chain)
 1.  `CreateAccountHandler` generates a UUID, persists the Account, and publishes `AccountCreatedEvent`.
-2.  **InMemoryEventBus synchronously triggers Identity subscribers:**
+2.  **InMemoryEventBus synchronously triggers Identity subscribers (all joining the ambient transaction):**
     *   **Link 1 (Read Model):** `AccountCreatedReadModelHandler` updates `user_summaries`.
     *   **Link 2 (Card Provisioning):** `OnAccountCreatedHandler` generates a Luhn-valid card number, inserts it into `user_cards`, and publishes `CardAssignedEvent`.
     *   **Link 3 (Card Read Model):** `CardAssignedReadModelHandler` updates the `card_number` in `user_summaries`.
+3.  The ambient UoW commits all cross-context mutations atomically.
 
 ---
 
@@ -237,9 +239,9 @@ CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, n
 
 ### 1. Specific Scenario (WHAT)
 
-*   **Scenario 1: Event Bus Partial Failure (Split Transaction)**
-    *   Admin creates a Currency. The `CreateCurrencyHandler` commits. The `EscrowBootstrapperEventHandler` encounters a database lock and fails.
-    *   **Impact:** The system has a Currency without an Escrow account. Because Event Subscribers use independent UoWs, this is an accepted trade-off for eventual consistency. Manual admin intervention is required.
+*   **Scenario 1: Strict Atomic Rollback on Subscriber Failure**
+    *   Admin creates a Currency. The `CreateCurrencyHandler` publishes `CurrencyCreatedEvent`. The `EscrowBootstrapperEventHandler` encounters a database constraint violation or error.
+    *   **Impact:** Because the event handler joins the ambient transaction via `contextvars`, the exception propagates to the outer `with self._uow:` block. The entire transaction is rolled back. The Currency is **not** created. This prevents "Split Transactions" and ensures the ledger never exists in a state where a Currency lacks its mandatory Escrow account.
 *   **Scenario 2: Cross-Currency Arithmetic Prevention**
     *   A developer attempts to add `Money(10.00, 'USD')` to `Money(5.00, 'EUR')`.
     *   **Impact:** The `Money` VO's `__add__` method immediately raises `CurrencyMismatchError`, preventing catastrophic silent ledger imbalances.
@@ -255,14 +257,14 @@ CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, n
 ## 7. Architectural Notes & Rejected Decisions
 
 ### 1. Current Implementation (WHAT)
-*   **Ambient Transactions (`contextvars`):** The `SqliteUnitOfWork` uses `contextvars` to track the active connection and nesting level. This allows the `DoubleEntryLedger` domain service to mutate multiple aggregates atomically without requiring the UoW to be explicitly passed through every method signature, preserving domain purity.
+*   **Implicit Ambient Transactions (`contextvars`):** The `SqliteUnitOfWork` uses `contextvars` to track the active connection and nesting level. Application Handlers rely entirely on the `__exit__` context manager boundary for commits. This allows the `DoubleEntryLedger` domain service and synchronous event subscribers to mutate multiple aggregates atomically without requiring the UoW to be explicitly passed through every method signature or explicitly committed, preserving domain purity.
 *   **Strict Aggregate Invariants:** The `Account` entity enforces currency matching on all mutations via the `Money` Value Object.
 *   **Cents-based Persistence:** The Repository pattern strictly hides the `INTEGER` cents implementation detail from the Domain layer.
 
 ### 2. Discarded Alternatives & Reasons (WHY)
 *   **Rejected:** *Direct Wallet-to-Wallet Transfers.* 
     *   **Reason:** Fails to handle asynchronous merchant fulfillment securely. The Three-Party Escrow model mathematically guarantees funds are secured before external state changes occur.
-*   **Rejected:** *Explicit UoW Injection in Domain Services.* 
-    *   **Reason:** Pollutes domain method signatures with infrastructure concerns. Ambient transactions via `contextvars` provide a cleaner, more orthogonal architecture.
+*   **Rejected:** *Explicit UoW Injection and Explicit Commits in Domain Services/Handlers.* 
+    *   **Reason:** Pollutes domain method signatures with infrastructure concerns and risks premature commits before event subscribers finish their work. Ambient transactions via `contextvars` combined with implicit `__exit__` commits provide a cleaner, strictly atomic, and orthogonal architecture.
 *   **Rejected:** *Using a global `try/except DomainException` block in a Flask error handler.*
     *   **Reason:** For an SSR dashboard using `flash()`, catching exceptions locally within the route functions allows for precise redirection logic (`redirect(request.referrer)`) that a global error handler would complicate.

@@ -1,6 +1,6 @@
 # Account & Currency Module
 
-**Version:** 2.2.0
+**Version:** 2.4.0 (SSOT)
 
 ## Table of Contents
 1. [Overview](#1-overview)
@@ -15,7 +15,9 @@
 ## 1. Overview
 The Account & Currency module is responsible for the lifecycle of financial accounts and the currencies in which they operate. It is a self-contained part of the `ledger` Bounded Context, built on Domain-Driven Design (DDD) and Clean Architecture. 
 
-This module enforces critical invariants such as the non-negative balance rule for standard withdrawals, the strict zero-balance/zero-holds/zero-authorizations prerequisite for currency mutation, and strict Bounded Context isolation on the read side. To guarantee deterministic execution and eliminate database-sequence coupling, all Aggregate Root identities are generated as **UUIDs (v4)** in the Application Layer prior to persistence. Financial quantities are strictly persisted as **INTEGER (cents)** to bypass SQLite's lack of native DECIMAL types, ensuring zero precision loss. Furthermore, Optimistic Concurrency Control (OCC) collisions are handled gracefully via **Application-Layer Exponential Backoff**. It utilizes an **Event-Driven Architecture** to deterministically bootstrap System Escrow accounts whenever a new currency is introduced, ensuring Aggregate purity and idempotency.
+This module enforces critical invariants such as the non-negative balance rule for standard withdrawals, the strict zero-balance/zero-holds/zero-authorizations prerequisite for currency mutation, and strict Bounded Context isolation on the read side. To guarantee deterministic execution and eliminate database-sequence coupling, all Aggregate Root identities are generated as **UUIDs (v4)** in the Application Layer prior to persistence. Financial quantities are strictly persisted as **INTEGER (cents)** to bypass SQLite's lack of native DECIMAL types, ensuring zero precision loss. Furthermore, Optimistic Concurrency Control (OCC) collisions are handled gracefully via **Application-Layer Exponential Backoff**. It utilizes an **Event-Driven Architecture** to deterministically bootstrap System Escrow accounts whenever a new currency is introduced. 
+
+**v2.4.0 Evolution:** The infrastructure has been fully standardized around **Implicit Ambient Transaction Management** via Python's `contextvars`. Application Handlers and synchronous Event Subscribers no longer explicitly invoke database commits; instead, they rely entirely on the implicit commit boundary of the Unit of Work (UoW) context manager. This guarantees strict ACID compliance across in-process event chains, ensuring that domain purity is maintained without sacrificing atomic consistency.
 
 ---
 
@@ -56,7 +58,7 @@ All rules listed here are non-negotiable and enforced at the aggregate level.
 
 - **Domain Events**
   - `AccountCreatedEvent`
-  - `CurrencyCreatedEvent` (Triggers asynchronous escrow provisioning)
+  - `CurrencyCreatedEvent` (Triggers atomic escrow provisioning)
   - `CurrencyActivatedEvent` / `CurrencyDeactivatedEvent`
 
 - **Exceptions**
@@ -71,11 +73,11 @@ All rules listed here are non-negotiable and enforced at the aggregate level.
 *Use Cases, CQRS, Event Handlers, and DTOs.*
 
 - **Commands & Handlers**
-  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, generates a UUID, persists the pure `Currency` aggregate, commits the UoW, and dispatches the `CurrencyCreatedEvent`.
-  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency`. **Implements a Retry Mechanism** with exponential backoff (Max 3 retries, base delay 0.1s) to automatically resolve transient `ConcurrencyException` collisions.
+  - `CreateCurrencyCommand` / `CreateCurrencyHandler` – Accepts currency attributes, generates a UUID, persists the pure `Currency` aggregate, and dispatches the `CurrencyCreatedEvent` strictly *inside* the UoW block. Relies on the implicit commit boundary of the context manager.
+  - `UpdateAccountCurrencyCommand` / `UpdateAccountCurrencyHandler` – Loads the `Account` aggregate, invokes `change_currency`. **Implements a Retry Mechanism** with exponential backoff (Max 3 retries, base delay 0.1s) to automatically resolve transient `ConcurrencyException` collisions. Relies on implicit commits.
 
 - **Event Handlers**
-  - `EscrowBootstrapperEventHandler` – Subscribes to `CurrencyCreatedEvent`. Generates the deterministic 10-digit account number via SHA-256, executes an idempotency check (`get_by_account_number`), instantiates the system `Account` aggregate, and persists it within its own UoW transaction.
+  - `EscrowBootstrapperEventHandler` – Subscribes to `CurrencyCreatedEvent`. Generates the deterministic 10-digit account number via SHA-256, executes an idempotency check (`get_by_account_number`), instantiates the system `Account` aggregate, and persists it. Due to Ambient Transaction Management, it seamlessly joins the parent's active database transaction, ensuring strict atomic consistency.
 
 - **Queries & Handlers**
   - `GetAllAccountsHandler` / `GetAllEscrowAccountsHandler` – Return optimized DTOs for list views via dedicated Query Ports.
@@ -99,7 +101,7 @@ All rules listed here are non-negotiable and enforced at the aggregate level.
   - `SqliteSystemAccountResolver` – Implements `SystemAccountResolverPort` by querying for accounts where `user_id IS NULL AND merchant_id IS NULL`.
 
 - **Unit of Work & DI**
-  - `SqliteUnitOfWork` – Manages atomic transactions and nesting levels. Configures SQLite PRAGMAs (`foreign_keys = ON`, `journal_mode=WAL`) and sets a `10.0s` connection timeout to gracefully handle physical write contention (`SQLITE_BUSY`).
+  - `SqliteUnitOfWork` – Manages atomic transactions and nesting levels via `contextvars`. Configures SQLite PRAGMAs (`foreign_keys = ON`, `journal_mode=WAL`) and sets a `10.0s` connection timeout to gracefully handle physical write contention (`SQLITE_BUSY`). Automatically commits on a clean `__exit__` or rolls back if an exception propagates.
   - `ledger_di.py` – Wires the dependency injection container, registers handler factories, and subscribes the `EscrowBootstrapperEventHandler` to the `CurrencyCreatedEvent` on the event bus.
 
 ---
@@ -108,28 +110,29 @@ All rules listed here are non-negotiable and enforced at the aggregate level.
 
 ### Flow 1: Currency Creation with Event-Driven Escrow Bootstrapping
 1. **Command dispatch:** `CreateCurrencyCommand` is processed by `CreateCurrencyHandler`.
-2. **Handler execution (UoW 1):**
+2. **Handler execution (Ambient UoW):**
    - A UUID is generated for the `currency_id`.
    - A pure `Currency` aggregate is instantiated and persisted.
-   - The UoW commits the transaction.
-   - The handler publishes a `CurrencyCreatedEvent` to the event bus.
-3. **Event Handling (Decoupled & Idempotent via UoW 2):**
-   - `EscrowBootstrapperEventHandler` catches the event.
+   - The handler publishes a `CurrencyCreatedEvent` to the event bus *inside* the UoW block.
+3. **Event Handling (Atomic & Idempotent via Ambient UoW):**
+   - `EscrowBootstrapperEventHandler` catches the event synchronously.
+   - Due to `contextvars`, it seamlessly joins the parent's active ambient transaction.
    - It generates a 10-digit account number using `SHA-256(currency_code) % 10^10`.
    - **Idempotency Check:** It queries `AccountRepository.get_by_account_number()`. If an account already exists, it exits early.
-   - It generates a new UUID for the `account_id`, instantiates the system `Account` (with `user_id=None`, `merchant_id=None`, zero balances), and persists it within a new, separate UoW transaction.
+   - It generates a new UUID for the `account_id`, instantiates the system `Account`, and persists it.
+4. **Atomic Commit:** Upon clean exit of the outermost `with self._uow:` block, the implicit commit finalizes both the Currency and the Escrow Account atomically. If the bootstrapper fails, the entire transaction rolls back, preventing orphaned currencies.
 
 ### Flow 2: Account Currency Change with OCC Retry
 1. **Command dispatch:** `UpdateAccountCurrencyCommand` carrying the `account_id` (UUID string) and target `CurrencyCode`.
-2. **Handler execution (Retry Loop):**
+2. **Handler execution (Retry Loop & Ambient UoW):**
    - Enters a `while True` loop (max 3 attempts).
-   - Opens UoW, loads the `Account` aggregate.
+   - Opens UoW context manager. Loads the `Account` aggregate.
    - Invokes `Account.change_currency(new_currency_code)`. The aggregate strictly checks BR-3.
    - If valid, it updates the `Money` value objects with the new currency code.
    - `SqliteAccountRepository.update()` verifies the currency exists, increments the `version`, and executes the SQL update.
    - If a concurrent modification occurred, SQLite returns `rowcount == 0`, triggering a `ConcurrencyException`.
    - **Backoff:** The handler catches the exception, sleeps for `0.1 * (2 ^ (attempt - 1))` seconds, and retries.
-3. **Persistence:** On success, the UoW commits and the loop breaks. Historical transactions remain untouched.
+3. **Implicit Persistence:** On success, the clean exit of the UoW context manager triggers the implicit commit, and the loop breaks. Historical transactions remain untouched.
 
 ---
 
@@ -157,11 +160,11 @@ All rules listed here are non-negotiable and enforced at the aggregate level.
 ### Application-Layer UUID Generation (Eliminating the Flush Paradox)
 By generating `uuid.uuid4().hex` in the Application Layer *before* invoking the repository, we completely decoupled the Domain from database auto-increment sequences. This eliminated the "mid-transaction flush paradox," allowing the `CreateCurrencyHandler` to remain pure and strictly adhere to the Unit of Work pattern without requiring partial commits to retrieve generated IDs.
 
+### Implicit Ambient Transactions & DDD Purity
+Strict DDD purity dictates that Aggregates must remain free of side-effects. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates at the domain level. Furthermore, by leveraging `contextvars` for Ambient Transaction Management, the event handler seamlessly joins the parent's active database transaction. This provides DDD purity at the domain layer while guaranteeing strict ACID compliance at the infrastructure layer, completely eliminating the risk of split transactions or orphaned entities.
+
 ### Integer Cents Persistence (Zero Precision Loss)
 SQLite lacks a native `DECIMAL` type, often degrading `NUMERIC` to `REAL` (Float), which introduces catastrophic rounding errors in financial systems. By strictly storing `balance`, `pending_holds`, and `amount` as `INTEGER` (representing cents) in the schema, and utilizing `_to_cents()` / `_from_cents()` mapping in the repositories, we guarantee absolute mathematical precision while allowing the Domain Layer to operate purely on `Decimal` objects.
-
-### Event-Driven Aggregate Provisioning (DDD Purity)
-Strict DDD purity dictates that Aggregates must remain free of side-effects. By publishing a `CurrencyCreatedEvent` and delegating the Escrow account provisioning to an Application-layer Event Handler, we decouple the lifecycle of the two aggregates. This prevents the `Currency` aggregate from becoming a "God object" and ensures clean domain boundaries.
 
 ### Strict Bounded Context Isolation on the Read Side
 The architectural exception allowing a `LEFT JOIN` on the `user_cards` table (from the `checkout`/`identity` context) has been **permanently revoked**. Direct cross-context data access creates tight coupling. The `SqliteAccountReadModel` strictly queries only within the `ledger` and core identity contexts. The `card_number` field in DTOs is hardcoded to `None`. Future integration requiring card data must rely on an Anti-Corruption Layer (ACL) or Integration Events.

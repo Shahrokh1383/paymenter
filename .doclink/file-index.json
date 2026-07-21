@@ -2276,6 +2276,132 @@
       "lastModified": "2026-07-21T14:41:54.641Z",
       "size": 0,
       "isDirectory": false
+    },
+    ".git/objects/a2/tmp_obj_rkSEIU": {
+      "id": "f439f5e8-6e4c-4cff-a182-aa2a695ee612",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.549Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/a2/a53e34723bbfcda7422e0fe31100c9ff77ca3d": {
+      "id": "db112695-06fa-41da-af62-b50b341e07d8",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.623Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/68/tmp_obj_AngYwG": {
+      "id": "4d558147-672b-40ce-be8a-37747834c778",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.654Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/68/79ee721bd9b46c5c7871544727762b87669786": {
+      "id": "e8250340-4cfd-4a49-abfb-e5b3d46f3b8a",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.704Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/97/1a434f66ad99e3c4acfca0fc19e3a3b155b415": {
+      "id": "dcf9df8c-11c4-4afc-a3aa-d690475a4ddf",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.778Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d6/a8c09da15c3e15b6b2e89aab6c5d1cf96d76c5": {
+      "id": "4b995158-408d-41f1-8801-2ee09604db06",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.844Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/e9/f5b57bb5e621b24a3a7b1e237d8cbb527ddc7a": {
+      "id": "6d7b8eba-29ce-4c66-9dcd-a08b4c1189ba",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.899Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d4/tmp_obj_AEORZQ": {
+      "id": "8fc2d176-ecf4-4f41-94f1-5e5b6215a4cf",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.928Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d4/41939158227244fe409c5080abd779955b1494": {
+      "id": "d209c524-7772-4e81-909f-55fd94625c73",
+      "hash": null,
+      "lastModified": "2026-07-21T15:15:59.980Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/89/22413767dde104795960d9ca0f956b7c51e1db": {
+      "id": "6c4309d8-bd2c-4bef-9105-f67361ca49d5",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:00.048Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/d3/fcec513b6a2a31cc7cf60cd5e764bc5a0e894f": {
+      "id": "b15ae22f-673e-44dc-aef9-1b23fce82574",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:00.177Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/fd/b13726abc234bb325ca43ba79669002b1562c7": {
+      "id": "41e483d5-d50d-4a96-9c04-846e6f5c1ea7",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:00.348Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/c1/6e4c7fe752c5fb6383c6359a6e0aa313798c78": {
+      "id": "fed2b4dc-1b12-4934-868b-f0bfd8fc83ad",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:46.650Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/b1/b5d47b7383c44fb81461b693bbf0b6a3986f9d": {
+      "id": "e4506a61-c35b-42ba-83ec-3a6580536fe5",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:46.713Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/35/d2574922d6617dae5ae2d838a59b59e1212b44": {
+      "id": "fb3680b7-9fda-443b-8f62-9351031e0134",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:46.770Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/40/82e3f9c0e0abb4cfbdb884b7fd82e55e9b68f4": {
+      "id": "bee8550d-9db4-43ff-bc54-e3d4e9a01150",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:46.928Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    ".git/objects/b4/04ea9dfdd09c88d8936ded142ef233b78fb7d0": {
+      "id": "8f1aa1a8-4e0e-43df-9203-e7419106c868",
+      "hash": null,
+      "lastModified": "2026-07-21T15:16:47.213Z",
+      "size": 0,
+      "isDirectory": false
+    },
+    "src/app/di/__pycache__/identity_di.cpython-313.pyc": {
+      "id": "54b1cb20-ef63-460d-8194-1ae383f07806",
+      "hash": null,
+      "lastModified": "2026-07-21T15:25:08.958Z",
+      "size": 0,
+      "isDirectory": false
     }
   }
 }

@@ -1,6 +1,6 @@
 # MODULE DOCUMENTATION: MERCHANT MANAGEMENT & WEBHOOK INTEGRATION
 
-**Version:** 2.3.0 (SSOT - Enterprise Architecture)  
+**Version:** 3.0.0
 
 ## Table of Contents
 1. [Overview](#overview)

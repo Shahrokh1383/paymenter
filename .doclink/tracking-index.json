@@ -1046,36 +1046,967 @@
     "docs/backend/identity/CardProvisioning.md": {
       "id": "7ccb1874-1a2f-4795-9810-f21d5885209d",
       "filePath": "docs/backend/identity/CardProvisioning.md",
-      "hashValue": "60ea91b3329192b1efc3fc6c775a97eebd53cb0ae261e514386177225c1570ed",
+      "hashValue": "da6651c15b4ff9b01d02bb4fee9f2f49b37af7e197b072689f3c548d11ce27fd",
       "diff": {
         "filePath": "docs/backend/identity/CardProvisioning.md",
         "oldHash": "60ea91b3329192b1efc3fc6c775a97eebd53cb0ae261e514386177225c1570ed",
-        "newHash": "60ea91b3329192b1efc3fc6c775a97eebd53cb0ae261e514386177225c1570ed",
+        "newHash": "da6651c15b4ff9b01d02bb4fee9f2f49b37af7e197b072689f3c548d11ce27fd",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "# MODULE DOCUMENTATION: CARD PROVISIONING",
+            "content": "# MODULE DOCUMENTATION: IDENTITY BOUNDED CONTEXT (CARD PROVISIONING & MERCHANT MANAGEMENT)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "**Version:** 3.0.0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 18,
+            "content": "The module generates cryptographically secure API keys and webhook secrets, persists domain aggregates and read models using an ambient Unit of Work pattern with raw SQL optimizations, and emits domain events to update downstream projections. It operates strictly via an in-memory synchronous event bus and command handlers, ensuring strict transactional consistency within the modular monolith.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "*   **Card Provisioning Trigger:** Exclusively triggered by the `AccountCreatedEvent` (carrying `account_id`, `user_id`, `merchant_id`, `account_number`, and `currency_code`).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 26,
+            "content": "*   **PAN Generation:** A 16-digit number is generated satisfying the Luhn checksum algorithm. The logic is implemented as a stateless utility function (`generate_card_number`) utilizing non-cryptographic randomness for digit generation, finalized with a deterministic check digit.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "*   **Uniqueness Constraint:** The generated PAN must be globally unique. Uniqueness is enforced **solely at the database layer** via a `UNIQUE` constraint on the `user_cards.card_number` column. Application-level pre-checks are intentionally omitted.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 29,
+            "content": "*   **Merchant Webhook Configuration:** Merchants can configure outbound webhook URLs and toggle their enabled state via the `ConfigureWebhookCommand`. URL validity is strictly enforced by the `WebhookUrl` Value Object (requiring `http` or `https` schemes).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "*   **Webhook Secret Generation:** Secrets are generated using cryptographically secure randomness (`secrets.token_urlsafe`), prefixed with `whsec_`, and must meet a minimum length requirement (>= 20 chars).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "*   **API Key Generation:** Merchant API keys are generated using `secrets.token_urlsafe`, strictly matching the regex `^pay_[A-Za-z0-9\\-_]{43}$`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 34,
+            "content": "*   **Why Luhn validation?** Ensures realistic behavior in integration testing and external payment gateway simulations, maintaining compatibility with standard financial instrument validation logic.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 35,
+            "content": "*   **Why rely purely on DB constraints for PAN uniqueness?** Given the 16-digit PAN space (with Luhn check digit), the probability of a collision is statistically negligible ($< 10^{-15}$). Skipping an application-level `SELECT` lookup eliminates an unnecessary database round-trip, optimizing for high-throughput insertion performance.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 36,
+            "content": "*   **Why Plaintext PAN Storage?** Application-level encryption (e.g., AES-256) complicates the database's ability to enforce the `UNIQUE` constraint without introducing deterministic encryption schemes (like AES-SIV). Furthermore, downstream read models require the plain card number for dashboard rendering. This is a deliberate architectural trade-off prioritizing query performance and schema simplicity, with Format-Preserving Encryption (FPE) scheduled for future security hardening phases.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 37,
+            "content": "*   **Why Plaintext Webhook Secrets?** Unlike user passwords, webhook secrets must be retained in plaintext (or reversibly encrypted) by the dispatching system. The platform requires the raw secret to generate HMAC-SHA256 signatures for outgoing webhook payloads. Hashing the secret would cryptographically prevent the system from signing payloads. Access to these secrets is strictly gated by application-level authorization and boundary controls.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 38,
+            "content": "*   **Why Application-Layer UUIDs for `account_id`?** Generating the `account_id` as a UUID hex string in the application layer prior to persistence ensures the identifier is deterministically known before the database transaction commits. This aligns perfectly with event-driven choreography, allowing the ID to be safely propagated through domain events without relying on database auto-increment return values.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 41,
+            "content": "*   **Rejected:** *Application-level uniqueness pre-check via Repository before PAN insert.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 42,
+            "content": "    *   **Reason:** Adds unnecessary latency and I/O overhead for a collision probability that is practically zero. The database's `UNIQUE` constraint is the authoritative, performant guardrail.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 43,
+            "content": "*   **Rejected:** *Hashing Webhook Secrets in the Database.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 44,
+            "content": "    *   **Reason:** Hashing destroys the system's ability to act as a webhook dispatcher. To sign outgoing HTTP payloads with HMAC, the raw secret is mathematically required at runtime.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 52,
+            "content": "    *   `OnAccountCreatedHandler`: Consumes `AccountCreatedEvent`, generates PAN, executes raw SQL `INSERT` via ambient `UnitOfWork`, commits, and publishes `CardAssignedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 53,
+            "content": "    *   `ConfigureWebhookHandler` & `GenerateWebhookSecretHandler`: Process commands to mutate the `Merchant` aggregate, persist changes via the Repository, and publish respective domain events.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 54,
+            "content": "    *   **Read Model Handlers:** Dedicated handlers (`AccountCreatedReadModelHandler`, `MerchantWebhookConfiguredReadModelHandler`, etc.) execute raw SQL `UPDATE`/`INSERT` statements to maintain denormalized CQRS read models (`user_summaries`, `merchant_summaries`).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 56,
+            "content": "    *   **Aggregates/Entities:** `Merchant` (encapsulates webhook configuration invariants and state toggling).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 57,
+            "content": "    *   **Value Objects:** `WebhookUrl` (validates URL structure), `ApiKey` (enforces strict regex formatting), `AccountNumber`, `CurrencyCode`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 58,
+            "content": "    *   **Events:** `CardAssignedEvent`, `MerchantOnboardedEvent`, `MerchantWebhookConfiguredEvent`, `MerchantWebhookSecretGeneratedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 60,
+            "content": "    *   `SqliteUnitOfWork`: Implements the Unit of Work pattern using Python's `contextvars` to support **ambient transactions**. This allows nested UoW contexts and ensures strict transaction boundaries without passing connection objects explicitly through the domain layer.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 61,
+            "content": "    *   `generators.py`: Pure functions for generating Luhn-valid PANs, API keys, and cryptographic secrets.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 64,
+            "content": "*   **Why Ambient Transactions via `contextvars`?** It elegantly solves the transaction boundary problem in event-driven architectures. When an event handler triggers another handler that requires a UoW, `contextvars` ensures they share the same underlying SQLite connection and transaction context, preventing deadlocks and ensuring atomic commits across the entire synchronous event chain.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 65,
+            "content": "*   **Why Raw SQL for Read Models instead of the Repository Pattern?** The `user_summaries` and `merchant_summaries` tables are strictly denormalized query models (CQRS read side). Creating full Repository interfaces for trivial `INSERT`/`UPDATE` projections violates the KISS principle and adds unnecessary object-relational mapping overhead. Raw SQL is strictly contained within dedicated Read Model Handlers.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 66,
+            "content": "*   **Why Value Objects for Webhook URLs and API Keys?** To enforce domain invariants at the boundary. The `WebhookUrl` Value Object guarantees that no invalid scheme (e.g., `ftp://`) or malformed URL can ever enter the domain state, preventing runtime errors during asynchronous webhook dispatching.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 69,
+            "content": "*   **Rejected:** *Passing `connection` objects explicitly through all handlers and services.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 70,
+            "content": "    *   **Reason:** Leads to severe signature pollution and tight coupling to the infrastructure layer. `contextvars` provides a clean, Pythonic implementation of the Ambient Context pattern.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 71,
+            "content": "*   **Rejected:** *Using an ORM (e.g., SQLAlchemy) for Read Model projections.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 72,
+            "content": "    *   **Reason:** ORMs introduce significant overhead for simple bulk updates and projections. Raw SQL provides deterministic performance and exact control over the query execution plan.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 79,
+            "content": "*   **Contract Type:** Passive Event Consumer & Command Processor (Internal Modular Monolith).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 80,
+            "content": "*   **Subscribed Events:** ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 81,
+            "content": "    *   `AccountCreatedEvent` (Published by Ledger Context).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 82,
+            "content": "*   **Published Events:** ",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 83,
+            "content": "    *   `CardAssignedEvent`, `MerchantOnboardedEvent`, `MerchantActivatedEvent`, `MerchantDeactivatedEvent`, `MerchantWebhookConfiguredEvent`, `MerchantWebhookSecretGeneratedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 84,
+            "content": "*   **Commands:**",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 85,
+            "content": "    *   `ConfigureWebhookCommand(merchant_id: int, webhook_url: Optional[str], webhook_enabled: bool)`",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 86,
+            "content": "    *   `GenerateWebhookSecretCommand(merchant_id: int)`",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 87,
+            "content": "*   **Database Schema (`merchants` & `merchant_summaries`):**",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 89,
+            "content": "    CREATE TABLE IF NOT EXISTS merchants (",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 90,
+            "content": "        id INTEGER PRIMARY KEY AUTOINCREMENT,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 91,
+            "content": "        name TEXT NOT NULL,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 92,
+            "content": "        api_key TEXT NOT NULL UNIQUE,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 93,
+            "content": "        is_active BOOLEAN NOT NULL DEFAULT 1,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 94,
+            "content": "        webhook_url TEXT,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 95,
+            "content": "        webhook_secret TEXT,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 96,
+            "content": "        webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 98,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 99,
+            "content": "    CREATE TABLE IF NOT EXISTS merchant_summaries (",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 100,
+            "content": "        id INTEGER PRIMARY KEY,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 101,
+            "content": "        name TEXT NOT NULL,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 102,
+            "content": "        api_key TEXT NOT NULL,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 103,
+            "content": "        is_active BOOLEAN NOT NULL DEFAULT 1,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 104,
+            "content": "        webhook_url TEXT,",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 105,
+            "content": "        webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 106,
+            "content": "    );",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 110,
+            "content": "*   **Why carry both `user_id` and `merchant_id` in events instead of a polymorphic `owner_id`?** Explicit nullable fields make downstream SQL queries, CQRS projections, and event consumers strictly type-safe and simpler to index, avoiding the need for an `owner_type` discriminator column and complex polymorphic SQL joins.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "*   **Why an In-Memory Synchronous Bus?** The system operates as a modular monolith. An in-memory bus guarantees strict synchronous execution and immediate consistency. The `EventBus` port abstraction allows future migration to an asynchronous message broker (e.g., RabbitMQ/Kafka) without altering domain logic.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 118,
+            "content": "**Flow A: Card Provisioning (Event-Driven)**",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 119,
+            "content": "1.  **Trigger:** Ledger's `CreateAccountHandler` generates a UUID, commits the Account, and publishes `AccountCreatedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 120,
+            "content": "2.  **Ambient Transaction Start:** The synchronous bus routes the event. `SqliteUnitOfWork` initializes an ambient transaction via `contextvars`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 121,
+            "content": "3.  **Read Model Update 1:** `AccountCreatedReadModelHandler` updates `user_summaries`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 122,
+            "content": "4.  **Card Provisioning:** `OnAccountCreatedHandler` receives the event, generates a Luhn-valid PAN, executes raw SQL `INSERT` into `user_cards` using the ambient connection, commits, and publishes `CardAssignedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 123,
+            "content": "5.  **Read Model Update 2:** `CardAssignedReadModelHandler` updates `user_summaries` with the new `card_number`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "**Flow B: Webhook Configuration (Command-Driven)**",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 126,
+            "content": "1.  **Trigger:** Delivery layer invokes `ConfigureWebhookHandler` with a `ConfigureWebhookCommand`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 127,
+            "content": "2.  **Aggregate Mutation:** Handler loads the `Merchant` aggregate via `MerchantRepository`. The `Merchant.configure_webhook()` method enforces invariants (e.g., cannot enable without a valid URL) and updates the `WebhookUrl` Value Object.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 128,
+            "content": "3.  **Persistence:** The repository persists the updated state. The UoW commits the ambient transaction.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 129,
+            "content": "4.  **Event Publication:** Post-commit, the handler publishes `MerchantWebhookConfiguredEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 130,
+            "content": "5.  **Projection:** `MerchantWebhookConfiguredReadModelHandler` updates the `merchant_summaries` table via raw SQL.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 132,
+            "content": "### 2. Sequence Justification (WHY)",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 133,
+            "content": "*   **Why Post-Commit Event Publication in Command Handlers?** Events are published *after* `self._uow.commit()` to guarantee that downstream event handlers only react to successfully persisted state changes. This prevents phantom events from triggering side effects if the database transaction fails.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 134,
+            "content": "*   **Why Ambient Transactions for Event Chains?** Because the event bus is synchronous, an event handler might trigger another handler that also requires a UoW. Ambient transactions ensure that all nested operations share the exact same database transaction, guaranteeing atomicity across the entire event chain.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 141,
+            "content": "*   **PAN Collision (IntegrityError):** If `generate_card_number` produces a PAN that already exists in `user_cards`, the raw SQL `INSERT` fails with a database constraint violation.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "*   **Uncaught Exception Bubble-up:** The `OnAccountCreatedHandler` does not implement a `try-except` block for `sqlite3.IntegrityError`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 143,
+            "content": "*   **Cascading Transaction Rollbacks:** If a downstream read model handler fails during the synchronous event chain, the ambient transaction rolls back, potentially undoing the primary aggregate creation if not carefully bounded.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 146,
+            "content": "*   **Why no retry logic for PAN collisions?** The probability of a 16-digit Luhn collision is $\\approx 10^{-15}$. Implementing a retry loop introduces unnecessary latency and code complexity for a statistically impossible scenario. The system relies on the database's `UNIQUE` constraint as the absolute source of truth. If a collision occurs, the exception bubbles up, resulting in an HTTP 500, which is an acceptable failure mode for a statistical anomaly.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 147,
+            "content": "*   **Impact of Synchronous Bus Failures:** Because the bus is strictly synchronous and in-process, an unhandled exception in *any* subscriber (e.g., a read model projection failing) will propagate up the call stack and abort the ambient transaction. This ensures strict data consistency (no orphaned projections) but requires rigorous error handling in all read model handlers to prevent blocking primary domain operations.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 154,
+            "content": "*   **Modular Monolith:** The entire system runs in a single Python process. Bounded contexts (Identity, Ledger) are strictly separated by domain rules and folder structures, but share the same SQLite database and memory space.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 155,
+            "content": "*   **CQRS Read Models:** The architecture strictly separates the write model (Domain Aggregates persisted via Repositories) from the read model (Denormalized tables updated via raw SQL in dedicated event handlers).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 156,
+            "content": "*   **Infrastructure as a Plugin:** The `EventBus` and `UnitOfWork` are defined as ABCs in `common/domain/ports`. Implementations are injected via the DI Container, ensuring the domain layer remains completely independent of SQLite or specific event routing mechanisms.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 159,
+            "content": "*   **Why a Modular Monolith over Microservices?** The current scale and team size do not justify the operational overhead of network partitions, distributed tracing, and eventual consistency complexities. The strict modular boundaries allow for seamless extraction into microservices in the future if scaling demands dictate it.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 160,
+            "content": "*   **Why skip the `CardNumber` Value Object?** Creating a Value Object requires mapping it through the Repository pattern. Since the architecture utilizes optimized raw SQL for high-throughput card insertion, a Value Object would introduce unnecessary mapping overhead without providing additional domain value beyond the generation phase.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 163,
+            "content": "*   **Rejected:** *Using Database Triggers for Read Model Projections.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 164,
+            "content": "    *   **Reason:** Triggers are opaque, bypass domain events, and make the system impossible to test via standard Python unit/integration tests. Explicit event handlers provide clear, testable, and version-controlled projection logic.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 165,
+            "content": "*   **Rejected:** *Implementing the Transactional Outbox Pattern.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 166,
+            "content": "    *   **Reason:** The use of ambient transactions via `contextvars` in a synchronous modular monolith guarantees immediate consistency without the need for a polling publisher or outbox table. The Outbox pattern is reserved for future asynchronous, distributed microservice extractions.",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "# MODULE DOCUMENTATION: CARD PROVISIONING (SSOT)",
+            "content": "# MODULE DOCUMENTATION: CARD PROVISIONING",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "**Version:** 2.1.0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 23,
+            "content": "*   **Trigger Mechanism:** Card provisioning is exclusively triggered by the `AccountCreatedEvent`, which carries `account_id` (UUID hex string), `user_id` (optional), `merchant_id` (optional), `account_number`, and `currency_code`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "*   **PAN Generation:** A 16-digit number is generated satisfying the Luhn checksum algorithm. The logic is implemented as a stateless utility function (`generate_card_number`) in the common infrastructure layer.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "*   **Uniqueness Constraint:** The generated PAN must be globally unique. Uniqueness is enforced **solely at the database layer** via a `UNIQUE` constraint on the `user_cards.card_number` column. There is no application-level pre-check (`check_exists_func` is hardcoded to a no-op `lambda _: False`).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "*   **Ownership Linking:** The card is linked to either a `user_id` or a `merchant_id` and strictly tied to an `account_id` (UUID string).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "*   **Why Luhn validation?** Card numbers simulate real-world payment instruments. A Luhn-valid PAN ensures realistic behavior in integration testing and external gateway simulations.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "*   **Why react to `AccountCreatedEvent`?** Strictly preserves Bounded Context isolation. Identity has no knowledge of Ledger's internal account creation logic; it only reacts to the fact that an account now exists.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "*   **Why rely purely on DB constraints for uniqueness?** Given the 16-digit PAN space (with Luhn check digit), the probability of a collision is statistically negligible ($< 10^{-15}$). Skipping an application-level `SELECT` lookup avoids an extra database round-trip on every issuance, optimizing for MVP speed.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 33,
+            "content": "*   **Why Plaintext Storage?** Application-level encryption (e.g., AES-256) was rejected because it breaks the database's ability to enforce the `UNIQUE` constraint on the underlying PAN. Furthermore, the dashboard UI requires the plain card number for display. This is an acknowledged, deliberate deviation from PCI-DSS compliance for the sake of MVP delivery speed.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 34,
+            "content": "*   **Why Application-Layer UUIDs for `account_id`?** Generating the `account_id` as a UUID hex string in the application layer prior to persistence ensures that the identifier is deterministically known before the database transaction commits. This perfectly aligns with event-driven choreography, allowing the ID to be safely propagated through domain events without relying on database auto-increment return values.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 37,
+            "content": "*   **Rejected:** *Application-level uniqueness pre-check via Repository before insert.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 38,
+            "content": "    *   **Reason:** Adds unnecessary latency and boilerplate for a collision probability that is practically zero. The database's `UNIQUE` constraint is the authoritative guardrail.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 39,
+            "content": "*   **Rejected:** *Implementing AES-256 encryption for the `card_number` column.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 40,
+            "content": "    *   **Reason:** Reversible encryption adds key management complexity and hinders `UNIQUE` constraint enforcement. Hashing breaks the dashboard UI requirement. Deferred to the production migration phase.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 48,
+            "content": "    *   `OnAccountCreatedHandler`: Consumes `AccountCreatedEvent`, generates PAN, executes raw SQL `INSERT` via `self._uow.conn.execute()`, commits, and publishes `CardAssignedEvent`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 49,
+            "content": "    *   `CardAssignedReadModelHandler`: Consumes `CardAssignedEvent`, executes raw SQL `UPDATE` on `user_summaries`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 51,
+            "content": "    *   `CardAssignedEvent`: Dataclass containing `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, and `card_number: str`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 52,
+            "content": "    *   *Note:* No dedicated `Card` aggregate or `CardRepository` interface exists in the domain layer.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 54,
+            "content": "    *   `generate_card_number`: Pure function in `src/common/infrastructure/generators.py`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 55,
+            "content": "    *   `SqliteUnitOfWork`: Provides the `conn` (sqlite3.Connection) object used directly by handlers.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 56,
+            "content": "    *   `user_cards` table schema includes `account_id TEXT NOT NULL`, a `UNIQUE` constraint on `card_number`, and Foreign Keys to `users`, `merchants`, and `accounts(id)`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 59,
+            "content": "*   **Why Raw SQL instead of the Repository Pattern?** The `user_cards` and `user_summaries` tables are treated as denormalized query models and simple side-effect logs, not domain aggregates. Creating a full `CardRepository` interface for a trivial `INSERT` violates the KISS principle and slows down MVP delivery. The raw SQL is strictly contained within the handler files.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 60,
+            "content": "*   **Why a free utility function instead of a Domain Service?** Card issuance is currently a pure, stateless operation depending only on randomness and the Luhn algorithm. Placing it in `common/infrastructure` keeps it reusable without over-engineering a `CardIssuanceService` domain service.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 61,
+            "content": "*   **Why reach into `uow.conn`?** It is a conscious MVP trade-off. While it leaks infrastructure concerns (SQLite) into the application layer, it avoids the boilerplate of a \"Query Executor\" abstraction. The schema is isolated, making future refactoring manageable.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 64,
+            "content": "*   **Rejected:** *Encapsulating PAN generation and persistence in a `CardIssuanceService` domain service.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 65,
+            "content": "    *   **Reason:** Over-engineering for the MVP. The pure function and direct handler execution are sufficient and testable.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 66,
+            "content": "*   **Rejected:** *Creating a `CardRepository` interface in the domain layer.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 67,
+            "content": "    *   **Reason:** The Constitution's Repository pattern is designed for aggregate persistence where business invariants must be enforced. Applying it to simple read-model projections contradicts KISS.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 74,
+            "content": "*   **Contract Type:** Passive Event Consumer (No REST/RPC endpoints).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 75,
+            "content": "*   **Subscribed Event:** `AccountCreatedEvent` (Published by Ledger Context).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 76,
+            "content": "    *   *Payload:* `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `account_number: AccountNumber`, `currency_code: CurrencyCode`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 77,
+            "content": "*   **Published Event:** `CardAssignedEvent` (Consumed by Read Model Projections).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 78,
+            "content": "    *   *Payload:* `account_id: str`, `user_id: Optional[int]`, `merchant_id: Optional[int]`, `card_number: str`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 79,
+            "content": "*   **Database Schema (`user_cards`):**",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 81,
+            "content": "    CREATE TABLE IF NOT EXISTS user_cards (",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 82,
+            "content": "        id INTEGER PRIMARY KEY AUTOINCREMENT, ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 83,
+            "content": "        user_id INTEGER, ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 84,
+            "content": "        merchant_id INTEGER,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 85,
+            "content": "        account_id TEXT NOT NULL, ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 86,
+            "content": "        card_number TEXT NOT NULL UNIQUE, ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 87,
+            "content": "        FOREIGN KEY (user_id) REFERENCES users(id), ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 88,
+            "content": "        FOREIGN KEY (merchant_id) REFERENCES merchants(id),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 89,
+            "content": "        FOREIGN KEY (account_id) REFERENCES accounts(id)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 94,
+            "content": "*   **Why no REST endpoint to manually issue a card?** Card issuance is an automated, mandatory side-effect of account creation. Manual creation would bypass the invariant that every account gets exactly one card.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 95,
+            "content": "*   **Why carry both `user_id` and `merchant_id` instead of a polymorphic `owner_id`?** Explicit nullable fields make downstream SQL queries and event consumers simpler and strictly type-safe, avoiding the need for an `owner_type` discriminator column.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 96,
+            "content": "*   **Why an In-Memory Synchronous Bus?** The system is a modular monolith. An in-memory bus (`InMemoryEventBus`) was chosen for development speed, simplicity, and strict synchronous execution. The `EventBus` port allows swapping to RabbitMQ/Kafka later without changing domain logic.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 98,
+            "content": "### 3. Rejected Alternatives",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 99,
+            "content": "*   **Rejected:** *Synchronous RPC (HTTP/gRPC) from Ledger to Identity.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 100,
+            "content": "    *   **Reason:** Temporally couples the contexts. A failure in Identity would block account creation. Event-driven choreography allows independent availability.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 101,
+            "content": "*   **Rejected:** *Using an external Message Broker (RabbitMQ/Kafka) for the MVP.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 102,
+            "content": "    *   **Reason:** Adds massive infrastructure and operational complexity for a single-process Flask application. Deferred until scaling requires asynchronous background workers.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 103,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 109,
+            "content": "1.  **Trigger:** Ledger's `CreateAccountHandler` generates a UUID hex string for `account_id`, creates the Account aggregate, commits the new account to the DB, and publishes `AccountCreatedEvent` to the `InMemoryEventBus`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 110,
+            "content": "2.  **Routing:** The synchronous bus routes the event to subscribers in the exact order they were registered in `identity_di.py`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "3.  **Read Model Update 1:** `AccountCreatedReadModelHandler` executes an `INSERT` or `UPDATE` on `user_summaries` to set the `account_id` and `balance`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 112,
+            "content": "4.  **Card Provisioning:** `OnAccountCreatedHandler` receives the event.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 113,
+            "content": "    *   Validates that `user_id` or `merchant_id` is present.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 114,
+            "content": "    *   Calls `generate_card_number(lambda _: False)`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 115,
+            "content": "    *   Executes raw SQL `INSERT` into `user_cards` via `uow.conn`, utilizing the string `account_id`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 116,
+            "content": "    *   Commits the UoW transaction.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 117,
+            "content": "    *   Publishes `CardAssignedEvent`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 118,
+            "content": "5.  **Read Model Update 2:** `CardAssignedReadModelHandler` receives `CardAssignedEvent` and executes an `UPDATE` on `user_summaries` to set the `card_number`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 120,
+            "content": "### 2. Sequence Justification (WHY)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 121,
+            "content": "*   **Why this exact order?** The synchronous nature of the `InMemoryEventBus` guarantees that `AccountCreatedReadModelHandler` runs *before* `OnAccountCreatedHandler`. This ensures the `user_summaries` row exists before the card assignment handler attempts to `UPDATE` it.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 122,
+            "content": "*   **Why no Outbox Pattern or Idempotency Keys?** Because the bus is strictly synchronous and in-process, events are never reordered, dropped, or replayed. The mathematical guarantee of sequential execution eliminates the need for complex distributed systems patterns like the Transactional Outbox.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 123,
+            "content": "*   **Why early-exit if both owner IDs are None?** Defensive programming against malformed events, ensuring the handler doesn't crash on invalid foreign key insertions.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "### 3. Rejected Alternatives",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 126,
+            "content": "*   **Rejected:** *Updating `user_summaries` directly within the `OnAccountCreatedHandler`.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 127,
+            "content": "    *   **Reason:** Blurs the boundary between Card Provisioning and Read Model modules, violating the Single Responsibility Principle.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 128,
+            "content": "*   **Rejected:** *Implementing an Outbox Pattern for event publishing.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 129,
+            "content": "    *   **Reason:** Massive over-engineering for a synchronous modular monolith. The in-memory bus provides immediate consistency without the need for a polling publisher.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 136,
+            "content": "*   **PAN Collision (IntegrityError):** If `generate_card_number` produces a PAN that already exists in `user_cards`, the raw SQL `INSERT` fails.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 137,
+            "content": "*   **Uncaught Exception Bubble-up:** There is no `try-except` block catching `sqlite3.IntegrityError` in the handler.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 138,
+            "content": "*   **Plaintext PAN Leakage:** The database file (`paymenter.db`) contains raw, unencrypted 16-digit card numbers.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 141,
+            "content": "*   **Why no error handling for collisions?** The probability of a 16-digit Luhn collision is $\\approx 10^{-15}$. The team adopted a \"fail-fast and fix later\" mindset. ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "*   **Impact of the Crash:** Because the bus is synchronous, the uncaught `IntegrityError` propagates up to the original Ledger `CreateAccountHandler`. This results in an HTTP 500 error to the client. The account remains created (if committed before publishing), but the user is left without a card, resulting in an inconsistent state and a broken dashboard UI.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 143,
+            "content": "*   **Why accept PCI-DSS non-compliance?** To avoid the performance hit of decryption on every read and the complexity of key management. The impact is that this codebase **cannot** be deployed to a real production environment processing real money without a complete security refactor.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 145,
+            "content": "### 3. Rejected Alternatives",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 146,
+            "content": "*   **Rejected:** *Adding a `try-except` block with a retry loop (up to 3 times) on `IntegrityError`.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 147,
+            "content": "    *   **Reason:** Adds code complexity and latency for a theoretical scenario that is statistically impossible at the MVP scale.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 148,
+            "content": "*   **Rejected:** *Using a deterministic encryption scheme (e.g., AES-SIV) to preserve uniqueness.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 149,
+            "content": "    *   **Reason:** Too complex to implement and manage keys for the MVP phase.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 150,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 156,
+            "content": "*   **Modular Monolith:** The entire system runs in a single Python/Flask process. Bounded contexts (Identity, Ledger) are separated by folders and domain rules, but share the same SQLite database and memory space.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 157,
+            "content": "*   **Infrastructure as a Plugin:** The `EventBus` and `UnitOfWork` are defined as ABCs in `common/domain/ports`. The current implementations (`InMemoryEventBus`, `SqliteUnitOfWork`) are injected via `DIContainer`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 158,
+            "content": "*   **Application-Layer ID Generation:** The `account_id` is generated as a UUID hex string in the Application layer (`uuid.uuid4().hex`) rather than relying on database auto-increment, ensuring deterministic event payloads.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 159,
+            "content": "*   **No `CardNumber` Value Object:** The domain relies on a primitive `str` for the card number, violating the \"Primitive Obsession Forbidden\" rule, but compensated by the strict Luhn generation logic.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 162,
+            "content": "*   **Why a Modular Monolith over Microservices?** The team size and MVP timeline do not justify the operational overhead of network partitions, distributed tracing, and separate databases. The modular structure allows extracting the Identity context into a microservice later if scaling demands it.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 163,
+            "content": "*   **Why skip the `CardNumber` Value Object?** Creating a Value Object requires mapping it through the Repository pattern. Since the team chose raw SQL for speed, a Value Object would just be an unused domain artifact. The decision prioritizes shipping speed over strict Domain-Driven Design purity.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 166,
+            "content": "*   **Rejected:** *Relying on Database Auto-Increment for `account_id`.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 167,
+            "content": "    *   **Reason:** Requires a post-insert fetch to retrieve the generated ID before publishing the `AccountCreatedEvent`. This tightly couples the event publishing to the database transaction lifecycle and complicates the Unit of Work pattern. Generating the UUID in the application layer simplifies the event-driven architecture.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 168,
+            "content": "*   **Rejected:** *Using a Database Trigger to generate and insert cards automatically upon account creation.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 169,
+            "content": "    *   **Reason:** Triggers are opaque, bypass domain events (`CardAssignedEvent`), and make the system impossible to test via standard Python unit/integration tests.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 170,
+            "content": "*   **Rejected:** *Strict adherence to the Repository Pattern for all database writes.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 171,
+            "content": "    *   **Reason:** While architecturally pure, enforcing it for simple read-model projections and side-effect logs would drastically increase boilerplate and slow down the MVP delivery timeline.",
             "type": "REMOVED"
           }
         ],
-        "modifiedLines": []
+        "modifiedLines": [
+          {
+            "lineNumber": 16,
+            "content": "The Identity Bounded Context is a reactive, event-driven module responsible for managing user identities, merchant onboarding, and the automated provisioning of virtual payment cards. It operates as a passive consumer to the Ledger context, listening for `AccountCreatedEvent` to automatically issue Luhn-valid Primary Account Numbers (PANs). Additionally, it manages Merchant configurations, specifically the setup and secret generation for outbound Webhook integrations. ",
+            "type": "MODIFIED"
+          }
+        ]
       }
     },
     "docs/backend/identity/MerchantManagement.md": {
       "id": "eba5c519-96e3-47db-9bae-19dac2c4e873",
       "filePath": "docs/backend/identity/MerchantManagement.md",
-      "hashValue": "80f96de6644071fb608df23b4b5434c57294cc28116b8abeae823ec9fbb8d528",
+      "hashValue": "7a0c30a5817aae73c369fd07a6303b1a5d849279ff32235f5b259b77728f5ec0",
       "diff": {
         "filePath": "docs/backend/identity/MerchantManagement.md",
         "oldHash": "3569cca0843c059b1d84f5ddd8aac5df7f2bf4c26b72d57541c16136e4e07611",
-        "newHash": "80f96de6644071fb608df23b4b5434c57294cc28116b8abeae823ec9fbb8d528",
+        "newHash": "7a0c30a5817aae73c369fd07a6303b1a5d849279ff32235f5b259b77728f5ec0",
         "addedLines": [
           {
             "lineNumber": 1,
@@ -2033,7 +2964,7 @@
         "modifiedLines": [
           {
             "lineNumber": 3,
-            "content": "**Version:** 2.3.0 (SSOT - Enterprise Architecture)  ",
+            "content": "**Version:** 3.0.0",
             "type": "MODIFIED"
           },
           {
@@ -11098,243 +12029,58 @@
     "fix.txt": {
       "id": "7ae759c1-3999-4587-9564-0ed123a3ec7b",
       "filePath": "fix.txt",
-      "hashValue": "bdec2a69cafccf98ed1fde70a970350dfd3b2128abafa5d8c4da45d4362a1c8b",
+      "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "diff": {
         "filePath": "fix.txt",
-        "oldHash": "bdec2a69cafccf98ed1fde70a970350dfd3b2128abafa5d8c4da45d4362a1c8b",
-        "newHash": "bdec2a69cafccf98ed1fde70a970350dfd3b2128abafa5d8c4da45d4362a1c8b",
-        "addedLines": [
+        "oldHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "newHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "addedLines": [],
+        "removedLines": [
           {
             "lineNumber": 1,
             "content": "",
-            "type": "ADDED"
+            "type": "REMOVED"
           },
           {
             "lineNumber": 2,
             "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 3,
-            "content": "        src/identity/domain/value_objects/webhook_url.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 4,
-            "content": "        src/identity/application/commands/webhook_commands.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 5,
-            "content": "        src/identity/application/handlers/webhook_handlers.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 6,
-            "content": "        src/identity/application/dto/webhook_status_dto.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 7,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 8,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 9,
-            "content": "        src/ledger/domain/services/double_entry_ledger.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 10,
-            "content": "        src/ledger/domain/entities/transaction.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 11,
-            "content": "        src/ledger/domain/events/transaction_events.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 12,
-            "content": "        src/ledger/application/commands/hold_funds_command.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 13,
-            "content": "        src/ledger/application/commands/complete_funds_command.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 14,
-            "content": "        src/ledger/application/commands/fail_and_refund_command.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 15,
-            "content": "        src/ledger/application/handlers/hold_funds_handler.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 16,
-            "content": "        src/ledger/application/handlers/complete_funds_handler.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 17,
-            "content": "        src/ledger/application/handlers/fail_and_refund_handler.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 18,
-            "content": "        src/ledger/application/handlers/get_transactions_handler.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 19,
-            "content": "        src/ledger/application/queries/get_transactions_query.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 20,
-            "content": "        src/ledger/application/dto/transaction_list_item.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 21,
-            "content": "        src/ledger/infrastructure/persistence/sqlite_transaction_repository.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 22,
-            "content": "        src/ledger/infrastructure/persistence/sqlite_transaction_read_model.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 23,
-            "content": "        src/ledger/infrastructure/adapters/sqlite_system_account_resolver.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 24,
-            "content": "        src/ledger/domain/ports/system_account_resolver_port.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 25,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 26,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 27,
-            "content": "        src/common/infrastructure/database/schemas/webhook/webhook.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 28,
-            "content": "        src/common/domain/value_objects/money.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 29,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 30,
-            "content": "    src/identity/domain/entities/merchant.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 31,
-            "content": "    src/identity/domain/events/merchant_events.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 32,
-            "content": "    src/identity/application/handlers/merchant_read_model_handlers.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 33,
-            "content": "    src/identity/application/dto/merchant_summary.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 34,
-            "content": "    src/identity/infrastructure/persistence/sqlite_merchant_repository.py",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 35,
-            "content": "    src/identity/infrastructure/web/dashboard_controller.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 36,
-            "content": "    src/app/di/identity_di.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 37,
-            "content": "    src/common/infrastructure/database/schemas/identity/identity.py ",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 38,
-            "content": "",
-            "type": "ADDED"
+            "type": "REMOVED"
           }
         ],
-        "removedLines": [],
         "modifiedLines": []
       }
     },
     ".git/index": {
       "id": "ca7b956e-83dc-4e7a-b3a0-e114c076cb1d",
       "filePath": ".git/index",
-      "hashValue": "8f6ff40270bf9fef3a9bc85f289c2798e5592fadd28e44f5d5abaddd78293148",
+      "hashValue": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "8f6ff40270bf9fef3a9bc85f289c2798e5592fadd28e44f5d5abaddd78293148",
-        "newHash": "8f6ff40270bf9fef3a9bc85f289c2798e5592fadd28e44f5d5abaddd78293148",
+        "oldHash": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
+        "newHash": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
         "addedLines": [
           {
-            "lineNumber": 309,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a�\u0016���3",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 310,
-            "content": "�%�@QУ�_",
+            "lineNumber": 308,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a���#<�\u0017!U���\u0005izu(՗z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
+            "lineNumber": 308,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001aL�[W\u0017*���SZ\u001a�",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 309,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a��(��)/\u0012�m\u0016\u001a�\u001b�Yd!��",
+            "content": "�\u001e]�",
             "type": "REMOVED"
           }
         ],
         "modifiedLines": [
           {
-            "lineNumber": 6,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_��\u001cH��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
-            "type": "MODIFIED"
-          },
-          {
-            "lineNumber": 9,
-            "content": "�\u0016=�\u0000\u001ddocs/backend/common/common.md\u0000\u0000\u0000\u0000\u0000j^l+\u0017`�0j^l; ]2�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00002�����,��hg�\u000fqa\f�:�Fg\u0000 docs/backend/common/docCommon.md\u0000\u0000j?�I\t\u000b=�jL��'��\\\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000(�\\\u0004�\u0010��R1H��:\u0015 ���\u0015�\u0000&docs/backend/guideline/Constitution.md\u0000\u0000\u0000\u0000j_k\u0015\u0019���j_k71�[�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000U����0d�)�P?��y�]� ��\u0000#docs/backend/guideline/HowToTest.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j(BI&�<j^�(\u0007\u000bڸ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'5%��\u000f\u0012�)a�V��T\u0011\\�\u001b!\u0012~\u00003docs/backend/guideline/Laravel_Integration_Guide.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�;�j]��\u000b���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@�\u0017ݞ��EP\u0013�d��I����\u000f\f\u0000/docs/backend/identity/AdministraionDashboard.md\u0000\u0000\u0000j\\\u001d1\u0014�\u0016�j]��\u000b���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?.\\g��\\���b#��\u001a�����\u0014�\u0000)docs/backend/identity/CardProvisioning.md\u0000j\\\u001d1\u0014�\u0003\u0000j_|V\u001f�[\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\"\u0018\bw������8n�+�p�����\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�� 5#\u0014\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j^a�\u0002�e\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
+            "lineNumber": 5,
+            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�\u0011\u0002��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
             "type": "MODIFIED"
           }
         ]
@@ -11343,32 +12089,32 @@
     ".git/gk/config": {
       "id": "52d4ed10-3384-49d4-aff1-ba0819a6a94b",
       "filePath": ".git/gk/config",
-      "hashValue": "2b03796343306421ee15649afdaf22b5d9dd5aa11173ebe95d59821653d02e4b",
+      "hashValue": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "2b03796343306421ee15649afdaf22b5d9dd5aa11173ebe95d59821653d02e4b",
-        "newHash": "2b03796343306421ee15649afdaf22b5d9dd5aa11173ebe95d59821653d02e4b",
+        "oldHash": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
+        "newHash": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
         "addedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T15:11:55.136Z",
+            "content": "\tgk-last-accessed = 2026-07-21T15:34:22.683Z",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T15:11:55.136Z",
+            "content": "\tgk-last-modified = 2026-07-21T15:34:22.683Z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T15:06:52.469Z",
+            "content": "\tgk-last-accessed = 2026-07-21T15:19:21.178Z",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T15:06:52.469Z",
+            "content": "\tgk-last-modified = 2026-07-21T15:19:21.178Z",
             "type": "REMOVED"
           }
         ],
@@ -11387,612 +12133,612 @@
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "# MODULE DOCUMENTATION: CROSS-CONTEXT ADMINISTRATION DASHBOARD & FINANCIAL CORE",
+            "content": "src\\identity\\application\\handlers\\merchant_read_model_handlers.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 2,
-            "content": "",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 3,
-            "content": "**Version:** 2.3.0 (SSOT)",
+            "content": "from src.identity.domain.events.merchant_events import (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 4,
-            "content": "",
+            "content": "    MerchantOnboardedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 5,
-            "content": "---",
+            "content": "    MerchantActivatedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "",
+            "content": "    MerchantDeactivatedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 7,
-            "content": "## Table of Contents",
+            "content": "    MerchantWebhookConfiguredEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 8,
-            "content": "1. [Overview](#1-overview)",
+            "content": ")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 9,
-            "content": "2. [Business Rules](#2-business-rules)",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 10,
-            "content": "3. [Backend Architecture](#3-backend-architecture)",
+            "content": "class MerchantOnboardedReadModelHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 11,
-            "content": "4. [API Contract / Integration](#4-api-contract--integration)",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 12,
-            "content": "5. [Execution Flows](#5-execution-flows)",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 13,
-            "content": "6. [Edge Cases & Known Issues](#6-edge-cases--known-issues)",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 14,
-            "content": "7. [Architectural Notes & Rejected Decisions](#7-architectural-notes--rejected-decisions)",
+            "content": "    def handle(self, event: MerchantOnboardedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 15,
-            "content": "8. [Complete File Index (100% Coverage)](#8-complete-file-index)",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 16,
-            "content": "",
+            "content": "            self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 17,
-            "content": "---",
+            "content": "                \"INSERT INTO merchant_summaries (id, name, api_key, is_active) VALUES (?, ?, ?, 1)\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 18,
-            "content": "",
+            "content": "                (event.merchant_id, event.name, event.api_key.value)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 19,
-            "content": "## 1. Overview",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 20,
-            "content": "",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 21,
-            "content": "The Administration Dashboard is a **Server-Side Rendered (SSR) Cross-Context Administration UI** built with Flask Blueprints. It serves as the central back-office control plane for administrators to manage the entire state of the `Paymenter` Modular Monolith. The dashboard directly invokes Application Services across the **`Identity`**, **`Ledger`**, and **`Webhook`** bounded contexts.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 22,
-            "content": "",
+            "content": "class MerchantToggledReadModelHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 23,
-            "content": "*   **Delivery Mechanism:** Standard HTML forms, server-rendered via `render_template`, strictly utilizing the Post/Redirect/Get (PRG) pattern to prevent duplicate form submissions.",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 24,
-            "content": "*   **Authentication:** None at the application layer. Security relies entirely on strict network perimeter controls (Internal VPN, WAF, reverse proxy).",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 25,
-            "content": "*   **Nature:** This module operates as a **Closed-Loop Financial Ledger Emulator**. Card numbers are generated locally using the Luhn algorithm to maintain strict deterministic validation parity with external payment networks, without relying on external I/O. Fund movements occur entirely within the in-process Ledger context, guaranteeing absolute mathematical isolation and deterministic state verification.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 26,
-            "content": "*   **v2.3.0 Evolution:** The system now features a complete **Three-Party Escrow Transaction Engine** and a robust **Merchant Webhook Configuration Subsystem**. The infrastructure has been upgraded to utilize Ambient Transaction Management via Python's `contextvars`, allowing deep domain services to participate in atomic transactions without explicit Unit of Work (UoW) injection.",
+            "content": "    def handle_activated(self, event: MerchantActivatedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 27,
-            "content": "",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 28,
-            "content": "---",
+            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 1 WHERE id = ?\", (event.merchant_id,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 29,
-            "content": "",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 30,
-            "content": "## 2. Business Rules",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 31,
-            "content": "",
+            "content": "    def handle_deactivated(self, event: MerchantDeactivatedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 32,
-            "content": "### 1. Specification (WHAT)",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 33,
-            "content": "",
+            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 0 WHERE id = ?\", (event.merchant_id,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 34,
-            "content": "#### Financial Core (Ledger Context)",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 35,
-            "content": "*   **Three-Party Escrow Mechanics:** All fund movements utilize a strict double-entry escrow model. ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 36,
-            "content": "    *   *Hold:* Payer's balance decreases, Payer's `pending_holds` increase, System Escrow balance increases.",
+            "content": "class MerchantWebhookConfiguredReadModelHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 37,
-            "content": "    *   *Complete:* Payer's `pending_holds` decrease, System Escrow balance decreases, Payee's balance increases.",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 38,
-            "content": "    *   *Fail/Refund:* Reverses the exact mathematical legs depending on whether the transaction was `Pending` or `Success`.",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 39,
-            "content": "*   **Deterministic Currency Bootstrap Invariant:** Every time a new Currency is created, the system **must** automatically generate a System Escrow Account. The **Domain Account Number** is deterministically calculated using a **SHA-256 hash of the currency code** (modulo 10 billion, zero-padded to 10 digits) to guarantee absolute idempotency across network retries.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 40,
-            "content": "*   **Financial Precision & Currency Isolation:** The `Money` Value Object strictly enforces `Decimal` precision (quantized to `0.01`) and mathematically prohibits arithmetic operations (`__add__`, `__sub__`) between different `CurrencyCode` instances, raising `CurrencyMismatchError`.",
+            "content": "    def handle(self, event: MerchantWebhookConfiguredEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 41,
-            "content": "*   **Zero-State Currency Change:** An account's currency can only be changed if its `balance`, `pending_holds`, and `open_authorizations` are all exactly zero. The `Account.change_currency()` method strictly enforces these domain invariants to prevent catastrophic silent ledger imbalances.",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 42,
-            "content": "*   **Strict Transaction State Machine:** The `Transaction` entity enforces a strict lifecycle: `Pending` $\\rightarrow$ `Success`/`Failed` $\\rightarrow$ `Refunded`. Any attempt to mutate a transaction outside this state graph raises `InvalidTransactionStateError`.",
+            "content": "            self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 43,
-            "content": "",
+            "content": "                \"UPDATE merchant_summaries SET webhook_url = ?, webhook_enabled = ? WHERE id = ?\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 44,
-            "content": "#### Identity & Webhook Context",
+            "content": "                (event.webhook_url, event.webhook_enabled, event.merchant_id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 45,
-            "content": "*   **Webhook Configuration Invariants:** ",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 46,
-            "content": "    *   A webhook cannot be enabled without providing a valid, absolute URL (enforced by the `WebhookUrl` Value Object via `urllib.parse`).",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 47,
-            "content": "    *   Webhook secrets must be cryptographically secure (`whsec_` prefix + 32 URL-safe bytes) and minimum 20 characters.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 48,
-            "content": "*   **Automatic Card Provisioning (Event-Driven Chain):** When an Account is created, `CreateAccountHandler` emits `AccountCreatedEvent`. The Identity context's `OnAccountCreatedHandler` intercepts this, generates a 16-digit Luhn-valid Card Number, persists it, and emits `CardAssignedEvent`. **System Escrow accounts are strictly excluded** from card provisioning.",
+            "content": "src\\identity\\application\\commands\\webhook_commands.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 49,
-            "content": "*   **Strict Identity Uniqueness:**",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 50,
-            "content": "    *   `users.phone_email` must be globally unique (E.164 or RFC-compliant email).",
+            "content": "from typing import Optional",
             "type": "REMOVED"
           },
           {
             "lineNumber": 51,
-            "content": "    *   `merchants.api_key` must be globally unique (`pay_` prefix + 43 URL-safe chars).",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 52,
-            "content": "    *   `accounts.account_number` must be globally unique (10 digits).",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 53,
-            "content": "    *   `user_cards.card_number` must be globally unique (16 digits, Luhn-valid).",
+            "content": "class ConfigureWebhookCommand:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 54,
-            "content": "*   **No Direct Data Manipulation:** The dashboard controller never imports SQLAlchemy, raw SQL, or repositories. All mutations are delegated to Application Handlers via the DI Container.",
+            "content": "    merchant_id: int",
             "type": "REMOVED"
           },
           {
             "lineNumber": 55,
-            "content": "",
+            "content": "    webhook_url: Optional[str]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 56,
-            "content": "### 2. Rationale & Trade-offs (WHY)",
+            "content": "    webhook_enabled: bool",
             "type": "REMOVED"
           },
           {
             "lineNumber": 57,
-            "content": "*   **Why Three-Party Escrow?** Direct wallet-to-wallet transfers cannot safely handle asynchronous merchant fulfillment. Escrow ensures funds are mathematically secured before the merchant is notified, preventing double-spend and insufficient funds race conditions.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 58,
-            "content": "*   **Why purge `LedgerAccountProvisioningAdapter`?** It relied on auto-increment IDs and raw SQL, bypassing the `Money` VO. Removing it ensures 100% of account creation flows through the Ledger bounded context, maintaining the Single Source of Truth (SSOT).",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 59,
-            "content": "*   **Why clamp `decrease_holds` at zero?** In an evolving system, legacy transactions might not have initialized holds. Clamping ensures backward compatibility and prevents pipeline crashes without corrupting the ledger.",
+            "content": "class GenerateWebhookSecretCommand:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 60,
-            "content": "",
+            "content": "    merchant_id: int",
             "type": "REMOVED"
           },
           {
             "lineNumber": 61,
-            "content": "---",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 62,
-            "content": "",
+            "content": "src\\identity\\application\\handlers\\identity_handlers.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 63,
-            "content": "## 3. Backend Architecture",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 64,
-            "content": "",
+            "content": "from src.common.domain.ports.event_bus import EventBus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 65,
-            "content": "### 1. Technical Details & Structure (WHAT)",
+            "content": "from src.common.infrastructure.generators import generate_api_key",
             "type": "REMOVED"
           },
           {
             "lineNumber": 66,
-            "content": "",
+            "content": "from src.identity.domain.entities.merchant import Merchant",
             "type": "REMOVED"
           },
           {
             "lineNumber": 67,
-            "content": "*   **Delivery Layer (Controller):** Flask Blueprint registered at `/dashboard`. Catches `DomainException` subclasses and bubbles exact error messages to UI flash alerts.",
+            "content": "from src.identity.domain.value_objects.api_key import ApiKey",
             "type": "REMOVED"
           },
           {
             "lineNumber": 68,
-            "content": "*   **Ambient Transaction Management:** The `SqliteUnitOfWork` utilizes Python's `contextvars` to manage nested transactions and ambient connections. This allows deep domain services (like `DoubleEntryLedger`) to participate in atomic transactions without explicit UoW injection, while strictly enforcing `PRAGMA foreign_keys = ON` and `journal_mode=WAL` at the connection boundary.",
+            "content": "from src.identity.domain.repositories import MerchantRepository",
             "type": "REMOVED"
           },
           {
             "lineNumber": 69,
-            "content": "*   **Dependency Injection (Composite Container):** Central `DIContainer` instantiates `InMemoryEventBus`, then delegates to context-specific registration functions.",
+            "content": "from src.identity.domain.events.merchant_events import (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 70,
-            "content": "*   **Event Bus (Synchronous In-Memory):** Subscribers are wired with their own independent `SqliteUnitOfWork` instances to prevent cross-context read-model failures from rolling back core domain transactions.",
+            "content": "    MerchantOnboardedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 71,
-            "content": "",
+            "content": "    MerchantActivatedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 72,
-            "content": "**Complete DDL (Identity + Ledger + Webhook - v2.3.0 Verified):**",
+            "content": "    MerchantDeactivatedEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 73,
-            "content": "```sql",
+            "content": ")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 74,
-            "content": "-- IDENTITY SCHEMA",
+            "content": "from src.identity.application.commands.identity_commands import (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 75,
-            "content": "CREATE TABLE IF NOT EXISTS users (",
+            "content": "    OnboardMerchantCommand, ToggleMerchantCommand",
             "type": "REMOVED"
           },
           {
             "lineNumber": 76,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT, ",
+            "content": ")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 77,
-            "content": "    name TEXT NOT NULL, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 78,
-            "content": "    phone_email TEXT NOT NULL UNIQUE",
+            "content": "class OnboardMerchantHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 79,
-            "content": ");",
+            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 80,
-            "content": "",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 81,
-            "content": "CREATE TABLE IF NOT EXISTS merchants (",
+            "content": "        self._merchant_repo = merchant_repo",
             "type": "REMOVED"
           },
           {
             "lineNumber": 82,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT,",
+            "content": "        self._event_bus = event_bus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 83,
-            "content": "    name TEXT NOT NULL,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 84,
-            "content": "    api_key TEXT NOT NULL UNIQUE,",
+            "content": "    def handle(self, cmd: OnboardMerchantCommand) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 85,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 86,
-            "content": "    webhook_url TEXT,",
+            "content": "            api_key = ApiKey(generate_api_key())",
             "type": "REMOVED"
           },
           {
             "lineNumber": 87,
-            "content": "    webhook_secret TEXT,",
+            "content": "            merchant = Merchant(id=0, name=cmd.name, api_key=api_key, is_active=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 88,
-            "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 89,
-            "content": ");",
+            "content": "            merchant_id = self._merchant_repo.add(merchant)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 90,
-            "content": "",
+            "content": "            merchant.id = merchant_id",
             "type": "REMOVED"
           },
           {
             "lineNumber": 91,
-            "content": "CREATE TABLE IF NOT EXISTS user_cards (",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 92,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 93,
-            "content": "    user_id INTEGER, ",
+            "content": "            self._event_bus.publish(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 94,
-            "content": "    merchant_id INTEGER,",
+            "content": "                MerchantOnboardedEvent(merchant_id=merchant.id, name=merchant.name, api_key=merchant.api_key)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 95,
-            "content": "    account_id TEXT NOT NULL, ",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 96,
-            "content": "    card_number TEXT NOT NULL UNIQUE, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 97,
-            "content": "    FOREIGN KEY (user_id) REFERENCES users(id), ",
+            "content": "class ToggleMerchantHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 98,
-            "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id),",
+            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 99,
-            "content": "    FOREIGN KEY (account_id) REFERENCES accounts(id)",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 100,
-            "content": ");",
+            "content": "        self._merchant_repo = merchant_repo",
             "type": "REMOVED"
           },
           {
             "lineNumber": 101,
-            "content": "",
+            "content": "        self._event_bus = event_bus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 102,
-            "content": "CREATE TABLE IF NOT EXISTS user_summaries (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 103,
-            "content": "    user_id INTEGER PRIMARY KEY,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 104,
-            "content": "    name TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 105,
-            "content": "    phone_email TEXT NOT NULL,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 106,
-            "content": "    account_id TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 107,
-            "content": "    account_number TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 108,
-            "content": "    card_number TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 109,
-            "content": "    balance TEXT DEFAULT '0.00',",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 110,
-            "content": "    currency_code TEXT,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 111,
-            "content": "    FOREIGN KEY (user_id) REFERENCES users(id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 112,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 113,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 103,
+            "content": "    def handle(self, cmd: ToggleMerchantCommand) -> None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 104,
+            "content": "        with self._uow:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 105,
+            "content": "            merchant = self._merchant_repo.get_by_id(cmd.merchant_id)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 106,
+            "content": "            if not merchant:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 107,
+            "content": "                raise ValueError(f\"Merchant with id {cmd.merchant_id} not found.\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 108,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 109,
+            "content": "            merchant.toggle()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 110,
+            "content": "            self._merchant_repo.update(merchant)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "            self._uow.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 112,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 113,
+            "content": "            event = (",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 114,
-            "content": "CREATE TABLE IF NOT EXISTS merchant_summaries (",
+            "content": "                MerchantActivatedEvent(merchant_id=merchant.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 115,
-            "content": "    id INTEGER PRIMARY KEY,",
+            "content": "                if merchant.is_active",
             "type": "REMOVED"
           },
           {
             "lineNumber": 116,
-            "content": "    name TEXT NOT NULL,",
+            "content": "                else MerchantDeactivatedEvent(merchant_id=merchant.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 117,
-            "content": "    api_key TEXT NOT NULL UNIQUE,",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 118,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
+            "content": "            self._event_bus.publish(event)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 119,
-            "content": "    webhook_url TEXT,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 120,
-            "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0,",
+            "content": "src\\identity\\domain\\value_objects\\webhook_url.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 121,
-            "content": "    FOREIGN KEY (id) REFERENCES merchants(id)",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 122,
-            "content": ");",
+            "content": "from urllib.parse import urlparse",
             "type": "REMOVED"
           },
           {
@@ -12002,197 +12748,197 @@
           },
           {
             "lineNumber": 124,
-            "content": "-- LEDGER SCHEMA",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 125,
-            "content": "CREATE TABLE IF NOT EXISTS currencies (",
+            "content": "class WebhookUrl:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 126,
-            "content": "    id TEXT PRIMARY KEY, ",
+            "content": "    value: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 127,
-            "content": "    name TEXT NOT NULL, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 128,
-            "content": "    code TEXT NOT NULL UNIQUE, ",
+            "content": "    def __post_init__(self):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 129,
-            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1",
+            "content": "        if not isinstance(self.value, str) or not self.value:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 130,
-            "content": ");",
+            "content": "            raise ValueError(\"WebhookUrl must be a non-empty string.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 131,
-            "content": "",
+            "content": "        parsed = urlparse(self.value)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 132,
-            "content": "CREATE TABLE IF NOT EXISTS accounts (",
+            "content": "        if parsed.scheme not in ('http', 'https') or not parsed.netloc:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 133,
-            "content": "    id TEXT PRIMARY KEY, ",
+            "content": "            raise ValueError(\"WebhookUrl must be a valid absolute URL (http/https).\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 134,
-            "content": "    user_id INTEGER,  ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 135,
-            "content": "    merchant_id INTEGER,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 136,
-            "content": "    currency_id TEXT NOT NULL, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 137,
-            "content": "    account_number TEXT NOT NULL UNIQUE, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 138,
-            "content": "    balance INTEGER NOT NULL DEFAULT 0,  -- Stored as exact cents",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 139,
-            "content": "    pending_holds INTEGER NOT NULL DEFAULT 0,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 140,
-            "content": "    open_authorizations INTEGER NOT NULL DEFAULT 0,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 141,
-            "content": "    version INTEGER NOT NULL DEFAULT 0, ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 142,
-            "content": "    FOREIGN KEY (user_id) REFERENCES users(id), ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 143,
-            "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id), ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 144,
-            "content": "    FOREIGN KEY (currency_id) REFERENCES currencies(id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 145,
-            "content": ");",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 146,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 135,
+            "content": "src\\identity\\domain\\value_objects\\api_key.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 136,
+            "content": "import re",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 137,
+            "content": "from dataclasses import dataclass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 138,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 139,
+            "content": "@dataclass(frozen=True)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 140,
+            "content": "class ApiKey:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 141,
+            "content": "    value: str",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 143,
+            "content": "    VALID_KEY_REGEX = re.compile(r'^pay_[A-Za-z0-9\\-_]{43}$')",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 144,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 145,
+            "content": "    def __post_init__(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 146,
+            "content": "        if not isinstance(self.value, str):",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 147,
-            "content": "CREATE TABLE IF NOT EXISTS transactions (",
+            "content": "            raise TypeError(\"ApiKey must be a string.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 148,
-            "content": "    id TEXT PRIMARY KEY, ",
+            "content": "        if not self.VALID_KEY_REGEX.match(self.value):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 149,
-            "content": "    merchant_id INTEGER, ",
+            "content": "            raise ValueError(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 150,
-            "content": "    from_account_id TEXT NOT NULL, ",
+            "content": "                \"ApiKey must start with 'pay_' and contain exactly 43 URL-safe characters.\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 151,
-            "content": "    to_account_id TEXT NOT NULL, ",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 152,
-            "content": "    amount INTEGER NOT NULL, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 153,
-            "content": "    currency_id TEXT NOT NULL, ",
+            "content": "src\\identity\\infrastructure\\persistence\\sqlite_merchant_repository.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 154,
-            "content": "    status TEXT NOT NULL, ",
+            "content": "import sqlite3",
             "type": "REMOVED"
           },
           {
             "lineNumber": 155,
-            "content": "    user_email TEXT, ",
+            "content": "from typing import List, Optional",
             "type": "REMOVED"
           },
           {
             "lineNumber": 156,
-            "content": "    version INTEGER NOT NULL DEFAULT 0, ",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 157,
-            "content": "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, ",
+            "content": "from src.identity.domain.entities.merchant import Merchant",
             "type": "REMOVED"
           },
           {
             "lineNumber": 158,
-            "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id), ",
+            "content": "from src.identity.domain.value_objects.api_key import ApiKey",
             "type": "REMOVED"
           },
           {
             "lineNumber": 159,
-            "content": "    FOREIGN KEY (from_account_id) REFERENCES accounts(id), ",
+            "content": "from src.identity.domain.value_objects.webhook_url import WebhookUrl",
             "type": "REMOVED"
           },
           {
             "lineNumber": 160,
-            "content": "    FOREIGN KEY (to_account_id) REFERENCES accounts(id), ",
+            "content": "from src.identity.domain.repositories import MerchantRepository",
             "type": "REMOVED"
           },
           {
             "lineNumber": 161,
-            "content": "    FOREIGN KEY (currency_id) REFERENCES currencies(id)",
+            "content": "from src.identity.application.dto.merchant_summary import MerchantSummaryDTO",
             "type": "REMOVED"
           },
           {
             "lineNumber": 162,
-            "content": ");",
+            "content": "from src.identity.application.dto.webhook_status_dto import WebhookStatusDTO",
             "type": "REMOVED"
           },
           {
@@ -12202,212 +12948,212 @@
           },
           {
             "lineNumber": 164,
-            "content": "-- WEBHOOK SCHEMA",
+            "content": "class SqliteMerchantRepository(MerchantRepository):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 165,
-            "content": "CREATE TABLE IF NOT EXISTS webhook_outbox (",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 166,
-            "content": "    id INTEGER PRIMARY KEY AUTOINCREMENT,",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 167,
-            "content": "    merchant_id INTEGER NOT NULL,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 168,
-            "content": "    event_type TEXT NOT NULL,",
+            "content": "    def _map_row_to_merchant(self, row: sqlite3.Row) -> Merchant:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 169,
-            "content": "    payload TEXT NOT NULL,",
+            "content": "        webhook_url = WebhookUrl(row['webhook_url']) if row['webhook_url'] else None",
             "type": "REMOVED"
           },
           {
             "lineNumber": 170,
-            "content": "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,",
+            "content": "        return Merchant(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 171,
-            "content": "    status TEXT NOT NULL DEFAULT 'pending',",
+            "content": "            id=row['id'], ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 172,
-            "content": "    attempts INTEGER NOT NULL DEFAULT 0,",
+            "content": "            name=row['name'],",
             "type": "REMOVED"
           },
           {
             "lineNumber": 173,
-            "content": "    last_attempt_at TIMESTAMP,",
+            "content": "            api_key=ApiKey(row['api_key']), ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 174,
-            "content": "    next_attempt_at TIMESTAMP,",
+            "content": "            is_active=bool(row['is_active']),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 175,
-            "content": "    signature TEXT NOT NULL,",
+            "content": "            webhook_url=webhook_url,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 176,
-            "content": "    FOREIGN KEY (merchant_id) REFERENCES merchants(id)",
+            "content": "            webhook_secret=row['webhook_secret'],",
             "type": "REMOVED"
           },
           {
             "lineNumber": 177,
-            "content": ");",
+            "content": "            webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
             "type": "REMOVED"
           },
           {
             "lineNumber": 178,
-            "content": "CREATE INDEX IF NOT EXISTS idx_webhook_outbox_status ON webhook_outbox(status, next_attempt_at);",
+            "content": "        )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 179,
-            "content": "```",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 180,
-            "content": "",
+            "content": "    def add(self, merchant: Merchant) -> int:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 181,
-            "content": "### 2. Architectural Decisions (WHY)",
+            "content": "        cursor = self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 182,
-            "content": "*   **Why `INTEGER` for `balance` and `pending_holds` in SQLite?** SQLite's dynamic typing causes affinity issues with `TEXT` decimals. Storing financial values as exact integer cents guarantees absolute precision. The Repository pattern strictly encapsulates `_to_cents()` and `_from_cents()`.",
+            "content": "            \"\"\"INSERT INTO merchants (name, api_key, is_active, webhook_url, webhook_secret, webhook_enabled) ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 183,
-            "content": "*   **Why Independent UoW in Event Subscribers?** Subscribers instantiate their own `SqliteUnitOfWork()`. This ensures that if an Identity Read Model update fails, it does not roll back the critical Ledger account creation. This enforces eventual consistency boundaries.",
+            "content": "               VALUES (?, ?, ?, ?, ?, ?)\"\"\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 184,
-            "content": "",
+            "content": "            (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 185,
-            "content": "---",
+            "content": "                merchant.name, merchant.api_key.value, merchant.is_active,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 186,
-            "content": "",
+            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 187,
-            "content": "## 4. API Contract / Integration",
+            "content": "                merchant.webhook_secret,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 188,
-            "content": "",
+            "content": "                merchant.webhook_enabled",
             "type": "REMOVED"
           },
           {
             "lineNumber": 189,
-            "content": "**Contract Type:** Internal HTML SSR via Flask Blueprint. **No JSON API.**  ",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 190,
-            "content": "**Base URL:** `/dashboard`  ",
+            "content": "        )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 191,
-            "content": "",
+            "content": "        return cursor.lastrowid",
             "type": "REMOVED"
           },
           {
             "lineNumber": 192,
-            "content": "**DTOs Returned to Templates:**",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 193,
-            "content": "*   `UserSummaryDTO(user_id, name, phone_email, account_number, card_number, currency_code)`",
+            "content": "    def update(self, merchant: Merchant) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 194,
-            "content": "*   `MerchantSummaryDTO(id, name, api_key, is_active, webhook_url, webhook_enabled)`",
+            "content": "        self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 195,
-            "content": "*   `WebhookStatusDTO(webhook_url, webhook_enabled)`",
+            "content": "            \"\"\"UPDATE merchants ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 196,
-            "content": "*   `AccountSummary(id, user_id, user_name, currency_id, currency_code, account_number, balance, pending_holds, open_authorizations, card_number)`",
+            "content": "               SET is_active = ?, webhook_url = ?, webhook_secret = ?, webhook_enabled = ? ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 197,
-            "content": "*   `CurrencySummaryDTO(id, name, code, is_active)`",
+            "content": "               WHERE id = ?\"\"\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 198,
-            "content": "*   `EscrowAccountSummary(id, currency_id, currency_code, account_number, balance)`",
+            "content": "            (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 199,
-            "content": "*   `TransactionListItem(id, amount, currency_code, status, created_at, user_email, from_account_number, to_account_number)`",
+            "content": "                merchant.is_active, ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 200,
-            "content": "",
+            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 201,
-            "content": "---",
+            "content": "                merchant.webhook_secret,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 202,
-            "content": "",
+            "content": "                merchant.webhook_enabled,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 203,
-            "content": "## 5. Execution Flows",
+            "content": "                merchant.id",
             "type": "REMOVED"
           },
           {
             "lineNumber": 204,
-            "content": "",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 205,
-            "content": "### 1. Step-by-step Sequence (WHAT)",
+            "content": "        )",
             "type": "REMOVED"
           },
           {
@@ -12417,316 +13163,721 @@
           },
           {
             "lineNumber": 207,
-            "content": "#### Flow A: Three-Party Escrow Fund Hold & Completion",
+            "content": "    def get_by_id(self, merchant_id: int) -> Optional[Merchant]:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 208,
-            "content": "1.  **Hold:** `HoldFundsHandler` invokes `DoubleEntryLedger.hold_funds()`. Payer's balance decreases, Payer's `pending_holds` increase, and the System Escrow account balance increases. A `Pending` Transaction is persisted.",
+            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE id = ?\", (merchant_id,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 209,
-            "content": "2.  **Complete:** `CompleteFundsHandler` invokes `DoubleEntryLedger.complete_funds()`. The Transaction transitions to `Success`. Payer's `pending_holds` decrease, Escrow balance decreases, and Payee's balance increases. `TransactionCompletedEvent` is published.",
+            "content": "        row = cursor.fetchone()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 210,
-            "content": "",
+            "content": "        return self._map_row_to_merchant(row) if row else None",
             "type": "REMOVED"
           },
           {
             "lineNumber": 211,
-            "content": "#### Flow B: Admin Configures Merchant Webhook (Event-Driven Projection)",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 212,
-            "content": "1.  Admin submits form to `POST /dashboard/merchants/<id>/webhook/configure`.",
+            "content": "    def get_all_summaries(self) -> List[MerchantSummaryDTO]:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 213,
-            "content": "2.  `ConfigureWebhookHandler` loads the `Merchant` aggregate, invokes `merchant.configure_webhook()` (which enforces URL validation via the `WebhookUrl` VO), and persists the state.",
+            "content": "        rows = self._uow.conn.execute(\"SELECT * FROM merchant_summaries\").fetchall()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 214,
-            "content": "3.  Handler publishes `MerchantWebhookConfiguredEvent`.",
+            "content": "        return [",
             "type": "REMOVED"
           },
           {
             "lineNumber": 215,
-            "content": "4.  **`MerchantWebhookConfiguredReadModelHandler` intercepts the event with its own independent UoW:**",
+            "content": "            MerchantSummaryDTO(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 216,
-            "content": "    *   Updates the `merchant_summaries` read model table with the new `webhook_url` and `webhook_enabled` state.",
+            "content": "                id=row['id'], ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 217,
-            "content": "    *   This ensures the Dashboard UI reflects the change immediately without querying the write model.",
+            "content": "                name=row['name'], ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 218,
-            "content": "",
+            "content": "                api_key=row['api_key'], ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 219,
-            "content": "#### Flow C: Admin Creates a Currency (Idempotent UUID + Deterministic VO)",
+            "content": "                is_active=bool(row['is_active']),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 220,
-            "content": "1.  Admin submits form to `POST /dashboard/currencies/add`.",
+            "content": "                webhook_url=row['webhook_url'],",
             "type": "REMOVED"
           },
           {
             "lineNumber": 221,
-            "content": "2.  `CreateCurrencyHandler` generates a random UUID, persists the `Currency`, and publishes `CurrencyCreatedEvent`.",
+            "content": "                webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
             "type": "REMOVED"
           },
           {
             "lineNumber": 222,
-            "content": "3.  **`EscrowBootstrapperEventHandler` intercepts the event:**",
+            "content": "            ) for row in rows",
             "type": "REMOVED"
           },
           {
             "lineNumber": 223,
-            "content": "    *   Generates the deterministic 10-digit `AccountNumber` using SHA-256.",
+            "content": "        ]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 224,
-            "content": "    *   **Idempotency Guard:** If the account number exists, the handler safely aborts.",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 225,
-            "content": "    *   If it doesn't exist, it creates the System Escrow Account and persists it.",
+            "content": "    def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 226,
-            "content": "",
+            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE api_key = ?\", (api_key.value,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 227,
-            "content": "#### Flow D: Admin Creates a User Account (Cross-Context UUID & Card Chain)",
+            "content": "        row = cursor.fetchone()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 228,
-            "content": "1.  `CreateAccountHandler` generates a UUID, persists the Account, and publishes `AccountCreatedEvent`.",
+            "content": "        return self._map_row_to_merchant(row) if row else None",
             "type": "REMOVED"
           },
           {
             "lineNumber": 229,
-            "content": "2.  **InMemoryEventBus synchronously triggers Identity subscribers:**",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 230,
-            "content": "    *   **Link 1 (Read Model):** `AccountCreatedReadModelHandler` updates `user_summaries`.",
+            "content": "    def get_webhook_status(self, merchant_id: int) -> Optional[WebhookStatusDTO]:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 231,
-            "content": "    *   **Link 2 (Card Provisioning):** `OnAccountCreatedHandler` generates a Luhn-valid card number, inserts it into `user_cards`, and publishes `CardAssignedEvent`.",
+            "content": "        cursor = self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 232,
-            "content": "    *   **Link 3 (Card Read Model):** `CardAssignedReadModelHandler` updates the `card_number` in `user_summaries`.",
+            "content": "            \"SELECT webhook_url, webhook_enabled FROM merchants WHERE id = ?\", (merchant_id,)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 233,
-            "content": "",
+            "content": "        )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 234,
-            "content": "---",
+            "content": "        row = cursor.fetchone()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 235,
-            "content": "",
+            "content": "        if not row: return None",
             "type": "REMOVED"
           },
           {
             "lineNumber": 236,
-            "content": "## 6. Edge Cases & Known Issues",
+            "content": "        return WebhookStatusDTO(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 237,
-            "content": "",
+            "content": "            webhook_url=row['webhook_url'], ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 238,
-            "content": "### 1. Specific Scenario (WHAT)",
+            "content": "            webhook_enabled=bool(row['webhook_enabled'])",
             "type": "REMOVED"
           },
           {
             "lineNumber": 239,
-            "content": "",
+            "content": "        )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 240,
-            "content": "*   **Scenario 1: Event Bus Partial Failure (Split Transaction)**",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 241,
-            "content": "    *   Admin creates a Currency. The `CreateCurrencyHandler` commits. The `EscrowBootstrapperEventHandler` encounters a database lock and fails.",
+            "content": "src\\common\\infrastructure\\generators.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 242,
-            "content": "    *   **Impact:** The system has a Currency without an Escrow account. Because Event Subscribers use independent UoWs, this is an accepted trade-off for eventual consistency. Manual admin intervention is required.",
+            "content": "import secrets",
             "type": "REMOVED"
           },
           {
             "lineNumber": 243,
-            "content": "*   **Scenario 2: Cross-Currency Arithmetic Prevention**",
+            "content": "import random",
             "type": "REMOVED"
           },
           {
             "lineNumber": 244,
-            "content": "    *   A developer attempts to add `Money(10.00, 'USD')` to `Money(5.00, 'EUR')`.",
+            "content": "import string",
             "type": "REMOVED"
           },
           {
             "lineNumber": 245,
-            "content": "    *   **Impact:** The `Money` VO's `__add__` method immediately raises `CurrencyMismatchError`, preventing catastrophic silent ledger imbalances.",
+            "content": "from typing import Callable",
             "type": "REMOVED"
           },
           {
             "lineNumber": 246,
-            "content": "*   **Scenario 3: Webhook Secret Flash Exposure**",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 247,
-            "content": "    *   The `GenerateWebhookSecretHandler` returns the plain-text secret, which is flashed to the UI via the PRG pattern.",
+            "content": "def generate_api_key() -> str: return f\"pay_{secrets.token_urlsafe(32)}\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 248,
-            "content": "    *   **Impact:** In a production environment, secrets should be hashed and shown via a secure, one-time-view mechanism. For this closed-loop environment, flashing is an acceptable, deliberate trade-off for immediate UI verification.",
+            "content": "def generate_otp_code() -> str: return ''.join(random.choices(string.digits, k=5))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 249,
-            "content": "*   **Scenario 4: Legacy Transaction Hold Settlement**",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 250,
-            "content": "    *   `account.decrease_holds()` is called on an account where `pending_holds` is already `0`.",
+            "content": "def generate_card_number(check_exists_func: Callable[[str], bool]) -> str:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 251,
-            "content": "    *   **Impact:** The system gracefully clamps the holds at zero (`max(Decimal('0.00'), ...)`) instead of throwing negative holds.",
+            "content": "    while True:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 252,
-            "content": "",
+            "content": "        # Generate the first 15 random digits",
             "type": "REMOVED"
           },
           {
             "lineNumber": 253,
-            "content": "---",
+            "content": "        digits = [str(random.randint(0, 9)) for _ in range(15)]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 254,
-            "content": "",
+            "content": "        ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 255,
-            "content": "## 7. Architectural Notes & Rejected Decisions",
+            "content": "        # Calculate the 16th digit (Luhn check digit)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 256,
-            "content": "",
+            "content": "        test_digits = digits + ['0']",
             "type": "REMOVED"
           },
           {
             "lineNumber": 257,
-            "content": "### 1. Current Implementation (WHAT)",
+            "content": "        reverse_digits = test_digits[::-1]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 258,
-            "content": "*   **Ambient Transactions (`contextvars`):** The `SqliteUnitOfWork` uses `contextvars` to track the active connection and nesting level. This allows the `DoubleEntryLedger` domain service to mutate multiple aggregates atomically without requiring the UoW to be explicitly passed through every method signature, preserving domain purity.",
+            "content": "        total = 0",
             "type": "REMOVED"
           },
           {
             "lineNumber": 259,
-            "content": "*   **Strict Aggregate Invariants:** The `Account` entity enforces currency matching on all mutations via the `Money` Value Object.",
+            "content": "        for i, digit in enumerate(reverse_digits):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 260,
-            "content": "*   **Cents-based Persistence:** The Repository pattern strictly hides the `INTEGER` cents implementation detail from the Domain layer.",
+            "content": "            n = int(digit)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 261,
-            "content": "",
+            "content": "            if i % 2 == 1:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 262,
-            "content": "### 2. Discarded Alternatives & Reasons (WHY)",
+            "content": "                n *= 2",
             "type": "REMOVED"
           },
           {
             "lineNumber": 263,
-            "content": "*   **Rejected:** *Direct Wallet-to-Wallet Transfers.* ",
+            "content": "                if n > 9:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 264,
-            "content": "    *   **Reason:** Fails to handle asynchronous merchant fulfillment securely. The Three-Party Escrow model mathematically guarantees funds are secured before external state changes occur.",
+            "content": "                    n -= 9",
             "type": "REMOVED"
           },
           {
             "lineNumber": 265,
-            "content": "*   **Rejected:** *Explicit UoW Injection in Domain Services.* ",
+            "content": "            total += n",
             "type": "REMOVED"
           },
           {
             "lineNumber": 266,
-            "content": "    *   **Reason:** Pollutes domain method signatures with infrastructure concerns. Ambient transactions via `contextvars` provide a cleaner, more orthogonal architecture.",
+            "content": "            ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 267,
-            "content": "*   **Rejected:** *Using a global `try/except DomainException` block in a Flask error handler.*",
+            "content": "        check_digit = (10 - (total % 10)) % 10",
             "type": "REMOVED"
           },
           {
             "lineNumber": 268,
-            "content": "    *   **Reason:** For an SSR dashboard using `flash()`, catching exceptions locally within the route functions allows for precise redirection logic (`redirect(request.referrer)`) that a global error handler would complicate.",
+            "content": "        num = ''.join(digits) + str(check_digit)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 269,
+            "content": "        ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 270,
+            "content": "        if not check_exists_func(num): ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 271,
+            "content": "            return num",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 272,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 273,
+            "content": "def generate_account_number(check_exists_func: Callable[[str], bool]) -> str:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 274,
+            "content": "    while True:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 275,
+            "content": "        num = ''.join([str(random.randint(0, 9)) for _ in range(10)])",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 276,
+            "content": "        if not check_exists_func(num): return num",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 277,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 278,
+            "content": "def generate_gateway_token(check_exists_func: Callable[[str], bool]) -> str:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 279,
+            "content": "    while True:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 280,
+            "content": "        token = f\"gw_{secrets.token_urlsafe(24)}\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 281,
+            "content": "        if not check_exists_func(token): return token",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 282,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 283,
+            "content": "src\\common\\infrastructure\\persistence\\sqlite_unit_of_work.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 284,
+            "content": "import sqlite3",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 285,
+            "content": "import contextvars",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 286,
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 287,
+            "content": "from src.common.infrastructure.database import DB_PATH",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 288,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 289,
+            "content": "# ContextVar to hold the active connection for ambient transactions",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 290,
+            "content": "_current_conn = contextvars.ContextVar(\"current_conn\", default=None)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 291,
+            "content": "_nesting_level = contextvars.ContextVar(\"nesting_level\", default=0)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 292,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 293,
+            "content": "class SqliteUnitOfWork(UnitOfWork):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 294,
+            "content": "    \"\"\"SQLite implementation of the UnitOfWork pattern with Ambient Transaction support.\"\"\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 295,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 296,
+            "content": "    def __enter__(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 297,
+            "content": "        conn = _current_conn.get()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 298,
+            "content": "        if conn is None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 299,
+            "content": "            conn = sqlite3.connect(DB_PATH, timeout=10.0)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 300,
+            "content": "            conn.row_factory = sqlite3.Row",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 301,
+            "content": "            conn.execute(\"PRAGMA foreign_keys = ON;\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 302,
+            "content": "            conn.execute(\"PRAGMA journal_mode=WAL;\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 303,
+            "content": "            _current_conn.set(conn)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 304,
+            "content": "            ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 305,
+            "content": "        self.conn = conn",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 306,
+            "content": "        _nesting_level.set(_nesting_level.get() + 1)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 307,
+            "content": "        return self",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 308,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 309,
+            "content": "    def __exit__(self, exc_type, exc_val, exc_tb):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 310,
+            "content": "        _nesting_level.set(_nesting_level.get() - 1)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 311,
+            "content": "        if _nesting_level.get() == 0:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 312,
+            "content": "            try:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 313,
+            "content": "                if exc_type is None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 314,
+            "content": "                    self.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 315,
+            "content": "                else:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 316,
+            "content": "                    self.rollback()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 317,
+            "content": "            finally:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 318,
+            "content": "                self.conn.close()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 319,
+            "content": "                _current_conn.set(None)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 320,
+            "content": "                self.conn = None",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 321,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 322,
+            "content": "    def commit(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 323,
+            "content": "        if self.conn:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 324,
+            "content": "            self.conn.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 325,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 326,
+            "content": "    def rollback(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 327,
+            "content": "        if self.conn:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 328,
+            "content": "            self.conn.rollback()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 329,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 330,
+            "content": "    @staticmethod",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 331,
+            "content": "    def get_current_connection():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 332,
+            "content": "        \"\"\"Return the active ambient connection, or None if outside a UoW.\"\"\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 333,
+            "content": "        return _current_conn.get()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 334,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 335,
+            "content": "src\\common\\domain\\ports\\event_bus.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 336,
+            "content": "from abc import ABC, abstractmethod",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 337,
+            "content": "from typing import Any, Callable",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 338,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 339,
+            "content": "class EventBus(ABC):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 340,
+            "content": "    \"\"\"Port for publishing and subscribing to Domain Events.\"\"\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 341,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 342,
+            "content": "    @abstractmethod",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 343,
+            "content": "    def subscribe(self, event_type: type, handler: Callable) -> None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 344,
+            "content": "        raise NotImplementedError",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 345,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 346,
+            "content": "    @abstractmethod",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 347,
+            "content": "    def publish(self, event: Any) -> None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 348,
+            "content": "        raise NotImplementedError",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 349,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 350,
             "content": "",
             "type": "REMOVED"
           }
@@ -12953,26 +14104,90 @@
     ".git/COMMIT_EDITMSG": {
       "id": "f06bae2a-b8b5-44a0-9aea-0f8134538c1e",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "3a4d8f80b08ac001ffe6e9821a304bf00fe756b0791af311dfe466bf2e868432",
-      "diff": null
+      "hashValue": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
+      "diff": {
+        "filePath": ".git/COMMIT_EDITMSG",
+        "oldHash": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
+        "newHash": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "updated administration dashboard doc",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "updated merchant management doc and fixed critical bugs while revewing the doc",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/logs/HEAD": {
       "id": "52f127c3-0ec1-4b1f-a2c1-c14de43afc54",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "871f9d3e7ac5825277450575b325c5f960602b6a1f8596d600dbee9b16d1284b",
-      "diff": null
+      "hashValue": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
+      "diff": {
+        "filePath": ".git/logs/HEAD",
+        "oldHash": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
+        "newHash": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
+        "addedLines": [
+          {
+            "lineNumber": 183,
+            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050 b404ea9dfdd09c88d8936ded142ef233b78fb7d0 Shahrokh <shahrokh.hatami2004@gmail.com> 1784647006 +0330\tcommit: updated administration dashboard doc",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/logs/refs/heads/dev": {
       "id": "0f651d09-0dc1-4827-9abc-c7782d0d1f02",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "ba4ba73c707aa3662f9da5c2a97789fbc9b755c397fe9c3d2ce99f55826cbdeb",
-      "diff": null
+      "hashValue": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
+      "diff": {
+        "filePath": ".git/logs/refs/heads/dev",
+        "oldHash": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
+        "newHash": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
+        "addedLines": [
+          {
+            "lineNumber": 16,
+            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050 b404ea9dfdd09c88d8936ded142ef233b78fb7d0 Shahrokh <shahrokh.hatami2004@gmail.com> 1784647006 +0330\tcommit: updated administration dashboard doc",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     },
     ".git/refs/heads/dev": {
       "id": "89943f45-244d-45c9-9d9f-634cd6c164a0",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "1686fe24648dfc9d921504544c078cd7eabaf9b611181cd52d0e2f98586f8341",
-      "diff": null
+      "hashValue": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
+      "diff": {
+        "filePath": ".git/refs/heads/dev",
+        "oldHash": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
+        "newHash": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "b404ea9dfdd09c88d8936ded142ef233b78fb7d0",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
     },
     ".git/objects/e2/b57b9d9310629c35ae43c7893bf664602e710f": {
       "id": "d4b18a7c-2a5a-4846-81b5-d49b1b7c2cd4",
@@ -12984,6 +14199,96 @@
       "id": "7458e99c-d6f2-426c-9d3c-55886eed2bc2",
       "filePath": ".git/objects/6d/b4093413a47705f7d90bf2bfafa0c74806a050",
       "hashValue": "182ebf5d7fd790d949c6006a110419dad822f03abe938f1d41e21af952696285",
+      "diff": null
+    },
+    ".git/objects/a2/a53e34723bbfcda7422e0fe31100c9ff77ca3d": {
+      "id": "e78863cd-7160-4f33-b309-221e43073d9f",
+      "filePath": ".git/objects/a2/a53e34723bbfcda7422e0fe31100c9ff77ca3d",
+      "hashValue": "54bd3299f333ef424d09b00e554e1fdf5566d4eaabdd2ce013472506ae4e21bd",
+      "diff": null
+    },
+    ".git/objects/68/79ee721bd9b46c5c7871544727762b87669786": {
+      "id": "324152e8-daef-41f5-983c-ce7d16dddb19",
+      "filePath": ".git/objects/68/79ee721bd9b46c5c7871544727762b87669786",
+      "hashValue": "219cfda6fa7580413341c865ec84ffae7ad50e23ff13cf3fed338bb29ef5e16b",
+      "diff": null
+    },
+    ".git/objects/97/1a434f66ad99e3c4acfca0fc19e3a3b155b415": {
+      "id": "07033c8e-2a83-4744-b58b-944f36394d3d",
+      "filePath": ".git/objects/97/1a434f66ad99e3c4acfca0fc19e3a3b155b415",
+      "hashValue": "acfdb91b8ef20da34c742b0b6d81ca543b11b3d46c660ac3b8e5b9656440a4f5",
+      "diff": null
+    },
+    ".git/objects/d6/a8c09da15c3e15b6b2e89aab6c5d1cf96d76c5": {
+      "id": "3da5b073-f360-47b8-817f-2308a831e467",
+      "filePath": ".git/objects/d6/a8c09da15c3e15b6b2e89aab6c5d1cf96d76c5",
+      "hashValue": "ddf97332174d9a5cfead33a877528c4b11e2164e642daa03da935f4e91a38d85",
+      "diff": null
+    },
+    ".git/objects/e9/f5b57bb5e621b24a3a7b1e237d8cbb527ddc7a": {
+      "id": "1c4e14df-3ef2-4fe3-a2ca-7b68a4b95c7c",
+      "filePath": ".git/objects/e9/f5b57bb5e621b24a3a7b1e237d8cbb527ddc7a",
+      "hashValue": "82f816ee8ae510b5c111e58ff587895e97971b6ecab35a5628b4c4b23443a7c1",
+      "diff": null
+    },
+    ".git/objects/d4/41939158227244fe409c5080abd779955b1494": {
+      "id": "a9c13be4-5765-4cde-be99-af0d13616e68",
+      "filePath": ".git/objects/d4/41939158227244fe409c5080abd779955b1494",
+      "hashValue": "233ed92d707280b94897d7667edf28829400947257217b20e6e9daa44d85284e",
+      "diff": null
+    },
+    ".git/objects/89/22413767dde104795960d9ca0f956b7c51e1db": {
+      "id": "05d96b08-13a4-4bf6-a4cf-d2c8b7dfe9f1",
+      "filePath": ".git/objects/89/22413767dde104795960d9ca0f956b7c51e1db",
+      "hashValue": "8cc268c8623e82d8866f9b6b9951d21adadfb5ed5081fc7b3fbd098e303046e1",
+      "diff": null
+    },
+    ".git/objects/d3/fcec513b6a2a31cc7cf60cd5e764bc5a0e894f": {
+      "id": "721df3c8-7814-4c0c-9906-20bd5eab5ea5",
+      "filePath": ".git/objects/d3/fcec513b6a2a31cc7cf60cd5e764bc5a0e894f",
+      "hashValue": "c07b0ca9e4570652072f5f52ccbf9b633972315b93d544360bbf346da7c9a111",
+      "diff": null
+    },
+    ".git/objects/fd/b13726abc234bb325ca43ba79669002b1562c7": {
+      "id": "78bf4aa8-6f5b-4160-a195-8d6583265af4",
+      "filePath": ".git/objects/fd/b13726abc234bb325ca43ba79669002b1562c7",
+      "hashValue": "d846db5837a741ca76bdabfaa7a8b864893ba10142ec47cd48123a4cc3b558a4",
+      "diff": null
+    },
+    ".git/objects/c1/6e4c7fe752c5fb6383c6359a6e0aa313798c78": {
+      "id": "a0c95003-ef01-4a80-8562-34bdd3a5334c",
+      "filePath": ".git/objects/c1/6e4c7fe752c5fb6383c6359a6e0aa313798c78",
+      "hashValue": "6fd82e05f126035dfbfbd876bc4ec1542916bb43460918bb3555afb160d5712e",
+      "diff": null
+    },
+    ".git/objects/b1/b5d47b7383c44fb81461b693bbf0b6a3986f9d": {
+      "id": "926ac089-9ab3-4b1a-8850-f2e4623ac892",
+      "filePath": ".git/objects/b1/b5d47b7383c44fb81461b693bbf0b6a3986f9d",
+      "hashValue": "ac4aee9f939cce69aed8f69e7d592c393b74364d756d1cb601d6d89c9446521d",
+      "diff": null
+    },
+    ".git/objects/35/d2574922d6617dae5ae2d838a59b59e1212b44": {
+      "id": "7675e65a-e72d-4f65-bfc0-0a4673faefdf",
+      "filePath": ".git/objects/35/d2574922d6617dae5ae2d838a59b59e1212b44",
+      "hashValue": "59663d653e433d6cc4fba0aae094a2920b4719ad1afbe196734b502f239a0ec7",
+      "diff": null
+    },
+    ".git/objects/40/82e3f9c0e0abb4cfbdb884b7fd82e55e9b68f4": {
+      "id": "237f3067-fde6-4ca5-a421-45803588d7f1",
+      "filePath": ".git/objects/40/82e3f9c0e0abb4cfbdb884b7fd82e55e9b68f4",
+      "hashValue": "62e13e29fd62b683855d43f0677a1f4fbf9b6faec4a1a3d4bb808d76b6d563e3",
+      "diff": null
+    },
+    ".git/objects/b4/04ea9dfdd09c88d8936ded142ef233b78fb7d0": {
+      "id": "af6f0543-c951-46a0-973e-e560f42d861f",
+      "filePath": ".git/objects/b4/04ea9dfdd09c88d8936ded142ef233b78fb7d0",
+      "hashValue": "0882de885db4b24370def6cda695a04b82e55b72b41d8a592d082aa80fd16870",
+      "diff": null
+    },
+    "src/app/di/__pycache__/identity_di.cpython-313.pyc": {
+      "id": "8837012e-89e0-4821-83ac-b2f85449248a",
+      "filePath": "src/app/di/__pycache__/identity_di.cpython-313.pyc",
+      "hashValue": "12a2d468d22e4a8584ae68e3d868b5ffe9ed2d1d4ff5ac36996ae13c39e34e93",
       "diff": null
     }
   }

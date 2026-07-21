@@ -10053,12 +10053,17 @@
     ".git/index": {
       "id": "ea3800d5-9f4d-410a-ae34-fc6b9901fae6",
       "filePath": ".git/index",
-      "hashValue": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
+      "hashValue": "cb16902a9b5476b8530a27cb2b15f32a865b52870af84a4f548c70f5bfdfc0a2",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
-        "newHash": "ff3e4a73bf485851f8e6c902f57d5c0964152f1f1479f19fc5aa6d46be17a4e6",
+        "oldHash": "cb16902a9b5476b8530a27cb2b15f32a865b52870af84a4f548c70f5bfdfc0a2",
+        "newHash": "cb16902a9b5476b8530a27cb2b15f32a865b52870af84a4f548c70f5bfdfc0a2",
         "addedLines": [
+          {
+            "lineNumber": 190,
+            "content": "tw�)�}C�H��\u00079�\u0000\u0007todo.md\u0000\u0000\u0000j@�.SB�j^�!\u001bF'@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\t���L�b�\"i�yHd��Rf\u0017}3�\u0000\btodo1.md\u0000\u0000TREE\u0000\u0000",
+            "type": "ADDED"
+          },
           {
             "lineNumber": 191,
             "content": "�\u0000315 7",
@@ -10066,404 +10071,144 @@
           },
           {
             "lineNumber": 192,
-            "content": "JO�h��*�B�i�1�8s@`)�src\u0000251 7",
+            "content": "��S��t\u0018�Z\u0010p\b\u0002\b]�n-��src\u0000251 7",
             "type": "ADDED"
           },
           {
             "lineNumber": 193,
-            "content": "��:��^[�B{������\u0006�\u0017app\u000010 1",
+            "content": "}>�\u001b��\u0005u��2�Ms�`���Vapp\u000010 1",
             "type": "ADDED"
           },
           {
             "lineNumber": 194,
-            "content": "�\u0014V\u0006S��v�$‸և����di\u00006 0",
+            "content": "��x��!�?�a�L��Q�FC3Jdi\u00006 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 195,
-            "content": "J�Gȅ.Bs\u001c\u0012��Q�l>��_�common\u000030 2",
+            "lineNumber": 299,
+            "content": "iw|T��[\u0012Üw-uh�tests\u00005 2",
             "type": "ADDED"
           },
           {
-            "lineNumber": 196,
-            "content": "3-·[յ\b�x?=�&�ԔWedomain\u00009 2",
+            "lineNumber": 300,
+            "content": "�m�U\u0010O�m\u0015�(�\u0000i�\u001fd!��unit\u00002 2",
             "type": "ADDED"
           },
           {
-            "lineNumber": 201,
-            "content": "�q�}Z�W�%�^nO�`\u000binfrastructure\u000020 3",
+            "lineNumber": 301,
+            "content": "cdZ�ӆ���ЍE%�",
             "type": "ADDED"
           },
           {
-            "lineNumber": 202,
-            "content": "h\u0002\t��fNu\u000f_���^�&=�E\u0014web\u00002 0",
+            "lineNumber": 302,
+            "content": "�r<B�webhook\u00001 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 203,
-            "content": "Ú��5�\u0012�\u0010����\u001e\u0006n\tz�database\u000013 1",
+            "lineNumber": 303,
+            "content": "co�vk6u\t̰�\u0000�k��\u0006���identity\u00001 1",
             "type": "ADDED"
           },
           {
-            "lineNumber": 204,
-            "content": "���'\u0017>�<&K�P�Q���[�schemas\u000012 5",
+            "lineNumber": 305,
+            "content": "��t\fed����F��ȴh\t���integration\u00002 1",
             "type": "ADDED"
           },
           {
-            "lineNumber": 205,
-            "content": "q~���-��\u0019��|��\u001f,��(&ledger\u00002 0",
+            "lineNumber": 306,
+            "content": "e#\u00166Օ�ܡ�a��%ݧ�k��webhook\u00002 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 206,
-            "content": "�)\u0006��Y�*6Ҥ�br�S�q(�webhook\u00002 0",
+            "lineNumber": 307,
+            "content": "�L�{(l�a�V�ۡ\u0003�Kmb\u001b�static\u000011 2",
             "type": "ADDED"
           },
           {
-            "lineNumber": 207,
-            "content": "\u001a\u0002�So��\u000e������a�\u0015r{`checkout\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 209,
-            "content": "\u0006��g$\u0013աH��$\u0016s\u00149�\u000f�\u0011notifications\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 210,
-            "content": "�&���Nu҄v���q7��\b�persistence\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 232,
-            "content": "�\u001a��a*C\u0013���Y:�iܜ�webhook\u000033 3",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 233,
-            "content": "�\u000e�cko\u0016r h� 0�Ld\u001e[��domain\u00009 2",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 234,
-            "content": "و���(@\"�B�`�A�\u0004JF�?ports\u00006 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 235,
-            "content": "��s�ap�;\u0016�7�\"��&%�%services\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 236,
-            "content": ";] �j��:�K����*Q��K^application\u000011 4",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 237,
-            "content": "���*\u001d�\u001d�[`��\u001f�$p��\u0000#dto\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 238,
-            "content": "\"W�bG�E�rݎc\u0010�k-|=AHqueries\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 239,
-            "content": "�j",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 240,
-            "content": "��\u001a���6o\u0004}Џe��\u0006*commands\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 241,
-            "content": "y��jH�\u0010E���#�(��)r\t�handlers\u00004 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 242,
-            "content": "8�s�Y��|n����c�\u0006sf��infrastructure\u000012 4",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 243,
-            "content": "�\u0005#�ӛ&�e@��f�\u001aF��4web\u00003 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 244,
-            "content": "U\u0007���N2\u001d\u0000hi4&\u0016�CwK��utils\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 245,
-            "content": "���+\u0000F6y�\u0002s�Z���\u0010�",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 246,
-            "content": "�adapters\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 247,
-            "content": "d�",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 248,
-            "content": "1��\u001bL���0����ٛ�persistence\u00004 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 249,
-            "content": "��7?-\u0011hI��\u0006�`�\u0000���ccheckout\u000044 3",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 280,
-            "content": "�贈�\u00152\u0000' o��'notifications\u000020 3",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 281,
-            "content": "\fd���'�җ�d���QWPax�domain\u00008 2",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 282,
-            "content": "��\u001d �\u0002\u0016��@�d[IL�9�ports\u00005 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 283,
-            "content": "�\u0011Q���\\�f��:�M�e$\u0004b�value_objects\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 284,
-            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u00004 1",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 285,
-            "content": "��U��h�̞�%���[m)���handlers\u00003 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 286,
-            "content": "��s�E|��\u0019�C�+#S��yinfrastructure\u00007 2",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 287,
-            "content": "Yw��\u001e�M\f������勦�bsmtp\u00002 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 288,
-            "content": "@���\u000b�g�m����w�(Ch�persistence\u00004 0",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 289,
-            "content": ":s@$�\u0001��\u0015��K�zO\u0015���\u0014docs\u000013 1",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 314,
+            "lineNumber": 312,
             "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u000010 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 315,
-            "content": "p\u0016��^��\u000e�>��]\"�����rtemplates\u000010 0",
+            "lineNumber": 313,
+            "content": "5��\f�\t^��)\u0005w\f/\u0000�\u0016d�rtemplates\u000010 0",
             "type": "ADDED"
           },
           {
-            "lineNumber": 316,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a��\u001f��ѱF����H�{�q`S",
+            "lineNumber": 314,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a�\u0005��88\\�q92��\u0006T��`\u001c",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
+            "lineNumber": 190,
+            "content": "tw�)�}C�H��\u00079�\u0000\u0007todo.md\u0000\u0000\u0000j@�.SB�j^�!\u001bF'@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\t���L�b�\"i�yHd��Rf\u0017}3�\u0000\btodo1.md\u0000\u0000TREE\u0000\u0000\f�\u0000-1 7",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 191,
-            "content": "�\u0000-1 7",
+            "content": "src\u0000-1 7",
             "type": "REMOVED"
           },
           {
             "lineNumber": 192,
-            "content": "src\u0000-1 6",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 193,
             "content": "app\u0000-1 1",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 194,
-            "content": "di\u0000-1 0",
+            "lineNumber": 193,
+            "content": "di\u00006 0",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 195,
-            "content": "common\u0000-1 2",
+            "lineNumber": 298,
+            "content": "iw|T��[\u0012Üw-uh�tests\u0000-1 2",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 196,
-            "content": "domain\u00009 2",
+            "lineNumber": 299,
+            "content": "unit\u0000-1 2",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 201,
-            "content": "�q�}Z�W�%�^nO�`\u000binfrastructure\u0000-1 3",
+            "lineNumber": 300,
+            "content": "identity\u00001 1",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 202,
-            "content": "web\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 203,
-            "content": "Ú��5�\u0012�\u0010����\u001e\u0006n\tz�database\u0000-1 1",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 204,
-            "content": "schemas\u0000-1 4",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 205,
-            "content": "ledger\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 206,
-            "content": "�)\u0006��Y�*6Ҥ�br�S�q(�checkout\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 208,
-            "content": "\u0006��g$\u0013աH��$\u0016s\u00149�\u000f�\u0011notifications\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 209,
-            "content": "persistence\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 231,
-            "content": "�\u001a��a*C\u0013���Y:�iܜ�checkout\u000044 3",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 262,
-            "content": "�贈�\u00152\u0000' o��'notifications\u0000-1 3",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 263,
-            "content": "domain\u0000-1 3",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 264,
-            "content": "ports\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 265,
-            "content": "services\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 266,
-            "content": "value_objects\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 267,
-            "content": "-��\f��`L-h�\f4�x\u0019��\u0018�application\u0000-1 4",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 268,
-            "content": "dto\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 269,
-            "content": "queries\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 270,
-            "content": "commands\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 271,
-            "content": "handlers\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 272,
-            "content": "infrastructure\u0000-1 5",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 273,
-            "content": "web\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 274,
-            "content": "smtp\u00002 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 275,
-            "content": "@���\u000b�g�m����w�(Ch�utils\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 276,
-            "content": "adapters\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 277,
-            "content": "persistence\u0000-1 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 278,
-            "content": "docs\u000013 1",
+            "lineNumber": 302,
+            "content": "��t\fed����F��ȴh\t���notifications\u0000-1 0",
             "type": "REMOVED"
           },
           {
             "lineNumber": 303,
-            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u0000-1 0",
+            "content": "integration\u0000-1 1",
             "type": "REMOVED"
           },
           {
             "lineNumber": 304,
-            "content": "templates\u000010 0",
+            "content": "notifications\u0000-1 0",
             "type": "REMOVED"
           },
           {
             "lineNumber": 305,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a�J�ݏ�3p�|H���}Q8:�",
+            "content": "static\u000011 2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 310,
+            "content": "��\u0014QY\u001bj9�\u0002�\u001c$s\u000e�\u0016�q�.doclink\u0000-1 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 311,
+            "content": "templates\u000010 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 312,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a/9\u00158/H^\u001be/�jr�0�E�^�",
             "type": "REMOVED"
           }
         ],
@@ -10533,67 +10278,87 @@
     ".git/COMMIT_EDITMSG": {
       "id": "0b0e8a0e-48cc-45f7-80af-42086d7cfdf1",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
+      "hashValue": "e9684721410e9f9929a3bf1e01bc7517d56722281a61acdf26fb4ae2aac3940a",
       "diff": {
         "filePath": ".git/COMMIT_EDITMSG",
-        "oldHash": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
-        "newHash": "56a491b2d3831d6df205e27d7870f0d111ac9725d42f40fe344bde8e564cf0a0",
+        "oldHash": "e9684721410e9f9929a3bf1e01bc7517d56722281a61acdf26fb4ae2aac3940a",
+        "newHash": "e9684721410e9f9929a3bf1e01bc7517d56722281a61acdf26fb4ae2aac3940a",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "refactor: extract webhook bounded context into standalone webhook module",
+            "content": "refactor: integrate webhook context across frontend, tests, and Flask wiring",
             "type": "ADDED"
           },
           {
             "lineNumber": 3,
-            "content": "- Moved all webhook-related application, domain, and infrastructure code from notifications to new src/webhook context (strict SRP and OCP)",
+            "content": "- Updated flask_app.py to use new webhook module for blueprint and CLI worker",
             "type": "ADDED"
           },
           {
             "lineNumber": 4,
-            "content": "- Created separate database schema for webhooks (src/common/infrastructure/database/schemas/webhook/)",
+            "content": "- Fixed all webhook-related test imports (test_webhook_delivery, test_webhook_outbox, test_webhook_signer)",
             "type": "ADDED"
           },
           {
             "lineNumber": 5,
-            "content": "- Registered webhooks DI module and event subscriptions in di_container",
+            "content": "- HTML templates remain unchanged (correct routes)",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "- Cleaned up notifications context to only contain email/OTP delivery",
+            "content": "- worker batch file requires no changes after Flask import fix",
             "type": "ADDED"
           },
           {
             "lineNumber": 7,
-            "content": "- Deleted old webhook files from notifications to prevent dead code",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 8,
-            "content": "- No behavioral changes; all existing tests should pass",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 9,
-            "content": "",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 10,
-            "content": "BREAKING CHANGE: Webhook dashboard URL and worker imports must now use the new module paths.",
-            "type": "ADDED"
-          },
-          {
-            "lineNumber": 11,
-            "content": "",
+            "content": "- Complete separation of webhook bounded context from notifications",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "added start_worker.bat for webhook starter in cmd terminal",
+            "content": "refactor: extract webhook bounded context into standalone webhook module",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "- Moved all webhook-related application, domain, and infrastructure code from notifications to new src/webhook context (strict SRP and OCP)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "- Created separate database schema for webhooks (src/common/infrastructure/database/schemas/webhook/)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "- Registered webhooks DI module and event subscriptions in di_container",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "- Cleaned up notifications context to only contain email/OTP delivery",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "- Deleted old webhook files from notifications to prevent dead code",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "- No behavioral changes; all existing tests should pass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "BREAKING CHANGE: Webhook dashboard URL and worker imports must now use the new module paths.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "",
             "type": "REMOVED"
           }
         ],
@@ -10603,15 +10368,15 @@
     ".git/logs/HEAD": {
       "id": "4cf9ce1f-5ed7-4dfd-817d-ba3ed25f032b",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
+      "hashValue": "8eefa8eb099398d4a9a922caf401d52e19419603ef53c580c27329de65bf58b4",
       "diff": {
         "filePath": ".git/logs/HEAD",
-        "oldHash": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
-        "newHash": "25cc2010d38516e4aabec263faaa06acf3ae035820f87893e91de123a7a34ac4",
+        "oldHash": "8eefa8eb099398d4a9a922caf401d52e19419603ef53c580c27329de65bf58b4",
+        "newHash": "8eefa8eb099398d4a9a922caf401d52e19419603ef53c580c27329de65bf58b4",
         "addedLines": [
           {
-            "lineNumber": 178,
-            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f 6731827b412e2c741ca97b0cb321684df38ae0dd Shahrokh <shahrokh.hatami2004@gmail.com> 1784636872 +0330\tcommit: refactor: extract webhook bounded context into standalone webhook module",
+            "lineNumber": 179,
+            "content": "6731827b412e2c741ca97b0cb321684df38ae0dd 3898e527d46db7102716465fb1ddea6663aee7bc Shahrokh <shahrokh.hatami2004@gmail.com> 1784637794 +0330\tcommit: refactor: integrate webhook context across frontend, tests, and Flask wiring",
             "type": "ADDED"
           }
         ],
@@ -10622,15 +10387,15 @@
     ".git/logs/refs/heads/dev": {
       "id": "96a173e8-ee36-4ec2-8ee1-9b770a388d23",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
+      "hashValue": "f95abea69106c340f0c01f5b99cafe521d18d7774e325d24db7ac65be03633b1",
       "diff": {
         "filePath": ".git/logs/refs/heads/dev",
-        "oldHash": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
-        "newHash": "b8fd5dba07eb03158bf558a3ba02a75ca338161303af5bc673819a236e19edfe",
+        "oldHash": "f95abea69106c340f0c01f5b99cafe521d18d7774e325d24db7ac65be03633b1",
+        "newHash": "f95abea69106c340f0c01f5b99cafe521d18d7774e325d24db7ac65be03633b1",
         "addedLines": [
           {
-            "lineNumber": 11,
-            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f 6731827b412e2c741ca97b0cb321684df38ae0dd Shahrokh <shahrokh.hatami2004@gmail.com> 1784636872 +0330\tcommit: refactor: extract webhook bounded context into standalone webhook module",
+            "lineNumber": 12,
+            "content": "6731827b412e2c741ca97b0cb321684df38ae0dd 3898e527d46db7102716465fb1ddea6663aee7bc Shahrokh <shahrokh.hatami2004@gmail.com> 1784637794 +0330\tcommit: refactor: integrate webhook context across frontend, tests, and Flask wiring",
             "type": "ADDED"
           }
         ],
@@ -10647,22 +10412,22 @@
     ".git/refs/heads/dev": {
       "id": "886288c5-dc83-4e8f-869a-96c6f70bbc9f",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
+      "hashValue": "a173e6d7d9854a1caf1a4e80a1a572ae37c43d1cf3c7d7e68ea74f59ce3130b9",
       "diff": {
         "filePath": ".git/refs/heads/dev",
-        "oldHash": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
-        "newHash": "6209890d07de8d94f1fcebdcb50091066b534d50590ab99f6381660aa6138ae0",
+        "oldHash": "a173e6d7d9854a1caf1a4e80a1a572ae37c43d1cf3c7d7e68ea74f59ce3130b9",
+        "newHash": "a173e6d7d9854a1caf1a4e80a1a572ae37c43d1cf3c7d7e68ea74f59ce3130b9",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "6731827b412e2c741ca97b0cb321684df38ae0dd",
+            "content": "3898e527d46db7102716465fb1ddea6663aee7bc",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "850a0388b103f1b1cb245f594a674f6c42b3c71f",
+            "content": "6731827b412e2c741ca97b0cb321684df38ae0dd",
             "type": "REMOVED"
           }
         ],
@@ -10687,92 +10452,92 @@
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "src\\app\\flask_app.py :",
+            "content": "tests\\integration\\webhook\\test_webhook_outbox.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 2,
-            "content": "import os",
+            "content": "import pytest",
             "type": "REMOVED"
           },
           {
             "lineNumber": 3,
-            "content": "import click",
+            "content": "import os",
             "type": "REMOVED"
           },
           {
             "lineNumber": 4,
-            "content": "from flask import Flask, redirect, url_for",
+            "content": "from decimal import Decimal",
             "type": "REMOVED"
           },
           {
             "lineNumber": 5,
-            "content": "from src.common.infrastructure.database import Database",
+            "content": "from src.common.infrastructure.database import Database, DB_PATH, create_connection",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "from src.app.di_container import DIContainer",
+            "content": "from src.common.infrastructure.event_bus import InMemoryEventBus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 7,
-            "content": "",
+            "content": "from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 8,
-            "content": "def create_app():",
+            "content": "from src.webhook.application.handlers.webhook_outbox_event_handler import WebhookOutboxEventHandler",
             "type": "REMOVED"
           },
           {
             "lineNumber": 9,
-            "content": "    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))",
+            "content": "from src.webhook.infrastructure.persistence.sqlite_webhook_outbox_repository import SqliteWebhookOutboxRepository",
             "type": "REMOVED"
           },
           {
             "lineNumber": 10,
-            "content": "    ",
+            "content": "from src.webhook.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter",
             "type": "REMOVED"
           },
           {
             "lineNumber": 11,
-            "content": "    app = Flask(",
+            "content": "from src.common.domain.value_objects.money import Money",
             "type": "REMOVED"
           },
           {
             "lineNumber": 12,
-            "content": "        __name__,",
+            "content": "from src.common.domain.value_objects.currency_code import CurrencyCode",
             "type": "REMOVED"
           },
           {
             "lineNumber": 13,
-            "content": "        template_folder=os.path.join(base_dir, 'templates'),",
+            "content": "from src.ledger.domain.events.transaction_events import TransactionCompletedEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 14,
-            "content": "        static_folder=os.path.join(base_dir, 'static')",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 15,
-            "content": "    )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 16,
-            "content": "    app.secret_key = \"super_secret_simulator_key\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 17,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 15,
+            "content": "@pytest.fixture(scope=\"module\", autouse=True)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "def setup_db():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 17,
+            "content": "    if os.path.exists(DB_PATH):",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 18,
-            "content": "    # 1. Initialize Database Schema",
+            "content": "        os.remove(DB_PATH)",
             "type": "REMOVED"
           },
           {
@@ -10782,127 +10547,127 @@
           },
           {
             "lineNumber": 20,
-            "content": "",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 21,
-            "content": "    # 2. Initialize DI Container and attach to App Context",
+            "content": "    # Setup a merchant with webhooks enabled",
             "type": "REMOVED"
           },
           {
             "lineNumber": 22,
-            "content": "    app.di_container = DIContainer()",
+            "content": "    conn = create_connection()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 23,
-            "content": "",
+            "content": "    conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 24,
-            "content": "    # 3. Register Hexagonal Blueprints",
+            "content": "        \"\"\"INSERT INTO merchants (name, api_key, is_active, webhook_url, webhook_secret, webhook_enabled) ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 25,
-            "content": "    from src.identity.infrastructure.web.dashboard_controller import dashboard_bp",
+            "content": "           VALUES (?, ?, ?, ?, ?, ?)\"\"\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 26,
-            "content": "    from src.ledger.infrastructure.web.transaction_controller import transaction_bp",
+            "content": "        (\"Test Merchant\", \"pay_test_key_12345678901234567890123456789012345678901\", 1, \"https://example.com/hook\", \"whsec_supersecret\", 1)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 27,
-            "content": "    from src.checkout.infrastructure.web.gateway_controller import gateway_bp",
+            "content": "    )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 28,
-            "content": "    from src.checkout.infrastructure.web.api_controller import api_bp",
+            "content": "    conn.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 29,
-            "content": "    from src.ledger.infrastructure.web.transaction_api_controller import transaction_api_bp",
+            "content": "    merchant_id = conn.execute(\"SELECT id FROM merchants WHERE name = 'Test Merchant'\").fetchone()['id']",
             "type": "REMOVED"
           },
           {
             "lineNumber": 30,
-            "content": "    from src.notifications.infrastructure.web.webhook_dashboard_controller import webhook_bp # NEW",
+            "content": "    conn.close()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 31,
-            "content": "",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 32,
-            "content": "    app.register_blueprint(dashboard_bp)",
+            "content": "    yield merchant_id",
             "type": "REMOVED"
           },
           {
             "lineNumber": 33,
-            "content": "    app.register_blueprint(transaction_bp)",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 34,
-            "content": "    app.register_blueprint(gateway_bp)",
+            "content": "    if os.path.exists(DB_PATH):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 35,
-            "content": "    app.register_blueprint(api_bp)",
+            "content": "        os.remove(DB_PATH)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 36,
-            "content": "    app.register_blueprint(transaction_api_bp)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 37,
-            "content": "    app.register_blueprint(webhook_bp) # NEW",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 38,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 37,
+            "content": "def test_webhook_outbox_inserts_record_atomically(setup_db):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 38,
+            "content": "    merchant_id = setup_db",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 39,
-            "content": "    # 4. Register CLI Commands",
+            "content": "    bus = InMemoryEventBus()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 40,
-            "content": "    @app.cli.command(\"webhook-worker\")",
+            "content": "    merchant_config_adapter = SqliteMerchantWebhookConfigAdapter(connection_factory=create_connection)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 41,
-            "content": "    def run_webhook_worker():",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 42,
-            "content": "        \"\"\"Runs the webhook background worker.\"\"\"",
+            "content": "    def get_handler():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 43,
-            "content": "        from src.notifications.infrastructure.web.webhook_worker import run_worker",
+            "content": "        uow = SqliteUnitOfWork()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 44,
-            "content": "        run_worker()",
+            "content": "        return WebhookOutboxEventHandler(uow, SqliteWebhookOutboxRepository(uow), merchant_config_adapter)",
             "type": "REMOVED"
           },
           {
@@ -10912,62 +10677,62 @@
           },
           {
             "lineNumber": 46,
-            "content": "    @app.route('/')",
+            "content": "    bus.subscribe(TransactionCompletedEvent, lambda e: get_handler().handle_completed(e))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 47,
-            "content": "    def index():",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 48,
-            "content": "        return redirect(url_for('dashboard.currencies'))",
+            "content": "    event = TransactionCompletedEvent(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 49,
-            "content": "",
+            "content": "        transaction_id=\"txn_123\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 50,
-            "content": "    return app",
+            "content": "        payer_account_id=\"acc_123\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 51,
-            "content": "",
+            "content": "        amount=Money(amount=Decimal(\"100.00\"), currency=CurrencyCode(value=\"USD\")),",
             "type": "REMOVED"
           },
           {
             "lineNumber": 52,
-            "content": "src\\app\\main.py :",
+            "content": "        merchant_id=merchant_id",
             "type": "REMOVED"
           },
           {
             "lineNumber": 53,
-            "content": "import os",
+            "content": "    )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 54,
-            "content": "import socket",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 55,
-            "content": "import threading",
+            "content": "    # Simulate the parent business transaction",
             "type": "REMOVED"
           },
           {
             "lineNumber": 56,
-            "content": "import webbrowser",
+            "content": "    with SqliteUnitOfWork():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 57,
-            "content": "from src.app.flask_app import create_app",
+            "content": "        bus.publish(event)",
             "type": "REMOVED"
           },
           {
@@ -10977,126 +10742,426 @@
           },
           {
             "lineNumber": 59,
-            "content": "def find_available_port(start_port=5000, max_port=5100):",
+            "content": "    # Assert the outbox record was committed atomically",
             "type": "REMOVED"
           },
           {
             "lineNumber": 60,
-            "content": "    for port in range(start_port, max_port):",
+            "content": "    conn = create_connection()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 61,
-            "content": "        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:",
+            "content": "    record = conn.execute(\"SELECT * FROM webhook_outbox WHERE merchant_id = ?\", (merchant_id,)).fetchone()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 62,
-            "content": "            try:",
+            "content": "    conn.close()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 63,
-            "content": "                s.bind((\"127.0.0.1\", port))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 64,
-            "content": "                return port",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 65,
-            "content": "            except OSError:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 66,
-            "content": "                continue",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 67,
-            "content": "    return start_port",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 68,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 69,
-            "content": "def open_browser(url):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 70,
-            "content": "    webbrowser.open_new_tab(url)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 71,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 72,
-            "content": "if __name__ == '__main__':",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 73,
-            "content": "    app = create_app()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 74,
-            "content": "    port = find_available_port()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 75,
-            "content": "    url = f\"http://127.0.0.1:{port}\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 76,
             "content": "    ",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 64,
+            "content": "    assert record is not None",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 65,
+            "content": "    assert record['event_type'] == \"payment.completed\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 66,
+            "content": "    assert record['status'] == \"pending\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 67,
+            "content": "    assert record['attempts'] == 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 68,
+            "content": "    assert \"txn_123\" in record['payload']",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 69,
+            "content": "    assert len(record['signature']) == 64  # SHA256 hex digest length",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 70,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 71,
+            "content": "def test_webhook_outbox_ignores_disabled_merchants(setup_db):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 72,
+            "content": "    merchant_id = setup_db",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 73,
+            "content": "    # Disable webhook for the merchant",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 74,
+            "content": "    conn = create_connection()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 75,
+            "content": "    conn.execute(\"UPDATE merchants SET webhook_enabled = 0 WHERE id = ?\", (merchant_id,))",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 76,
+            "content": "    conn.commit()",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 77,
-            "content": "    if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':",
+            "content": "    conn.close()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 78,
-            "content": "        threading.Timer(1.5, open_browser, args=[url]).start()",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 79,
-            "content": "",
+            "content": "    bus = InMemoryEventBus()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 80,
-            "content": "    print(f\"Starting Paymenter (Hexagonal Architecture) on {url}\")",
+            "content": "    merchant_config_adapter = SqliteMerchantWebhookConfigAdapter(connection_factory=create_connection)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 81,
-            "content": "    app.run(debug=True, port=port)",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 82,
-            "content": "",
+            "content": "    def get_handler():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 83,
+            "content": "        uow = SqliteUnitOfWork()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 84,
+            "content": "        return WebhookOutboxEventHandler(uow, SqliteWebhookOutboxRepository(uow), merchant_config_adapter)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 85,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 86,
+            "content": "    bus.subscribe(TransactionCompletedEvent, lambda e: get_handler().handle_completed(e))",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 87,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 88,
+            "content": "    event = TransactionCompletedEvent(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 89,
+            "content": "        transaction_id=\"txn_456\",",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 90,
+            "content": "        payer_account_id=\"acc_123\",",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 91,
+            "content": "        amount=Money(amount=Decimal(\"50.00\"), currency=CurrencyCode(value=\"USD\")),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 92,
+            "content": "        merchant_id=merchant_id",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 93,
+            "content": "    )",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 94,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 95,
+            "content": "    with SqliteUnitOfWork():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 96,
+            "content": "        bus.publish(event)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 97,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 98,
+            "content": "    # Assert no new record was inserted",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 99,
+            "content": "    conn = create_connection()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 100,
+            "content": "    records = conn.execute(\"SELECT * FROM webhook_outbox WHERE merchant_id = ? AND payload LIKE '%txn_456%'\", (merchant_id,)).fetchall()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 101,
+            "content": "    conn.close()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 102,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 103,
+            "content": "    assert len(records) == 0",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 104,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 105,
+            "content": "tests\\unit\\webhook\\test_webhook_signer.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 106,
+            "content": "import pytest",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 107,
+            "content": "from src.webhook.infrastructure.utils.webhook_signer import WebhookSigner",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 108,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 109,
+            "content": "def test_webhook_signer_generates_correct_signature():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 110,
+            "content": "    payload = '{\"event\":\"payment.completed\",\"transaction_id\":\"txn_123\"}'",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "    secret = \"whsec_supersecret\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 112,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 113,
+            "content": "    import hmac",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 114,
+            "content": "    import hashlib",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 115,
+            "content": "    expected_signature = hmac.new(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 116,
+            "content": "        key=secret.encode('utf-8'),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 117,
+            "content": "        msg=payload.encode('utf-8'),",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 118,
+            "content": "        digestmod=hashlib.sha256",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 119,
+            "content": "    ).hexdigest()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 120,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 121,
+            "content": "    actual_signature = WebhookSigner.sign(payload, secret)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 122,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 123,
+            "content": "    assert actual_signature == expected_signature",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 124,
+            "content": "    assert len(actual_signature) == 64",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 126,
+            "content": "def test_webhook_signer_consistent_for_same_input():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 127,
+            "content": "    payload = '{\"event\":\"payment.failed\"}'",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 128,
+            "content": "    secret = \"another_secret\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 129,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 130,
+            "content": "    sig1 = WebhookSigner.sign(payload, secret)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 131,
+            "content": "    sig2 = WebhookSigner.sign(payload, secret)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 132,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 133,
+            "content": "    assert sig1 == sig2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 134,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 135,
+            "content": "def test_webhook_signer_different_for_different_payloads():",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 136,
+            "content": "    secret = \"another_secret\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 137,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 138,
+            "content": "    sig1 = WebhookSigner.sign('{\"event\":\"payment.completed\"}', secret)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 139,
+            "content": "    sig2 = WebhookSigner.sign('{\"event\":\"payment.refunded\"}', secret)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 140,
+            "content": "    ",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 141,
+            "content": "    assert sig1 != sig2",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 143,
             "content": "",
             "type": "REMOVED"
           }
@@ -11107,36 +11172,20 @@
     ".git/gk/config": {
       "id": "860a8dbb-366e-4226-bfb7-9bdca84ca2c2",
       "filePath": ".git/gk/config",
-      "hashValue": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
+      "hashValue": "332fa20937f4d343e55f545f8cc59fda1dcc29f6e6fb3ecadf53c451d2cd70bb",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
-        "newHash": "02cac6bc15d707fa6b4f59437804a0f0657a5c4c6c6633f0b17e899d1f49f427",
-        "addedLines": [
-          {
-            "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T12:30:45.165Z",
-            "type": "ADDED"
-          },
+        "oldHash": "332fa20937f4d343e55f545f8cc59fda1dcc29f6e6fb3ecadf53c451d2cd70bb",
+        "newHash": "332fa20937f4d343e55f545f8cc59fda1dcc29f6e6fb3ecadf53c451d2cd70bb",
+        "addedLines": [],
+        "removedLines": [],
+        "modifiedLines": [
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T12:30:45.165Z",
-            "type": "ADDED"
+            "content": "\tgk-last-modified = 2026-07-21T12:45:59.594Z",
+            "type": "MODIFIED"
           }
-        ],
-        "removedLines": [
-          {
-            "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T11:28:34.801Z",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T11:28:34.801Z",
-            "type": "REMOVED"
-          }
-        ],
-        "modifiedLines": []
+        ]
       }
     },
     ".road_analyzer_exclude.json": {
@@ -14243,8 +14292,284 @@
     ".pytest_cache/v/cache/nodeids": {
       "id": "411837b1-af29-4411-ada4-5c15acb54654",
       "filePath": ".pytest_cache/v/cache/nodeids",
-      "hashValue": "1b1d22209acb51ee0c2fd192ebcee5bbc3c83d7e7873373a22bf6905c18adfc1",
+      "hashValue": "66709baea31992c16f877508f5379a25f55f8afb5a56421f5ada5e0dd878c140",
+      "diff": {
+        "filePath": ".pytest_cache/v/cache/nodeids",
+        "oldHash": "66709baea31992c16f877508f5379a25f55f8afb5a56421f5ada5e0dd878c140",
+        "newHash": "66709baea31992c16f877508f5379a25f55f8afb5a56421f5ada5e0dd878c140",
+        "addedLines": [
+          {
+            "lineNumber": 7,
+            "content": "  \"tests/integration/webhook/test_webhook_delivery.py::test_delivery_repo_mark_as_sent\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "  \"tests/integration/webhook/test_webhook_delivery.py::test_delivery_repo_record_retry_and_get_pending\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "  \"tests/integration/webhook/test_webhook_delivery.py::test_retry_policy_calculates_next_attempt\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "  \"tests/integration/webhook/test_webhook_outbox.py::test_webhook_outbox_ignores_disabled_merchants\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "  \"tests/integration/webhook/test_webhook_outbox.py::test_webhook_outbox_inserts_record_atomically\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "  \"tests/unit/notifications/test_webhook_signer.py::test_webhook_signer_generates_correct_signature\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 20,
+            "content": "  \"tests/unit/webhook/test_webhook_signer.py::test_webhook_signer_consistent_for_same_input\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 21,
+            "content": "  \"tests/unit/webhook/test_webhook_signer.py::test_webhook_signer_different_for_different_payloads\",",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 22,
+            "content": "  \"tests/unit/webhook/test_webhook_signer.py::test_webhook_signer_generates_correct_signature\"",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 14,
+            "content": "  \"tests/unit/notifications/test_webhook_signer.py::test_webhook_signer_generates_correct_signature\"",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
+    },
+    ".git/objects/54/5023c029740835a209b484a8c1dae85528844c": {
+      "id": "e85a486c-f4a5-4a4e-b052-5176cfb5525d",
+      "filePath": ".git/objects/54/5023c029740835a209b484a8c1dae85528844c",
+      "hashValue": "2932da4db9f11d8ccb6a57bda1a808c4e78852e220c695a2098ef3c00f3511e6",
       "diff": null
+    },
+    ".git/objects/ab/f9e7b30401f383bf3566204cc91fd7cb036d39": {
+      "id": "6a31b24c-63ad-4f49-a29b-4ae38d6defd0",
+      "filePath": ".git/objects/ab/f9e7b30401f383bf3566204cc91fd7cb036d39",
+      "hashValue": "bc11c63ae4f0f303a0418557614350640ccd390aa58503ffec34c67bdee04a17",
+      "diff": null
+    },
+    ".git/objects/cc/709201247ca000a91a1a817908c89a75b35a0f": {
+      "id": "5b379fd0-78c9-488e-9410-030e2b9edb5d",
+      "filePath": ".git/objects/cc/709201247ca000a91a1a817908c89a75b35a0f",
+      "hashValue": "7a2c7ccdc80330ffc249448370fd88c132457c512cd7616eee5f4f48a30d4b5d",
+      "diff": null
+    },
+    ".git/objects/eb/5c96a144712506e4c66b12fcd5e0ca6bbf9ab0": {
+      "id": "f5925738-8792-456e-a34c-6f4e46e315e2",
+      "filePath": ".git/objects/eb/5c96a144712506e4c66b12fcd5e0ca6bbf9ab0",
+      "hashValue": "4275b4c4769facb96060cc7e406a9e2ca485244c42aa084113079c053701d78e",
+      "diff": null
+    },
+    ".git/objects/d5/2e3bbbd974db6f63a5bb3465d04dad41f0299c": {
+      "id": "ccb377db-50ec-4c2f-b997-750d0a29d08a",
+      "filePath": ".git/objects/d5/2e3bbbd974db6f63a5bb3465d04dad41f0299c",
+      "hashValue": "16bdff7d3ef6a5369e895bc9ea2bc9faf8b65de60bb1a75b08b960a67390e701",
+      "diff": null
+    },
+    ".git/objects/47/3103b294db3524a495a8e1f7f918e1db5cb6e8": {
+      "id": "324df155-bea0-4544-9fa9-d84b21bb0b43",
+      "filePath": ".git/objects/47/3103b294db3524a495a8e1f7f918e1db5cb6e8",
+      "hashValue": "c8f7f4afe5d413735258cb6c87d5dbed11d44b09cef1fcccf87abca3dc8c3d11",
+      "diff": null
+    },
+    ".git/objects/c7/c6a8da1a708b6bb2e8fef3cbcca7aff7a7a431": {
+      "id": "b737d214-dc2a-4918-8d4c-15966c929505",
+      "filePath": ".git/objects/c7/c6a8da1a708b6bb2e8fef3cbcca7aff7a7a431",
+      "hashValue": "14ec2748602d3098e8139ce5d54c6dfc4292c5e160d97541a86ed0286427c6a8",
+      "diff": null
+    },
+    ".git/objects/35/82dc0c99095eade72905770c2f00a51664f472": {
+      "id": "0daa539b-3ed6-410a-9794-7e19162a98d2",
+      "filePath": ".git/objects/35/82dc0c99095eade72905770c2f00a51664f472",
+      "hashValue": "3778e6adf50ada6609c1f17a8641d430ab1a3c2186c9fa9e828f274d2f9d69ef",
+      "diff": null
+    },
+    ".git/objects/c0/e378b8bf21e93fdc61834c97d151874643334a": {
+      "id": "16851806-d148-43a3-8241-03068960a239",
+      "filePath": ".git/objects/c0/e378b8bf21e93fdc61834c97d151874643334a",
+      "hashValue": "c751799043feb7a42a8b5c8aa3ed44d8061b1f131355dc4fc4486da67918af18",
+      "diff": null
+    },
+    ".git/objects/a1/4cf57b286ccc61eb56efdba103ea4b6d621bde": {
+      "id": "59951892-ebe9-4af1-9892-e87deb4bfbc1",
+      "filePath": ".git/objects/a1/4cf57b286ccc61eb56efdba103ea4b6d621bde",
+      "hashValue": "f8444c74303d8f16aaca6c3d080051359abd8f332130f3a7eaa4c26495ae9c76",
+      "diff": null
+    },
+    ".git/objects/63/645a8cd386909d85d08d45258a0da9723c42dd": {
+      "id": "b470081d-651a-4830-80b3-5875d3b6321f",
+      "filePath": ".git/objects/63/645a8cd386909d85d08d45258a0da9723c42dd",
+      "hashValue": "d4669d109b4321e598133b89caf84567cac9fa3fa5fa7ebc52763149d9056955",
+      "diff": null
+    },
+    ".git/objects/63/6ff7766b367509ccb0cb00fd6bb0ba06a9bb87": {
+      "id": "ef4b557e-175a-40ea-834f-c52a2f693f44",
+      "filePath": ".git/objects/63/6ff7766b367509ccb0cb00fd6bb0ba06a9bb87",
+      "hashValue": "97cd3712a7741f894480d977bca9af0169bad591466567c3b35928f061f2c6d8",
+      "diff": null
+    },
+    ".git/objects/89/6d8c55104faf6d15c528d20069fd1f6421809f": {
+      "id": "fe02cfee-2efd-413c-8022-1bdde6e8bc49",
+      "filePath": ".git/objects/89/6d8c55104faf6d15c528d20069fd1f6421809f",
+      "hashValue": "8de4c803e6871b9196ba6aeefb854bd8292c10ac200a589d29e0a35143b3604e",
+      "diff": null
+    },
+    ".git/objects/38/98e527d46db7102716465fb1ddea6663aee7bc": {
+      "id": "4c17cca9-6d9d-4412-8b88-9e182e4cfe35",
+      "filePath": ".git/objects/38/98e527d46db7102716465fb1ddea6663aee7bc",
+      "hashValue": "8688fcf126e8fb261c309fb5115f58ae553140c28fa41ba06137cc78c8e2cb0c",
+      "diff": null
+    },
+    ".git/objects/65/231636d59599dca19961bb8625dda7806b97fa": {
+      "id": "063ca0c1-28ed-4bbe-bd2a-c67838935bf4",
+      "filePath": ".git/objects/65/231636d59599dca19961bb8625dda7806b97fa",
+      "hashValue": "768fb08a0edb4deb58afb5cbc4e535233a4db69ff1ccf4f2b1ec8f35cacd6470",
+      "diff": null
+    },
+    ".git/objects/7d/3e931bb9c805758cab32904d73bf60bdbec656": {
+      "id": "ef91a66b-e2b8-468b-a590-2b4c0afb58d6",
+      "filePath": ".git/objects/7d/3e931bb9c805758cab32904d73bf60bdbec656",
+      "hashValue": "a230e9870d4345e9a4ffc7d20e91ece318a9706dd9338ddd11d532a7486729fa",
+      "diff": null
+    },
+    ".git/objects/80/ab53b4e67418ca5a10700802085d806e2d9587": {
+      "id": "0b9134ff-57d7-4d83-89ab-ae1227bdc990",
+      "filePath": ".git/objects/80/ab53b4e67418ca5a10700802085d806e2d9587",
+      "hashValue": "d97d52073c24436679bccbe05e974cd3f827ffca2af8a5cd103d462bc603f0af",
+      "diff": null
+    },
+    "tests/integration/webhook/__init__.py": {
+      "id": "f9d3b0b8-b1e1-4b93-a9be-b6fc160d2f42",
+      "filePath": "tests/integration/webhook/__init__.py",
+      "hashValue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff": null
+    },
+    "tests/integration/webhook/__pycache__/test_webhook_delivery.cpython-313-pytest-9.1.1.pyc": {
+      "id": "25fa4fa7-6b9e-41b5-826c-a0b37021ccd4",
+      "filePath": "tests/integration/webhook/__pycache__/test_webhook_delivery.cpython-313-pytest-9.1.1.pyc",
+      "hashValue": "3d75be521677172d540e0177431ee40e1dbe15ff674113d39fe24c3babea536b",
+      "diff": null
+    },
+    "tests/integration/webhook/__pycache__/__init__.cpython-313.pyc": {
+      "id": "d12d1662-e45b-4c4a-9fa8-c50831a7c38c",
+      "filePath": "tests/integration/webhook/__pycache__/__init__.cpython-313.pyc",
+      "hashValue": "f059a6df7ec7773b87732598df1d7e834033ba61077a0f0ff871cd196e0a70b9",
+      "diff": null
+    },
+    "tests/integration/webhook/__pycache__/test_webhook_outbox.cpython-313-pytest-9.1.1.pyc": {
+      "id": "ca2b413f-a9b0-4281-a970-8645229b90cd",
+      "filePath": "tests/integration/webhook/__pycache__/test_webhook_outbox.cpython-313-pytest-9.1.1.pyc",
+      "hashValue": "21eca6c70969f00aa5a18f0ef68737a612fc82ffa3cfa68f8ab42ef1350293dd",
+      "diff": null
+    },
+    ".pytest_cache/v/cache/lastfailed": {
+      "id": "ac3e3176-f6da-4a85-89d8-506d076857e8",
+      "filePath": ".pytest_cache/v/cache/lastfailed",
+      "hashValue": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "diff": {
+        "filePath": ".pytest_cache/v/cache/lastfailed",
+        "oldHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "newHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "{}",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "{",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "  \"tests/integration/webhook/test_webhook_delivery.py\": true,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "  \"tests/integration/webhook/test_webhook_outbox.py\": true,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 4,
+            "content": "  \"tests/unit/identity/domain/test_merchant_webhook.py\": true,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "  \"tests/unit/webhook/test_webhook_signer.py\": true",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "}",
+            "type": "REMOVED"
+          }
+        ],
+        "modifiedLines": []
+      }
+    },
+    "src/webhook/domain/services/__pycache__/webhook_retry_policy.cpython-313.pyc": {
+      "id": "cba11cc4-116d-40a7-bf99-b9dd17497143",
+      "filePath": "src/webhook/domain/services/__pycache__/webhook_retry_policy.cpython-313.pyc",
+      "hashValue": "596a439679a7100826ee22891648d93422ad20526cf1d02299b488a406781d6e",
+      "diff": null
+    },
+    "src/webhook/domain/services/__pycache__/__init__.cpython-313.pyc": {
+      "id": "131fd81f-3026-4800-8e68-69f128a5573c",
+      "filePath": "src/webhook/domain/services/__pycache__/__init__.cpython-313.pyc",
+      "hashValue": "206175a4272b3ce75516d75b0c10c6c48a29a2805414cec659877b93004184ef",
+      "diff": null
+    },
+    "docs/backend/guideline/HowToTest.md": {
+      "id": "a2bde02d-d3dd-4dbd-8cc2-76de87574387",
+      "filePath": "docs/backend/guideline/HowToTest.md",
+      "hashValue": "187fd73e1d1d82ae91ec0eb7e55622e74bfc0101028cac0eb03951d0b68ab677",
+      "diff": {
+        "filePath": "docs/backend/guideline/HowToTest.md",
+        "oldHash": "187fd73e1d1d82ae91ec0eb7e55622e74bfc0101028cac0eb03951d0b68ab677",
+        "newHash": "187fd73e1d1d82ae91ec0eb7e55622e74bfc0101028cac0eb03951d0b68ab677",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "Run the following command in the root of the project to test :",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 2,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 3,
+            "content": "python -m pytest -v",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [],
+        "modifiedLines": []
+      }
     }
   }
 }

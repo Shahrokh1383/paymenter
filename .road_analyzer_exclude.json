@@ -17,14 +17,13 @@
     "static\\css",
     "src\\checkout",
     "start_worker.bat",
-    "src\\ledger",
-    "src\\identity",
     "static",
-    "templates"
+    "templates",
+    "src\\notifications"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-21T13:24:33.337Z",
+  "lastModified": "2026-07-21T18:55:28.959Z",
   "version": 1
 }

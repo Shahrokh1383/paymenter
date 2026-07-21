@@ -15,13 +15,14 @@
     "tests",
     "find.py",
     "static\\css",
-    "src\\identity",
+    "src\\checkout",
+    "start_worker.bat",
     "src\\ledger",
-    "src\\checkout"
+    "src\\identity"
   ],
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-21T10:18:53.226Z",
+  "lastModified": "2026-07-21T11:27:32.557Z",
   "version": 1
 }

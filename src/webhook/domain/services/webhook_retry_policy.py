@@ -2,8 +2,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 class WebhookRetryPolicy:
-    """Pure domain logic for calculating webhook retry intervals."""
-    
     MAX_ATTEMPTS = 5
     INTERVALS = [
         timedelta(minutes=1),
@@ -17,7 +15,5 @@ class WebhookRetryPolicy:
     def calculate_next_attempt(current_attempts: int) -> Optional[datetime]:
         if current_attempts >= WebhookRetryPolicy.MAX_ATTEMPTS:
             return None
-        
         index = min(current_attempts, len(WebhookRetryPolicy.INTERVALS) - 1)
-        # Use timezone-aware UTC datetime
         return datetime.now(timezone.utc) + WebhookRetryPolicy.INTERVALS[index]

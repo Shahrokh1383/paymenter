@@ -1,5 +1,5 @@
 from src.common.domain.ports.unit_of_work import UnitOfWork
-from src.notifications.domain.ports.webhook_outbox_port import WebhookOutboxPort
+from src.webhook.domain.ports.webhook_outbox_port import WebhookOutboxPort
 
 class SqliteWebhookOutboxRepository(WebhookOutboxPort):
     def __init__(self, uow: UnitOfWork):

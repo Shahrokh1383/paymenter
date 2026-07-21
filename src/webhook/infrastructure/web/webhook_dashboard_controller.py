@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.notifications.application.queries.get_all_deliveries_query import GetAllDeliveriesQuery
-from src.notifications.application.commands.retry_webhook_delivery_command import RetryWebhookDeliveryCommand
+from src.webhook.application.queries.get_all_deliveries_query import GetAllDeliveriesQuery
+from src.webhook.application.commands.retry_webhook_delivery_command import RetryWebhookDeliveryCommand
 
 webhook_bp = Blueprint('webhooks', __name__, url_prefix='/webhooks')
 

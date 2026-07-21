@@ -1,7 +1,7 @@
 from typing import Optional
 from src.common.infrastructure.database import create_connection
 from src.identity.application.dto.webhook_config_dto import WebhookConfigDTO
-from src.notifications.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort
+from src.webhook.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort
 
 class SqliteMerchantWebhookConfigAdapter(MerchantWebhookConfigPort):
     def __init__(self, connection_factory):

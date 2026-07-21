@@ -1,16 +1,15 @@
 from typing import List
 from datetime import datetime, timezone
 from src.common.domain.ports.unit_of_work import UnitOfWork
-from src.notifications.application.dto.webhook_delivery_dto import WebhookDeliveryDTO
-from src.notifications.domain.ports.webhook_delivery_query_port import WebhookDeliveryQueryPort
-from src.notifications.domain.ports.webhook_delivery_processor_port import WebhookDeliveryProcessorPort
+from src.webhook.application.dto.webhook_delivery_dto import WebhookDeliveryDTO
+from src.webhook.domain.ports.webhook_delivery_query_port import WebhookDeliveryQueryPort
+from src.webhook.domain.ports.webhook_delivery_processor_port import WebhookDeliveryProcessorPort
 
 class SqliteWebhookDeliveryRepository(WebhookDeliveryQueryPort, WebhookDeliveryProcessorPort):
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
     def _format_dt(self, dt: datetime) -> str:
-        """Formats a timezone-aware datetime to UTC string for SQLite."""
         if dt.tzinfo is not None:
             dt = dt.astimezone(timezone.utc)
         return dt.strftime('%Y-%m-%d %H:%M:%S')

@@ -11,12 +11,9 @@ from src.common.infrastructure.database.schemas.identity.identity import IDENTIT
 from src.common.infrastructure.database.schemas.ledger.ledger import LEDGER_SCHEMA
 from src.common.infrastructure.database.schemas.checkout.checkout import CHECKOUT_SCHEMA
 from src.common.infrastructure.database.schemas.notifications.notifications import NOTIFICATIONS_SCHEMA
+from src.common.infrastructure.database.schemas.webhook.webhook import WEBHOOK_SCHEMA
 
 def create_connection() -> sqlite3.Connection:
-    """
-    Factory function to create properly configured SQLite connections.
-    Ensures consistent PRAGMA settings across all infrastructure adapters (Rule 6).
-    """
     conn = sqlite3.connect(DB_PATH, timeout=10.0)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
@@ -26,10 +23,6 @@ def create_connection() -> sqlite3.Connection:
 class Database:
     @staticmethod
     def initialize() -> None:
-        """
-        Strictly orchestrates schema creation. 
-        No data seeding is allowed here to protect Domain Invariants (Rule 4).
-        """
         if not os.path.exists(DB_DIR):
             os.makedirs(DB_DIR)
         
@@ -40,7 +33,8 @@ class Database:
             IDENTITY_SCHEMA + 
             LEDGER_SCHEMA + 
             CHECKOUT_SCHEMA + 
-            NOTIFICATIONS_SCHEMA
+            NOTIFICATIONS_SCHEMA +
+            WEBHOOK_SCHEMA
         )
         
         try:

@@ -1,16 +1,15 @@
 import time
 import logging
 from src.common.infrastructure.persistence.sqlite_unit_of_work import SqliteUnitOfWork
-from src.notifications.infrastructure.persistence.sqlite_webhook_delivery_repository import SqliteWebhookDeliveryRepository
-from src.notifications.infrastructure.adapters.requests_http_client_adapter import RequestsHttpClientAdapter
-from src.notifications.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter
+from src.webhook.infrastructure.persistence.sqlite_webhook_delivery_repository import SqliteWebhookDeliveryRepository
+from src.webhook.infrastructure.adapters.requests_http_client_adapter import RequestsHttpClientAdapter
+from src.webhook.infrastructure.persistence.sqlite_merchant_webhook_config_adapter import SqliteMerchantWebhookConfigAdapter
 from src.common.infrastructure.database import create_connection
-from src.notifications.domain.services.webhook_retry_policy import WebhookRetryPolicy
+from src.webhook.domain.services.webhook_retry_policy import WebhookRetryPolicy
 
 logger = logging.getLogger(__name__)
 
 def run_worker():
-    """Main loop for the background webhook forwarder."""
     logger.info("Starting Webhook Forwarder Worker...")
     http_client = RequestsHttpClientAdapter()
     merchant_config_adapter = SqliteMerchantWebhookConfigAdapter(connection_factory=create_connection)
@@ -55,4 +54,4 @@ def run_worker():
         except Exception as e:
             logger.error(f"Worker loop error: {e}")
             
-        time.sleep(10) # Poll every 10 seconds
+        time.sleep(10)

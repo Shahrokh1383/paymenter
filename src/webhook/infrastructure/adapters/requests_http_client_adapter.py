@@ -1,5 +1,5 @@
 import requests
-from src.notifications.domain.ports.http_client_port import HttpClientPort
+from src.webhook.domain.ports.http_client_port import HttpClientPort
 
 class RequestsHttpClientAdapter(HttpClientPort):
     def post(self, url: str, headers: dict, body: str) -> int:

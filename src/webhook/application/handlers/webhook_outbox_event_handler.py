@@ -1,8 +1,8 @@
 import json
 from src.common.domain.ports.unit_of_work import UnitOfWork
-from src.notifications.domain.ports.webhook_outbox_port import WebhookOutboxPort
-from src.notifications.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort
-from src.notifications.infrastructure.utils.webhook_signer import WebhookSigner
+from src.webhook.domain.ports.webhook_outbox_port import WebhookOutboxPort
+from src.webhook.domain.ports.merchant_webhook_config_port import MerchantWebhookConfigPort
+from src.webhook.infrastructure.utils.webhook_signer import WebhookSigner
 from src.ledger.domain.events.transaction_events import (
     TransactionCompletedEvent, TransactionFailedEvent, TransactionRefundedEvent
 )
@@ -39,8 +39,6 @@ class WebhookOutboxEventHandler:
                 "currency": str(event.amount.currency)
             }
             payload_json = json.dumps(payload, sort_keys=True)
-            
-            # Refactored: Use the dedicated WebhookSigner utility (DRY & SRP)
             signature = WebhookSigner.sign(payload_json, config.webhook_secret)
 
             self._outbox_repo.add(

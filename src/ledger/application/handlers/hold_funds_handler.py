@@ -49,6 +49,5 @@ class HoldFundsHandler:
                 self._account_repo.update(escrow_acc)
                 
             self._txn_repo.add(txn)
-            self._uow.commit()
             
             return txn.id

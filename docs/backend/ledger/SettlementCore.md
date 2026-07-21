@@ -1,6 +1,6 @@
 # Transaction & Settlement Module
 
-**Version:** 2.2.0
+**Version:** 2.3.0 (SSOT)
 
 ## Table of Contents
 1. [Overview](#1-overview)
@@ -8,7 +8,7 @@
 3. [Backend Architecture](#3-backend-architecture)
 4. [API Contract](#4-api-contract)
 5. [Execution Flows](#5-execution-flows)
-6. [Edge Cases & Known Issues](#6-edge-cases--known-issues)
+6. [Infrastructure Optimization Targets](#6-infrastructure-optimization-targets)
 7. [Architectural Notes & Trade-offs](#7-architectural-notes--trade-offs)
 
 ---
@@ -16,7 +16,7 @@
 ## 1. Overview
 The Transaction & Settlement module is the operational heart of the `ledger` Bounded Context. It orchestrates the complete lifecycle of a financial transaction using a strict double-entry ledger pattern enhanced with a **Dual-Tracking Hybrid Escrow** mechanism. Every fund movement follows a multi-step logic: funds are physically debited from the payer and credited to a system escrow account, while simultaneously incrementing a shadow `pending_holds` tracker on the payer's account for strict audit and lifecycle invariants.
 
-The module operates with **application-generated UUIDs** for all aggregate identities, completely decoupling the domain model from database sequence generators. For optimal performance and precision, monetary values are persisted as **integer cents** at the infrastructure layer, while the domain layer strictly enforces `Decimal` precision via the `Money` value object. It exposes both HTML and JSON API endpoints, enforces idempotency via an in-memory caching decorator, and publishes domain events for downstream contexts strictly after successful database commits. Furthermore, system escrow accounts are auto-provisioned via an event-driven bootstrapper using deterministic SHA-256 hashing whenever a new currency is introduced.
+The module operates with **application-generated UUIDs** for all aggregate identities, completely decoupling the domain model from database sequence generators. For optimal performance and precision, monetary values are persisted as **integer cents** at the infrastructure layer, while the domain layer strictly enforces `Decimal` precision via the `Money` value object. It exposes both HTML and JSON API endpoints, enforces idempotency via a caching decorator, and publishes domain events for downstream contexts strictly **within the atomic database transaction boundary**, ensuring zero phantom events. Furthermore, system escrow accounts are auto-provisioned via an event-driven bootstrapper using deterministic SHA-256 hashing, seamlessly joining the ambient transaction to guarantee atomic currency and escrow creation.
 
 ---
 
@@ -66,43 +66,41 @@ The following rules are enforced by the `Transaction`, `Account`, and `Currency`
   - `Money` – Immutable, enforces currency matching on arithmetic operations, and quantizes to 2 decimal places.
   - `CurrencyCode` – Normalized 3-letter ISO code.
   - `AccountNumber` – Strictly validated 10-digit string.
-  - `EmailAddress` – RFC-compliant email validation.
 
 - **Domain Service**
   - `DoubleEntryLedger` – Stateless orchestrator that manipulates `Account` aggregates and the `Transaction` aggregate to execute hold, complete, and fail/refund operations.
 
 - **Domain Events**
   - `TransactionCompletedEvent`, `TransactionFailedEvent`, `TransactionRefundedEvent`
-  - `AccountCreatedEvent`, `CurrencyCreatedEvent`, `CurrencyActivatedEvent`, `CurrencyDeactivatedEvent`
+  - `CurrencyCreatedEvent`, `CurrencyActivatedEvent`, `CurrencyDeactivatedEvent`
 
 - **Ports**
   - `SystemAccountResolverPort` – Retrieves the system escrow account for a given currency.
-  - `UnitOfWork` – Manages atomic database transactions.
+  - `UnitOfWork` – Manages atomic database transactions via ambient connection pooling.
   - `EventBus` – Publishes and subscribes to domain events.
 
 ### 3.2. Application Layer (Orchestration)
 *Use Cases, CQRS, DTOs.*
 
 - **Commands & Handlers**
-  - `HoldFundsHandler` – Validates accounts, resolves escrow, calls `DoubleEntryLedger.hold_funds()`, and persists a `Pending` transaction.
-  - `CompleteFundsHandler` / `FailAndRefundHandler` – Settle or reverse transactions and dispatch events post-commit.
+  - `HoldFundsHandler`, `CompleteFundsHandler`, `FailAndRefundHandler` – Orchestrate fund movements and publish resulting domain events strictly *inside* the Unit of Work boundary to guarantee atomic consistency.
   - `UpdateAccountCurrencyHandler` – Enforces BR-3 and implements a robust exponential backoff retry mechanism for OCC conflicts.
-  - `CreateCurrencyHandler` & `EscrowBootstrapperEventHandler` – Listens to `CurrencyCreatedEvent` to automatically provision system escrow accounts using deterministic SHA-256 hashing to generate the 10-digit `AccountNumber`.
+  - `CreateCurrencyHandler` & `EscrowBootstrapperEventHandler` – Listens to `CurrencyCreatedEvent` to automatically provision system escrow accounts using deterministic SHA-256 hashing.
 
 - **Queries & Handlers**
-  - `GetTransactionsHandler`, `GetAllAccountsHandler`, `GetAllCurrenciesHandler` – Return DTOs via strictly isolated read models.
+  - `GetTransactionsHandler`, `GetAllAccountsHandler`, `GetAllEscrowAccountsHandler` – Return DTOs via strictly isolated read models.
 
 ### 3.3. Infrastructure Layer (Adapters & Persistence)
 *Implementation details.*
 
 - **Write Repositories**
-  - `SqliteTransactionRepository`, `SqliteAccountRepository`, `SqliteCurrencyRepository` – Persist aggregates with strict Optimistic Concurrency Control (OCC) via a `version` column. They encapsulate monetary serialization via `_to_cents()` and `_from_cents()` methods, storing financial figures as `INTEGER` in SQLite to eliminate string-parsing overhead and guarantee exact integer arithmetic at the DB level.
+  - `SqliteTransactionRepository`, `SqliteAccountRepository`, `SqliteCurrencyRepository` – Persist aggregates with strict Optimistic Concurrency Control (OCC) via a `version` column. They encapsulate monetary serialization via `_to_cents()` and `_from_cents()` methods, storing financial figures as `INTEGER` in SQLite.
 
 - **Read Models**
   - `SqliteTransactionReadModel`, `SqliteAccountReadModel`, `SqliteEscrowAccountReadModel` – Execute highly optimised SQL JOINs strictly *intra-context*.
 
-- **Unit of Work**
-  - `SqliteUnitOfWork` – Context manager managing atomicity. Uses SQLite WAL mode and enforces foreign keys. Auto-commits on clean exit, auto-rollbacks on exceptions.
+- **Unit of Work (Ambient Transactions)**
+  - `SqliteUnitOfWork` – Context manager leveraging Python's `contextvars` to manage ambient database transactions. It supports nested UoW blocks safely, increments a nesting level counter, and automatically commits on a clean `__exit__` or rolls back if an exception propagates.
 
 - **Web Controllers & Middleware**
   - `transaction_bp` (HTML) / `transaction_api_bp` (JSON).
@@ -138,39 +136,36 @@ Both API endpoints are protected by the `@idempotent` decorator. A repeated requ
    - Identity resolution prevents duplicate UoW tracking (`if from_acc.id == escrow_acc.id: from_acc = escrow_acc`).
    - Application layer generates a new UUID (`uuid.uuid4().hex`) for the `Transaction` aggregate.
    - `DoubleEntryLedger.hold_funds()` physically debits the payer, increments `pending_holds`, and credits the escrow.
-4. **Persistence:** Repositories convert `Money` decimals to integer cents via `_to_cents()` and persist the mutated aggregates (incrementing OCC versions). `UnitOfWork.commit()` atomically persists everything.
+4. **Persistence:** Repositories convert `Money` decimals to integer cents via `_to_cents()` and persist the mutated aggregates. `UnitOfWork.__exit__` automatically commits the ambient transaction on clean exit.
 
 ### Flow 2: Completing Funds (Settlement)
 1. **HTTP Request:** External system sends `POST /api/transactions/<uuid:id>/complete` with `Idempotency-Key`.
 2. **Orchestration (UoW):**
    - Loads `Transaction`, `from_acc`, `to_acc`, and `escrow_acc`.
    - `DoubleEntryLedger.complete_funds()` transitions transaction to `Success`, decrements `pending_holds` on payer, debits escrow, and credits payee.
-3. **Persistence & Eventing:** Aggregates saved via integer-cents conversion. UoW commits. `TransactionCompletedEvent` is published to the `EventBus` **outside** the UoW block.
+3. **Persistence & Eventing:** Aggregates saved via integer-cents conversion. `TransactionCompletedEvent` is published to the `EventBus` **inside** the UoW block. `UnitOfWork.__exit__` automatically commits the ambient transaction, ensuring state and events are atomically finalized.
 
 ### Flow 3: Failing / Refunding (Chargeback)
 1. **Orchestration (UoW):**
    - **Pending case:** Marks as `Failed`, decrements `pending_holds`, debits escrow, credits payer.
    - **Success case:** Marks as `Refunded`, credits payer, and forcefully debits payee via `apply_system_reversal()` (bypassing non-negative invariant). Escrow is untouched.
-2. **Persistence & Eventing:** Aggregates saved. UoW commits. Appropriate failure/refund event is published outside the UoW block.
+2. **Persistence & Eventing:** Aggregates saved. `TransactionFailedEvent` or `TransactionRefundedEvent` is published **inside** the UoW block. `UnitOfWork.__exit__` automatically commits the ambient transaction.
 
 ---
 
-## 6. Edge Cases & Known Issues
+## 6. Infrastructure Optimization Targets
 
-### Issue 1: Partial Exception Mapping (OCC 500 Risk)
-**Description:** Domain exceptions (`InsufficientFundsError`, `AccountNotFoundError`, `CurrencyMismatchError`) are correctly mapped to HTTP `409 Conflict` in the API controllers. However, `ConcurrencyException` thrown by OCC conflicts is not explicitly caught in the `try/except` blocks of `transaction_api_controller.py`.  
-**Impact:** Race conditions result in a generic `500 Internal Server Error` instead of a retry-friendly 409.  
-**Action Required:** Register a global `@app.errorhandler` or add explicit `except ConcurrencyException` blocks to map to a 409 response.
+While the core domain and transaction boundaries are fully robust, the following infrastructure optimizations are tracked for future production hardening:
 
-### Issue 2: At-Most-Once Event Delivery (No Outbox)
-**Description:** Events are published synchronously via `EventBus` after `uow.commit()`. A crash between commit and publish loses the event.  
-**Impact:** Downstream contexts may miss `TransactionCompletedEvent`.  
-**Action Required:** Implement the Transactional Outbox Pattern for production message brokers.
+- **Target 1: Shared Idempotency Store**
+  **Description:** The `@idempotent` decorator currently relies on a local Python dictionary (`_idempotency_store`) to cache responses. 
+  **Impact:** The cache is lost on application restart and cannot be shared across multiple horizontal instances (pods/containers).
+  **Action Required:** Migrate the idempotency store to a shared, persistent datastore like Redis or a dedicated database table with TTLs for horizontal scalability.
 
-### Issue 3: In-Memory Idempotency Store Limitations
-**Description:** The `@idempotent` decorator relies on a Python dictionary (`_idempotency_store`) to cache responses.  
-**Impact:** The cache is lost on application restart and cannot be shared across multiple horizontal instances (pods/containers). Retries hitting a different instance will re-execute the command.  
-**Action Required:** Migrate the idempotency store to a shared, persistent datastore like Redis or a dedicated database table with TTLs.
+- **Target 2: Global OCC Exception Mapping**
+  **Description:** Domain exceptions are correctly mapped to HTTP `409 Conflict` in the API controllers. However, `ConcurrencyException` thrown by OCC conflicts falls through to a generic `500 Internal Server Error`.
+  **Impact:** Race conditions result in a 500 error instead of a retry-friendly 409.
+  **Action Required:** Register a global `@app.errorhandler` for `ConcurrencyException` to explicitly map it to a 409 response, enabling automated client-side retries.
 
 ---
 
@@ -179,8 +174,8 @@ Both API endpoints are protected by the `@idempotent` decorator. A repeated requ
 ### Dual-Tracking Hybrid Escrow Model
 The module implements a hybrid approach. Funds are physically moved to an Immediate Escrow account to prevent double-spending, while the payer's `pending_holds` field is simultaneously incremented. This provides the security of pre-funding with the auditability and lifecycle tracking of a shadow hold system. The `decrease_holds` method includes defensive clamping (`max(0, ...)`) to gracefully handle legacy data.
 
-### Event-Driven Escrow Bootstrapping
-System Escrow accounts are not hardcoded. When a new currency is created, a `CurrencyCreatedEvent` is published. The `EscrowBootstrapperEventHandler` subscribes to this event and automatically provisions a system account. It uses a deterministic SHA-256 hash of the currency code to generate a 10-digit `AccountNumber`, ensuring idempotency and preventing duplicate escrow accounts on event retries.
+### Event-Driven Escrow Bootstrapping & Atomic Nesting
+System Escrow accounts are not hardcoded. When a new currency is created, a `CurrencyCreatedEvent` is published *inside* the Unit of Work. The `EscrowBootstrapperEventHandler` subscribes to this event and automatically provisions a system account using a deterministic SHA-256 hash of the currency code to generate a 10-digit `AccountNumber`. Because the `SqliteUnitOfWork` utilizes `contextvars` for ambient transaction management, the nested UoW block inside the event handler seamlessly joins the parent transaction. This guarantees that currency creation and escrow provisioning are strictly atomic.
 
 ### Integer-Cents Persistence Strategy
 To eliminate floating-point inaccuracies and string-parsing overhead at the database engine level, monetary values (`amount`, `balance`, `pending_holds`) are stored as `INTEGER` (cents) in SQLite. The conversion logic (`_to_cents` and `_from_cents`) is strictly encapsulated within the Infrastructure Repositories, ensuring the Domain `Money` value object remains pure and completely unaware of its serialization format.
@@ -191,8 +186,11 @@ By shifting Aggregate IDs from database-generated integers to application-genera
 ### Strict Intra-Context Read Model Isolation
 Query handlers never touch aggregates. The Read Models perform highly optimised SQL JOINs strictly within the ledger context (`transactions`, `accounts`, `currencies`). They refuse to join tables from external contexts, ensuring the ledger remains fully autonomous and deployable independently.
 
-### Safe Event Publishing Timing
-By instantiating domain events inside the Unit of Work block but invoking `event_bus.publish()` strictly **outside** the block, the handlers guarantee that events are only dispatched if the database commit succeeds. This prevents "phantom events" where downstream contexts react to transactions that were ultimately rolled back.
+### Atomic Event Publishing within Ambient Transactions
+By invoking `event_bus.publish()` strictly **inside** the Unit of Work block, the handlers ensure that event dispatching is tightly coupled with the ambient database transaction. This prevents "phantom events" where downstream contexts react to transactions that were ultimately rolled back, and guarantees that state mutations and event emissions are treated as a single atomic operation.
+
+### Ambient Transaction Management via ContextVars
+The `SqliteUnitOfWork` leverages Python's `contextvars` to hold the active database connection and a nesting level counter. This allows multiple handlers or event subscribers to invoke `with self._uow:` safely without prematurely committing or closing the connection. The physical commit is deferred until the outermost context manager exits cleanly, providing robust protection against partial state mutations in complex orchestration flows.
 
 ### Aggregate Identity Resolution in UoW
 The application handlers implement a precise identity resolution pattern (`if from_acc.id == escrow_acc.id: from_acc = escrow_acc`). This prevents the Unit of Work from tracking the same database row under two different Python object references, which would otherwise cause state corruption or false Optimistic Concurrency Control (OCC) failures when `repo.update()` is called multiple times on the same underlying row.

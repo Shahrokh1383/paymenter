@@ -26,8 +26,7 @@ class UpdateAccountCurrencyHandler:
                     account.change_currency(new_currency_code)
                     
                     self._repo.update(account)
-                    self._uow.commit()
-                    return  # Success, break loop
+                    return 
                     
             except ConcurrencyException:
                 attempt += 1

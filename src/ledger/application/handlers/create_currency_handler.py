@@ -29,8 +29,6 @@ class CreateCurrencyHandler:
             currency = Currency.create(id=currency_id, name=command.name, code=code)
             
             self._currency_repo.add(currency)
-            self._uow.commit()
-            
             self._event_bus.publish(
                 CurrencyCreatedEvent(currency_id=currency_id, name=command.name, code=code)
             )

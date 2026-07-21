@@ -28,7 +28,8 @@
     "venv",
     "__init__.py",
     "__pycache__",
-    ".pytest_cache"
+    ".pytest_cache",
+    "start_worker.bat"
   ],
   "schemaVersion": "1.0",
   "docFolder": {

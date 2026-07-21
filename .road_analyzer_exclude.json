@@ -15,7 +15,6 @@
     "tests",
     "find.py",
     "static\\css",
-    "src\\notifications",
     "src\\identity",
     "src\\ledger",
     "src\\checkout"
@@ -23,6 +22,6 @@
   "globalPatterns": [
     "__init__.py"
   ],
-  "lastModified": "2026-07-20T21:00:38.400Z",
+  "lastModified": "2026-07-21T10:18:53.226Z",
   "version": 1
 }

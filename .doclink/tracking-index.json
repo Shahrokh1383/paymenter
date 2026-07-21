@@ -3008,17 +3008,519 @@
     "docs/backend/identity/UserManagement.md": {
       "id": "87aa70b5-aaf4-4c92-a78f-65b338b49af1",
       "filePath": "docs/backend/identity/UserManagement.md",
-      "hashValue": "1b0d33bde8528c2ceeb902ec0127a9d6a7a0c364def08578be0d1c0551a2d141",
+      "hashValue": "03853744b6eef5c0393730ec200625e70acbe4c1e9b8cfa73f958abb86c0c8c1",
       "diff": {
         "filePath": "docs/backend/identity/UserManagement.md",
         "oldHash": "1b0d33bde8528c2ceeb902ec0127a9d6a7a0c364def08578be0d1c0551a2d141",
-        "newHash": "1b0d33bde8528c2ceeb902ec0127a9d6a7a0c364def08578be0d1c0551a2d141",
-        "addedLines": [],
-        "removedLines": [],
+        "newHash": "03853744b6eef5c0393730ec200625e70acbe4c1e9b8cfa73f958abb86c0c8c1",
+        "addedLines": [
+          {
+            "lineNumber": 1,
+            "content": "# MODULE DOCUMENTATION: IDENTITY & DASHBOARD ORCHESTRATION",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 18,
+            "content": "The read-side maintains denormalized `user_summaries` and `merchant_summaries` tables that incrementally aggregate data from the Identity and Ledger contexts to serve the internal Administration Dashboard. Furthermore, the module's web layer acts as a monolithic Backend-For-Frontend (BFF), dispatching commands across multiple bounded contexts. The architecture prioritizes immediate consistency, ambient nested transaction safety, and strict server-side orchestration.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "*   **Merchant API Key Issuance:** Upon onboarding, a `Merchant` is issued a strict `ApiKey` Value Object (prefix `pay_` + 43 URL-safe characters). This key serves as the immutable credential for external integrations.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "*   **Webhook Invariants:** A Merchant's webhook configuration is governed by strict domain rules. A webhook cannot be enabled without providing a valid, absolute HTTP/HTTPS URL (`WebhookUrl` VO). Webhook secrets are generated as cryptographically secure strings (prefix `whsec_` + 32 URL-safe chars) and must meet minimum length constraints.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 26,
+            "content": "*   **Temporal Decoupling & Cross-Context Provisioning:** `User` and `Merchant` entities exist independently of `Account` entities (managed by the Ledger context). When an account is provisioned in the Ledger context, the Identity context reacts by generating a PAN (Card Number) and linking it to the owner, subsequently updating the read models.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "*   **Domain Events:** State changes emit deterministic events: `UserRegisteredEvent`, `MerchantOnboardedEvent`, `MerchantActivatedEvent`/`MerchantDeactivatedEvent`, `MerchantWebhookConfiguredEvent`, and `MerchantWebhookSecretGeneratedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "*   **Single String Value Object (`PhoneEmail`):** Combining phone and email into a single string simplifies the UI and allows a single `UNIQUE` constraint in SQLite to prevent duplicate accounts across both mediums. Normalization prevents casing-based duplicates.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "*   **Surrogate Keys:** Using auto-incrementing integer IDs decouples internal identity from mutable contact information and external API credentials, protecting foreign key relationships from volatility.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "*   **Nullable Foreign Keys in Read Models:** Making `account_id` nullable in `user_summaries` reflects the real-world business flow where onboarding and financial account creation are distinct, sequential operations rather than a single atomic transaction.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 35,
+            "content": "*   **Rejected:** *Separate `Phone` and `Email` Value Objects.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 36,
+            "content": "    *   **Reason:** Discarded because it complicates the database schema and makes the SQLite `UNIQUE` constraint implementation significantly harder. Downstream type-ambiguity was accepted to achieve write-side simplicity and strict database-level uniqueness.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 43,
+            "content": "*   **Domain & Application:** Pure Python dataclasses. Handlers rely strictly on the `UnitOfWork` and `EventBus` ports.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 44,
+            "content": "*   **Ambient Nested Transactions:** `SqliteUnitOfWork` utilizes `contextvars` to manage ambient connections and a `_nesting_level` counter. This allows multiple handlers or nested `with uow:` blocks (e.g., event handlers opening their own UoW) to share the same connection without prematurely committing, rolling back, or causing SQLite locking exceptions.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 45,
+            "content": "*   **Multi-Stage CQRS Read Model:** The summary tables are populated synchronously via distinct event listeners:",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 46,
+            "content": "    1.  **Identity Projections:** `UserRegisteredReadModelHandler`, `MerchantOnboardedReadModelHandler`, `MerchantToggledReadModelHandler`, `MerchantWebhookConfiguredReadModelHandler`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 47,
+            "content": "    2.  **Cross-Context Projections:** `AccountCreatedReadModelHandler` (Listens to Ledger `AccountCreatedEvent` -> Updates account/balance fields in `user_summaries`).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 48,
+            "content": "    3.  **Cross-Context Projections:** `CardAssignedReadModelHandler` (Listens to Identity `CardAssignedEvent` -> Updates card fields in `user_summaries`).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 51,
+            "content": "*   **Cross-Context Event Listening:** The Identity context explicitly imports and listens to `src.ledger.domain.events.account_events.AccountCreatedEvent`. This ensures the dashboard's unified view remains consistent without requiring a dedicated aggregation service or cross-context SQL JOINs at query time.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 52,
+            "content": "*   **SQLite with WAL Mode & Ambient UoW:** The nested transaction support via `contextvars` prevents `sqlite3.ProgrammingError` when the DI container or controller inadvertently wraps multiple command executions in overlapping UoW contexts.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 53,
+            "content": "*   **Denormalized Read Models:** Pre-joins user, merchant, account, and card data to prepare the Identity context for a future microservice split, strictly adhering to the rule that contexts must not perform cross-context SQL JOINs at query time.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 57,
+            "content": "    *   **Reason:** Discarded to avoid distributed system overhead. Strict bounded-context purity (Identity importing Ledger events) was sacrificed to maintain a unified dashboard view within a single process space.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 58,
+            "content": "*   **Rejected:** *Relational Database Connection Pooling (PostgreSQL/MySQL).*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 59,
+            "content": "    *   **Reason:** Discarded in favor of SQLite's zero-configuration file-based persistence, relying on WAL mode and ambient UoW to handle concurrency safely.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 69,
+            "content": "    *   `GET /dashboard/merchants` -> Executes `GetAllMerchantsQuery`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 70,
+            "content": "    *   `POST /dashboard/merchants/add` -> Maps to `OnboardMerchantCommand`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 71,
+            "content": "    *   `POST /dashboard/merchants/toggle/<id>` -> Maps to `ToggleMerchantCommand`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 72,
+            "content": "    *   `POST /dashboard/merchants/<id>/webhook/configure` -> Maps to `ConfigureWebhookCommand`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 73,
+            "content": "    *   `POST /dashboard/merchants/<id>/webhook/generate-secret` -> Maps to `GenerateWebhookSecretCommand`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 74,
+            "content": "    *   `POST /dashboard/accounts/create` -> Dispatches `CreateAccountCommand` (Ledger).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 78,
+            "content": "*   **Monolithic Dashboard Controller:** Eliminates the need for an API Gateway or complex frontend state management, allowing a single execution context to manipulate multiple domains atomically via the BFF pattern.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 79,
+            "content": "*   **SSR via Flask:** Eliminates the need for a frontend build pipeline, ensuring the UI is strictly a reflection of the server-side read models.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 82,
+            "content": "*   **Rejected:** *Decoupled SPA consuming a JSON API via API Gateway.*",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 83,
+            "content": "    *   **Reason:** Discarded in favor of server-side orchestration to enforce strict context boundaries at the delivery layer and eliminate client-side state synchronization complexities.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 102,
+            "content": "3.  **Cross-Context Reaction:** `OnAccountCreatedHandler` (residing in Identity) catches the Ledger event.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 103,
+            "content": "4.  **Card Generation:** Handler generates a PAN and inserts a record into `user_cards`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 104,
+            "content": "5.  **Commit & Secondary Event:** Handler commits the UoW and emits `CardAssignedEvent`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 105,
+            "content": "6.  **Read-Model Sync (Stage 2 & 3):** `AccountCreatedReadModelHandler` and `CardAssignedReadModelHandler` catch their respective events, opening nested UoW blocks to execute `UPDATE` statements on `user_summaries`, populating account balances and card numbers.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 108,
+            "content": "*   **Commit before Publish:** Ensures downstream handlers don't attempt to read uncommitted data from the database.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 109,
+            "content": "*   **Ambient UoW via ContextVars:** The `_nesting_level` logic ensures that if the event bus triggers a handler that opens its own `with uow:` block, it reuses the existing connection and only decrements the level, preventing \"database is locked\" or \"closed connection\" errors.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 114,
+            "content": "*   **The \"Phantom Entity\" Anomaly:** If the write-side commits but the synchronous Read-Model Handler fails (e.g., database constraint violation on the summary table), the entity exists in the domain but is invisible to the dashboard.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 115,
+            "content": "*   **Cross-Context Compile-Time Coupling:** The Identity context explicitly imports `src.ledger.domain.events.account_events`. If the Ledger context changes the schema of `AccountCreatedEvent`, the Identity context will fail to import, violating the Dependency Inversion Principle.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 119,
+            "content": "*   **Root Cause (Phantom Entity):** Synchronous in-process event bus without a distributed transaction (Outbox pattern).",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 120,
+            "content": "*   **Root Cause (Coupling):** Prioritizing a unified local dashboard view over strict bounded-context isolation and dependency rules.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 121,
+            "content": "*   **Impact:** Requires strict schema versioning and monitoring. Read-model repair scripts must be available to reconcile domain state with dashboard state in the event of projection failures.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 131,
+            "content": "*   **Ambient Unit of Work:** `SqliteUnitOfWork` tracks `_nesting_level` via `contextvars` to allow safe composition of multiple operations without prematurely closing the SQLite connection.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 132,
+            "content": "*   **Centralized Generators:** Utility functions like `generate_card_number` and `generate_api_key` are housed in `src.common.infrastructure.generators`.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 135,
+            "content": "*   **Centralized Generators:** Kept in `common` for DRY convenience across the system, even though card generation technically belongs to the Card/Checkout domain and API key generation belongs to Identity.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 136,
+            "content": "*   **Nested UoW:** Implemented specifically to prevent SQLite locking exceptions when the DI container or event bus inadvertently nests transaction boundaries.",
+            "type": "ADDED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "    *   **Reason:** Discarded to maintain raw SQL transparency and avoid the heavy dependency footprint of an ORM, keeping the CQRS projections and nested transaction mechanics explicitly visible and deterministic in the codebase.",
+            "type": "ADDED"
+          }
+        ],
+        "removedLines": [
+          {
+            "lineNumber": 1,
+            "content": "# MODULE DOCUMENTATION: USER MANAGEMENT & DASHBOARD ORCHESTRATION",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 13,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 23,
+            "content": "*   **Temporal Decoupling of Accounts:** A `User` can exist independently of an `Account`. The read-model (`user_summaries`) accepts a nullable `account_id`, allowing the user record to be created first, and subsequently updated when an account is provisioned via the Ledger context.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "*   **Domain Events:** Successful registration emits a `UserRegisteredEvent` containing the `user_id`, `name`, and normalized `PhoneEmail`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "*   **Single String Value Object:** Combining phone and email into a single `PhoneEmail` string simplifies the UI and allows a single `UNIQUE` constraint in SQLite to prevent duplicate accounts across both mediums. Normalization prevents casing-based duplicates.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 28,
+            "content": "*   **Surrogate Key:** Using an auto-incrementing integer ID decouples the user's internal identity from their mutable contact information, allowing future contact updates without breaking foreign keys.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 29,
+            "content": "*   **Nullable Foreign Keys in Read Model:** Making `account_id` nullable in `user_summaries` reflects the real-world business flow where user onboarding and financial account creation are distinct, sequential steps rather than a single atomic transaction.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "*   **Rejected:** *Separate `Phone` and `Email` Value Objects / Two Nullable Columns.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 33,
+            "content": "    *   **Reason:** Discarded because it complicates the database schema and makes the SQLite `UNIQUE` constraint implementation significantly harder. We sacrificed downstream type-ambiguity to achieve write-side simplicity.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 40,
+            "content": "*   **Domain & Application:** Pure Python dataclasses (`User`, `PhoneEmail`, `RegisterUserCommand`). Handlers rely strictly on the `UnitOfWork` and `EventBus` ports.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 41,
+            "content": "*   **Persistence & Nested Transactions:** `SqliteUserRepository` persists to SQLite. The `SqliteUnitOfWork` creates a fresh `sqlite3` connection per request but utilizes a `_nesting_level` counter. This allows multiple handlers or nested `with uow:` blocks to share the same connection without prematurely committing or closing the file handle.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 42,
+            "content": "*   **Multi-Stage CQRS Read Model:** The `user_summaries` table is populated synchronously via three distinct event listeners:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 43,
+            "content": "    1.  `UserRegisteredReadModelHandler` (Listens to Identity `UserRegisteredEvent` -> Inserts base user data).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 44,
+            "content": "    2.  `AccountCreatedReadModelHandler` (Listens to Ledger `AccountCreatedEvent` -> Updates account/balance fields).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 45,
+            "content": "    3.  `CardAssignedReadModelHandler` (Listens to Identity `CardAssignedEvent` -> Updates card fields).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 48,
+            "content": "*   **Cross-Context Event Listening:** The Identity context explicitly imports and listens to `src.ledger.domain.events.account_events.AccountCreatedEvent`. This ensures the dashboard's unified view remains consistent without requiring a dedicated aggregation service.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 49,
+            "content": "*   **SQLite with WAL Mode & Nested UoW:** Chosen for the \"zero-ops\" mandate. The nested transaction support prevents `sqlite3.ProgrammingError` when the DI container or controller inadvertently wraps multiple command executions in overlapping UoW contexts.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 50,
+            "content": "*   **Denormalized Read Model:** Pre-joins user, account, and card data to prepare the Identity context for a future microservice split, strictly adhering to the rule that contexts must not perform cross-context SQL JOINs at query time.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 54,
+            "content": "    *   **Reason:** Discarded to avoid microservice overhead. We sacrificed strict bounded-context purity (Identity importing Ledger events) to maintain a unified dashboard view in a single local process.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 55,
+            "content": "*   **Rejected:** *PostgreSQL / MySQL with Connection Pooling.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 56,
+            "content": "    *   **Reason:** Discarded to maintain the zero-ops simulator mandate.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 66,
+            "content": "    *   `POST /dashboard/accounts/update-currency` -> Dispatches `UpdateAccountCurrencyCommand` (Ledger).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 70,
+            "content": "*   **Monolithic Dashboard Controller:** Chosen for rapid MVP delivery. It eliminates the need for an API Gateway or complex frontend state management, allowing a single developer to ship a fully functional admin UI that directly manipulates multiple domains.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 71,
+            "content": "*   **SSR via Flask:** Eliminates the need for a frontend build pipeline.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 74,
+            "content": "*   **Rejected:** *Decoupled SPA (React/Next.js) consuming a JSON API via API Gateway.*",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 75,
+            "content": "    *   **Reason:** Discarded to accelerate MVP delivery. We sacrificed API-first design and strict context isolation at the delivery layer to deliver a functional local UI in the shortest possible time.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 94,
+            "content": "3.  **Cross-Context Projection (Stage 2):** `AccountCreatedReadModelHandler` (residing in Identity) catches the Ledger event.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 95,
+            "content": "4.  **Update:** It opens a UoW and executes an `UPDATE` on `user_summaries`, populating the previously NULL `account_id`, `account_number`, `currency_code`, and `balance`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 98,
+            "content": "*   **Commit before Publish:** Ensures downstream handlers don't attempt to read uncommitted data.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 99,
+            "content": "*   **Nested UoW in Read-Model Handlers:** The `_nesting_level` logic in `SqliteUnitOfWork` ensures that if the event bus triggers a handler that opens its own `with uow:` block, it reuses the existing connection and only decrements the level, preventing the \"database is locked\" or \"closed connection\" errors common in SQLite.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 104,
+            "content": "*   **The \"Phantom User\" Anomaly:** If the write-side commits but the synchronous `UserRegisteredReadModelHandler` fails, the user exists in the domain but is invisible to the dashboard.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 105,
+            "content": "*   **Cross-Context Compile-Time Coupling:** The Identity context explicitly imports `src.ledger.domain.events.account_events`. If the Ledger context changes the schema of `AccountCreatedEvent`, the Identity context will crash at runtime or fail to import, violating the Dependency Inversion Principle.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 109,
+            "content": "*   **Root Cause (Phantom User):** Synchronous in-process event bus without a distributed transaction (Outbox pattern).",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 110,
+            "content": "*   **Root Cause (Coupling):** Prioritizing a unified local dashboard over strict bounded-context isolation and dependency rules.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "*   **Impact:** Low for a local simulator, but catastrophic for a production microservice ecosystem.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 121,
+            "content": "*   **Nested Unit of Work:** `SqliteUnitOfWork` tracks `_nesting_level` to allow safe composition of multiple operations without prematurely closing the SQLite connection.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 122,
+            "content": "*   **Centralized Generators:** Utility functions like `generate_card_number` are housed in `src/common/infrastructure/generators.py`.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "*   **Centralized Generators:** Kept in `common` for DRY convenience across the simulator, even though card generation technically belongs to the Checkout/Card domain.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 126,
+            "content": "*   **Nested UoW:** Implemented to prevent SQLite locking exceptions when the DI container or event bus inadvertently nests transaction boundaries.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 132,
+            "content": "    *   **Reason:** Discarded to maintain raw SQL transparency and avoid the heavy dependency footprint of an ORM, keeping the CQRS projections explicitly visible in the codebase.",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 133,
+            "content": "",
+            "type": "REMOVED"
+          }
+        ],
         "modifiedLines": [
           {
             "lineNumber": 3,
-            "content": "**Version:** 2.1.0  ",
+            "content": "**Version:** 3.0.0  ",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "6. [Edge Cases & Architectural Trade-offs](#edge-cases--architectural-trade-offs)",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "The Identity module manages the lifecycle of `User` and `Merchant` entities within the Identity bounded context. It operates on a strict Hexagonal/DDD architecture with a multi-stage CQRS-lite read-model projection. The write-side handles registration, onboarding, and outbound integration configurations (Webhooks), enforcing domain invariants via specialized Value Objects (`PhoneEmail`, `ApiKey`, `WebhookUrl`). ",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 38,
+            "content": "    *   **Reason:** Discarded to allow independent lifecycles and maintain strict separation between Identity (who the user is) and Ledger (what the user owns).",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 91,
+            "content": "4.  **Transaction Start:** `SqliteUnitOfWork` opens an ambient connection (`_nesting_level` = 1).",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 96,
+            "content": "9.  **Read-Model Projection (Stage 1):** `UserRegisteredReadModelHandler` catches the event, re-enters the ambient UoW (`_nesting_level` = 2), inserts base data into `user_summaries`, and decrements the level.",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 99,
+            "content": "### 2. Step-by-step Sequence: Cross-Context Account & Card Provisioning (WHAT)",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 111,
+            "content": "## Edge Cases & Architectural Trade-offs",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 125,
+            "content": "    *   **Reason:** Discarded as excessive infrastructure overhead for the current scale. The risk of phantom entities and tight compile-time coupling is accepted to maintain absolute architectural simplicity and synchronous execution guarantees.",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 140,
+            "content": "    *   **Reason:** Discarded to prioritize developer velocity. Strict bounded-context purity (making Identity aware of Ledger events, and generic infrastructure aware of Luhn algorithms) was sacrificed to maintain a single, easily accessible codebase.",
             "type": "MODIFIED"
           }
         ]
@@ -12053,34 +12555,34 @@
     ".git/index": {
       "id": "ca7b956e-83dc-4e7a-b3a0-e114c076cb1d",
       "filePath": ".git/index",
-      "hashValue": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
+      "hashValue": "e99d974f33f71f7b2ec17a48ce8dcb4551e96ebbdb78f89029ce9337b56325f9",
       "diff": {
         "filePath": ".git/index",
-        "oldHash": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
-        "newHash": "0a27a8a0954a746aff8c4650e2279bc26f78f621137959eb5f3ffc520eaa1285",
+        "oldHash": "e99d974f33f71f7b2ec17a48ce8dcb4551e96ebbdb78f89029ce9337b56325f9",
+        "newHash": "e99d974f33f71f7b2ec17a48ce8dcb4551e96ebbdb78f89029ce9337b56325f9",
         "addedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a���#<�\u0017!U���\u0005izu(՗z",
+            "lineNumber": 309,
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a}\u0001���F�\u0006[�΀�lJ\u0007ΪMc",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
-            "lineNumber": 308,
-            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001aL�[W\u0017*���SZ\u001a�",
-            "type": "REMOVED"
-          },
-          {
             "lineNumber": 309,
-            "content": "�\u001e]�",
+            "content": "�\u0012h�\u001d���.R��Y�\u0011��!�\u001a_S��6�:��M�\u001b����g\"",
             "type": "REMOVED"
           }
         ],
         "modifiedLines": [
           {
-            "lineNumber": 5,
-            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�\u0011\u0002��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
+            "lineNumber": 6,
+            "content": "m\f\u000f�\u0000j?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001fQ8l\u0000����\u000b}D�\u0003�%&^\"�\u001d\u001d\u0000\tREADME.md\u0000j?�I\b��Dj?�I\b��D\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0016~\u0011���R\u0018�(!oy=f�����o\u0000\u000bcommand.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�\\\u0011��\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u000bcontent.txt\u0000\u0000\u0000\u0000\u0000\u0000\u0000j^b�",
+            "type": "MODIFIED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "�\u0016=�\u0000\u001ddocs/backend/common/common.md\u0000\u0000\u0000\u0000\u0000j^l+\u0017`�0j^l; ]2�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00002�����,��hg�\u000fqa\f�:�Fg\u0000 docs/backend/common/docCommon.md\u0000\u0000j?�I\t\u000b=�jL��'��\\\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000(�\\\u0004�\u0010��R1H��:\u0015 ���\u0015�\u0000&docs/backend/guideline/Constitution.md\u0000\u0000\u0000\u0000j_k\u0015\u0019���j_k71�[�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000U����0d�)�P?��y�]� ��\u0000#docs/backend/guideline/HowToTest.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j(BI&�<j^�(\u0007\u000bڸ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'5%��\u000f\u0012�)a�V��T\u0011\\�\u001b!\u0012~\u00003docs/backend/guideline/Laravel_Integration_Guide.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�;�j_�86��@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000D��A��X\"rD�@�P���y�[\u0014�\u0000/docs/backend/identity/AdministraionDashboard.md\u0000\u0000\u0000j\\\u001d1\u0014�\u0016�j_�Y5�\\�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000A���\u001f���P�\"�7n#�S)q���\u0000)docs/backend/identity/CardProvisioning.md\u0000j\\\u001d1\u0014�\u0003\u0000j_�n%���\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000!���[�7Ot\u001eF~8ecM{�X.�\u0000+docs/backend/identity/MerchantManagement.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0014�\u0003\u0000j_�� s%�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000/Uw\u0001�n\u0003�N�3u7rOo��y�e�\u0000'docs/backend/identity/UserManagement.md\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�\u0006@\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000?=�[���;\u00154\u0002�\u001d���GO9��\u0000#docs/backend/ledger/LedgerKernel.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000j\\\u001d1\u0015\u0001,@j]��\u000b�GT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000@<���\u0003��dt\u0000r�\u001c���j4��^\u0000%docs/backend/ledger/SettlementCore.md\u0000\u0000\u0000\u0000\u0000jZ?�\u0014>��j\\\u001d1\u0015\u0010m�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u001c�\u001b\u001ev-��g;5\u0015*�냙�\u0007�\u0000\fdocs/idea.md\u0000\u0000\u0000\u0000\u0000\u0000j?�I\t\u000b=�j_�@\u0006�\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\u0007fix.txt\u0000\u0000\u0000j?�I\t\u001a{�j^a�\u0002�e\u0018\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000��\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000�⛲��CK�)�wZ���S�\u0000\bfix2.txt\u0000\u0000j(",
             "type": "MODIFIED"
           }
         ]
@@ -12089,32 +12591,32 @@
     ".git/gk/config": {
       "id": "52d4ed10-3384-49d4-aff1-ba0819a6a94b",
       "filePath": ".git/gk/config",
-      "hashValue": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
+      "hashValue": "2e8ddcbc7730dc27794397f0a44244f1c3c265abf2979a71463e7f1b7c5b3a2f",
       "diff": {
         "filePath": ".git/gk/config",
-        "oldHash": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
-        "newHash": "9060faaf9fedde680d5d3daacad3d12ba6b4b8ca15902ea54f883b5797945069",
+        "oldHash": "2e8ddcbc7730dc27794397f0a44244f1c3c265abf2979a71463e7f1b7c5b3a2f",
+        "newHash": "2e8ddcbc7730dc27794397f0a44244f1c3c265abf2979a71463e7f1b7c5b3a2f",
         "addedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T15:34:22.683Z",
+            "content": "\tgk-last-accessed = 2026-07-21T16:49:40.765Z",
             "type": "ADDED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T15:34:22.683Z",
+            "content": "\tgk-last-modified = 2026-07-21T16:49:40.765Z",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 5,
-            "content": "\tgk-last-accessed = 2026-07-21T15:19:21.178Z",
+            "content": "\tgk-last-accessed = 2026-07-21T16:34:07.705Z",
             "type": "REMOVED"
           },
           {
             "lineNumber": 6,
-            "content": "\tgk-last-modified = 2026-07-21T15:19:21.178Z",
+            "content": "\tgk-last-modified = 2026-07-21T16:34:07.705Z",
             "type": "REMOVED"
           }
         ],
@@ -12133,252 +12635,252 @@
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "src\\identity\\application\\handlers\\merchant_read_model_handlers.py :",
+            "content": "src\\identity\\domain\\value_objects\\api_key.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 2,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
+            "content": "import re",
             "type": "REMOVED"
           },
           {
             "lineNumber": 3,
-            "content": "from src.identity.domain.events.merchant_events import (",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 4,
-            "content": "    MerchantOnboardedEvent,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 5,
-            "content": "    MerchantActivatedEvent,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 6,
-            "content": "    MerchantDeactivatedEvent,",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 7,
-            "content": "    MerchantWebhookConfiguredEvent",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 8,
-            "content": ")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 9,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 10,
-            "content": "class MerchantOnboardedReadModelHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 11,
-            "content": "    def __init__(self, uow: UnitOfWork):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 12,
-            "content": "        self._uow = uow",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 13,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 14,
-            "content": "    def handle(self, event: MerchantOnboardedEvent) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 15,
-            "content": "        with self._uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 16,
-            "content": "            self._uow.conn.execute(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 17,
-            "content": "                \"INSERT INTO merchant_summaries (id, name, api_key, is_active) VALUES (?, ?, ?, 1)\",",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 18,
-            "content": "                (event.merchant_id, event.name, event.api_key.value)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 19,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 20,
-            "content": "            self._uow.commit()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 21,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 22,
-            "content": "class MerchantToggledReadModelHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 23,
-            "content": "    def __init__(self, uow: UnitOfWork):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 24,
-            "content": "        self._uow = uow",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 25,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 26,
-            "content": "    def handle_activated(self, event: MerchantActivatedEvent) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 27,
-            "content": "        with self._uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 28,
-            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 1 WHERE id = ?\", (event.merchant_id,))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 29,
-            "content": "            self._uow.commit()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 30,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 31,
-            "content": "    def handle_deactivated(self, event: MerchantDeactivatedEvent) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 32,
-            "content": "        with self._uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 33,
-            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 0 WHERE id = ?\", (event.merchant_id,))",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 34,
-            "content": "            self._uow.commit()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 35,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 36,
-            "content": "class MerchantWebhookConfiguredReadModelHandler:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 37,
-            "content": "    def __init__(self, uow: UnitOfWork):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 38,
-            "content": "        self._uow = uow",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 39,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 40,
-            "content": "    def handle(self, event: MerchantWebhookConfiguredEvent) -> None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 41,
-            "content": "        with self._uow:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 42,
-            "content": "            self._uow.conn.execute(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 43,
-            "content": "                \"UPDATE merchant_summaries SET webhook_url = ?, webhook_enabled = ? WHERE id = ?\",",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 44,
-            "content": "                (event.webhook_url, event.webhook_enabled, event.merchant_id)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 45,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 46,
-            "content": "            self._uow.commit()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 47,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 48,
-            "content": "src\\identity\\application\\commands\\webhook_commands.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 49,
             "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 4,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 5,
+            "content": "@dataclass(frozen=True)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 6,
+            "content": "class ApiKey:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 7,
+            "content": "    value: str",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 8,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 9,
+            "content": "    VALID_KEY_REGEX = re.compile(r'^pay_[A-Za-z0-9\\-_]{43}$')",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 10,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 11,
+            "content": "    def __post_init__(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 12,
+            "content": "        if not isinstance(self.value, str):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 13,
+            "content": "            raise TypeError(\"ApiKey must be a string.\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 14,
+            "content": "        if not self.VALID_KEY_REGEX.match(self.value):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 15,
+            "content": "            raise ValueError(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 16,
+            "content": "                \"ApiKey must start with 'pay_' and contain exactly 43 URL-safe characters.\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 17,
+            "content": "            )",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 18,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 19,
+            "content": "src\\identity\\domain\\value_objects\\webhook_url.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 20,
+            "content": "from dataclasses import dataclass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 21,
+            "content": "from urllib.parse import urlparse",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 22,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 23,
+            "content": "@dataclass(frozen=True)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 24,
+            "content": "class WebhookUrl:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 25,
+            "content": "    value: str",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 26,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 27,
+            "content": "    def __post_init__(self):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 28,
+            "content": "        if not isinstance(self.value, str) or not self.value:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 29,
+            "content": "            raise ValueError(\"WebhookUrl must be a non-empty string.\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 30,
+            "content": "        parsed = urlparse(self.value)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 31,
+            "content": "        if parsed.scheme not in ('http', 'https') or not parsed.netloc:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 32,
+            "content": "            raise ValueError(\"WebhookUrl must be a valid absolute URL (http/https).\")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 33,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 34,
+            "content": "src\\common\\domain\\exceptions.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 35,
+            "content": "class DomainException(Exception):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 36,
+            "content": "    \"\"\"Base exception for all domain-level errors.\"\"\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 37,
+            "content": "    pass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 38,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 39,
+            "content": "class NotFoundError(DomainException):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 40,
+            "content": "    \"\"\"Raised when any entity is not found.\"\"\"",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 41,
+            "content": "    pass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 42,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 43,
+            "content": "class InsufficientFundsError(DomainException):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 44,
+            "content": "    pass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 45,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 46,
+            "content": "class CurrencyMismatchError(DomainException):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 47,
+            "content": "    pass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 48,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 49,
+            "content": "class InvalidTransactionStateError(DomainException):",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 50,
-            "content": "from typing import Optional",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
@@ -12388,27 +12890,27 @@
           },
           {
             "lineNumber": 52,
-            "content": "@dataclass(frozen=True)",
+            "content": "class AccountNotFoundError(NotFoundError):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 53,
-            "content": "class ConfigureWebhookCommand:",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 54,
-            "content": "    merchant_id: int",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 55,
-            "content": "    webhook_url: Optional[str]",
+            "content": "class ConcurrencyException(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 56,
-            "content": "    webhook_enabled: bool",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
@@ -12418,1097 +12920,1097 @@
           },
           {
             "lineNumber": 58,
-            "content": "@dataclass(frozen=True)",
+            "content": "class UserAlreadyExistsError(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 59,
-            "content": "class GenerateWebhookSecretCommand:",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 60,
-            "content": "    merchant_id: int",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 61,
-            "content": "",
+            "content": "class CurrencyNotFoundError(NotFoundError):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 62,
-            "content": "src\\identity\\application\\handlers\\identity_handlers.py :",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 63,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 64,
-            "content": "from src.common.domain.ports.event_bus import EventBus",
+            "content": "class CurrencyAlreadyExistsError(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 65,
-            "content": "from src.common.infrastructure.generators import generate_api_key",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 66,
-            "content": "from src.identity.domain.entities.merchant import Merchant",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 67,
-            "content": "from src.identity.domain.value_objects.api_key import ApiKey",
+            "content": "class NonZeroBalanceCurrencyChangeError(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 68,
-            "content": "from src.identity.domain.repositories import MerchantRepository",
+            "content": "    \"\"\"Raised when attempting to change currency on an account with a non-zero balance.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 69,
-            "content": "from src.identity.domain.events.merchant_events import (",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 70,
-            "content": "    MerchantOnboardedEvent,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 71,
-            "content": "    MerchantActivatedEvent,",
+            "content": "class InvalidTopupAmountError(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 72,
-            "content": "    MerchantDeactivatedEvent",
+            "content": "    \"\"\"Raised when a topup amount is less than or equal to zero.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 73,
-            "content": ")",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 74,
-            "content": "from src.identity.application.commands.identity_commands import (",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 75,
-            "content": "    OnboardMerchantCommand, ToggleMerchantCommand",
+            "content": "class PendingHoldsExistError(DomainException):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 76,
-            "content": ")",
+            "content": "    \"\"\"Raised when attempting to change currency on an account with pending holds or authorizations.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 77,
-            "content": "",
+            "content": "    pass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 78,
-            "content": "class OnboardMerchantHandler:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 79,
-            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
+            "content": "src\\common\\domain\\ports\\event_bus.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 80,
-            "content": "        self._uow = uow",
+            "content": "from abc import ABC, abstractmethod",
             "type": "REMOVED"
           },
           {
             "lineNumber": 81,
-            "content": "        self._merchant_repo = merchant_repo",
+            "content": "from typing import Any, Callable",
             "type": "REMOVED"
           },
           {
             "lineNumber": 82,
-            "content": "        self._event_bus = event_bus",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 83,
-            "content": "",
+            "content": "class EventBus(ABC):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 84,
-            "content": "    def handle(self, cmd: OnboardMerchantCommand) -> None:",
+            "content": "    \"\"\"Port for publishing and subscribing to Domain Events.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 85,
-            "content": "        with self._uow:",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 86,
-            "content": "            api_key = ApiKey(generate_api_key())",
+            "content": "    @abstractmethod",
             "type": "REMOVED"
           },
           {
             "lineNumber": 87,
-            "content": "            merchant = Merchant(id=0, name=cmd.name, api_key=api_key, is_active=True)",
+            "content": "    def subscribe(self, event_type: type, handler: Callable) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 88,
-            "content": "",
+            "content": "        raise NotImplementedError",
             "type": "REMOVED"
           },
           {
             "lineNumber": 89,
-            "content": "            merchant_id = self._merchant_repo.add(merchant)",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 90,
-            "content": "            merchant.id = merchant_id",
+            "content": "    @abstractmethod",
             "type": "REMOVED"
           },
           {
             "lineNumber": 91,
-            "content": "            self._uow.commit()",
+            "content": "    def publish(self, event: Any) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 92,
-            "content": "",
+            "content": "        raise NotImplementedError",
             "type": "REMOVED"
           },
           {
             "lineNumber": 93,
-            "content": "            self._event_bus.publish(",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 94,
-            "content": "                MerchantOnboardedEvent(merchant_id=merchant.id, name=merchant.name, api_key=merchant.api_key)",
+            "content": "src\\ledger\\domain\\events\\account_events.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 95,
-            "content": "            )",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 96,
-            "content": "",
+            "content": "from typing import Optional",
             "type": "REMOVED"
           },
           {
             "lineNumber": 97,
-            "content": "class ToggleMerchantHandler:",
+            "content": "from src.common.domain.value_objects.currency_code import CurrencyCode",
             "type": "REMOVED"
           },
           {
             "lineNumber": 98,
-            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
+            "content": "from src.ledger.domain.value_objects.account_number import AccountNumber",
             "type": "REMOVED"
           },
           {
             "lineNumber": 99,
-            "content": "        self._uow = uow",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 100,
-            "content": "        self._merchant_repo = merchant_repo",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 101,
-            "content": "        self._event_bus = event_bus",
+            "content": "class AccountCreatedEvent:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 102,
-            "content": "",
+            "content": "    account_id: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 103,
-            "content": "    def handle(self, cmd: ToggleMerchantCommand) -> None:",
+            "content": "    user_id: Optional[int]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 104,
-            "content": "        with self._uow:",
+            "content": "    merchant_id: Optional[int]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 105,
-            "content": "            merchant = self._merchant_repo.get_by_id(cmd.merchant_id)",
+            "content": "    account_number: AccountNumber",
             "type": "REMOVED"
           },
           {
             "lineNumber": 106,
-            "content": "            if not merchant:",
+            "content": "    currency_code: CurrencyCode",
             "type": "REMOVED"
           },
           {
             "lineNumber": 107,
-            "content": "                raise ValueError(f\"Merchant with id {cmd.merchant_id} not found.\")",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 108,
-            "content": "",
+            "content": "src\\identity\\domain\\events\\card_events.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 109,
-            "content": "            merchant.toggle()",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 110,
-            "content": "            self._merchant_repo.update(merchant)",
+            "content": "from typing import Optional",
             "type": "REMOVED"
           },
           {
             "lineNumber": 111,
-            "content": "            self._uow.commit()",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 112,
-            "content": "",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 113,
-            "content": "            event = (",
+            "content": "class CardAssignedEvent:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 114,
-            "content": "                MerchantActivatedEvent(merchant_id=merchant.id)",
+            "content": "    account_id: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 115,
-            "content": "                if merchant.is_active",
+            "content": "    user_id: Optional[int]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 116,
-            "content": "                else MerchantDeactivatedEvent(merchant_id=merchant.id)",
+            "content": "    merchant_id: Optional[int]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 117,
-            "content": "            )",
+            "content": "    card_number: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 118,
-            "content": "            self._event_bus.publish(event)",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 119,
-            "content": "",
+            "content": "src\\identity\\application\\commands\\identity_commands.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 120,
-            "content": "src\\identity\\domain\\value_objects\\webhook_url.py :",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 121,
-            "content": "from dataclasses import dataclass",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 122,
-            "content": "from urllib.parse import urlparse",
+            "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 123,
-            "content": "",
+            "content": "class OnboardMerchantCommand:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 124,
-            "content": "@dataclass(frozen=True)",
+            "content": "    name: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 125,
-            "content": "class WebhookUrl:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 126,
-            "content": "    value: str",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 127,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 128,
-            "content": "    def __post_init__(self):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 129,
-            "content": "        if not isinstance(self.value, str) or not self.value:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 130,
-            "content": "            raise ValueError(\"WebhookUrl must be a non-empty string.\")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 131,
-            "content": "        parsed = urlparse(self.value)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 132,
-            "content": "        if parsed.scheme not in ('http', 'https') or not parsed.netloc:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 133,
-            "content": "            raise ValueError(\"WebhookUrl must be a valid absolute URL (http/https).\")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 134,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 135,
-            "content": "src\\identity\\domain\\value_objects\\api_key.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 136,
-            "content": "import re",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 137,
-            "content": "from dataclasses import dataclass",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 138,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 139,
             "content": "@dataclass(frozen=True)",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 140,
-            "content": "class ApiKey:",
+            "lineNumber": 127,
+            "content": "class ToggleMerchantCommand:",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 141,
-            "content": "    value: str",
+            "lineNumber": 128,
+            "content": "    merchant_id: int",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 142,
+            "lineNumber": 129,
             "content": "",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 143,
-            "content": "    VALID_KEY_REGEX = re.compile(r'^pay_[A-Za-z0-9\\-_]{43}$')",
+            "lineNumber": 130,
+            "content": "src\\identity\\application\\handlers\\identity_handlers.py :",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 144,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 145,
-            "content": "    def __post_init__(self):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 146,
-            "content": "        if not isinstance(self.value, str):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 147,
-            "content": "            raise TypeError(\"ApiKey must be a string.\")",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 148,
-            "content": "        if not self.VALID_KEY_REGEX.match(self.value):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 149,
-            "content": "            raise ValueError(",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 150,
-            "content": "                \"ApiKey must start with 'pay_' and contain exactly 43 URL-safe characters.\"",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 151,
-            "content": "            )",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 152,
-            "content": "",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 153,
-            "content": "src\\identity\\infrastructure\\persistence\\sqlite_merchant_repository.py :",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 154,
-            "content": "import sqlite3",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 155,
-            "content": "from typing import List, Optional",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 156,
+            "lineNumber": 131,
             "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 157,
+            "lineNumber": 132,
+            "content": "from src.common.domain.ports.event_bus import EventBus",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 133,
+            "content": "from src.common.infrastructure.generators import generate_api_key",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 134,
             "content": "from src.identity.domain.entities.merchant import Merchant",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 158,
+            "lineNumber": 135,
             "content": "from src.identity.domain.value_objects.api_key import ApiKey",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 159,
-            "content": "from src.identity.domain.value_objects.webhook_url import WebhookUrl",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 160,
+            "lineNumber": 136,
             "content": "from src.identity.domain.repositories import MerchantRepository",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 161,
-            "content": "from src.identity.application.dto.merchant_summary import MerchantSummaryDTO",
+            "lineNumber": 137,
+            "content": "from src.identity.domain.events.merchant_events import (",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 162,
-            "content": "from src.identity.application.dto.webhook_status_dto import WebhookStatusDTO",
+            "lineNumber": 138,
+            "content": "    MerchantOnboardedEvent,",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 163,
+            "lineNumber": 139,
+            "content": "    MerchantActivatedEvent,",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 140,
+            "content": "    MerchantDeactivatedEvent",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 141,
+            "content": ")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 142,
+            "content": "from src.identity.application.commands.identity_commands import (",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 143,
+            "content": "    OnboardMerchantCommand, ToggleMerchantCommand",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 144,
+            "content": ")",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 145,
             "content": "",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 164,
-            "content": "class SqliteMerchantRepository(MerchantRepository):",
+            "lineNumber": 146,
+            "content": "class OnboardMerchantHandler:",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 165,
-            "content": "    def __init__(self, uow: UnitOfWork):",
+            "lineNumber": 147,
+            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 166,
+            "lineNumber": 148,
             "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
-            "lineNumber": 167,
+            "lineNumber": 149,
+            "content": "        self._merchant_repo = merchant_repo",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 150,
+            "content": "        self._event_bus = event_bus",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 151,
             "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 152,
+            "content": "    def handle(self, cmd: OnboardMerchantCommand) -> None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 153,
+            "content": "        with self._uow:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 154,
+            "content": "            api_key = ApiKey(generate_api_key())",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 155,
+            "content": "            merchant = Merchant(id=0, name=cmd.name, api_key=api_key, is_active=True)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 156,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 157,
+            "content": "            merchant_id = self._merchant_repo.add(merchant)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 158,
+            "content": "            merchant.id = merchant_id",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 159,
+            "content": "            self._uow.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 160,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 161,
+            "content": "            self._event_bus.publish(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 162,
+            "content": "                MerchantOnboardedEvent(merchant_id=merchant.id, name=merchant.name, api_key=merchant.api_key)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 163,
+            "content": "            )",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 164,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 165,
+            "content": "class ToggleMerchantHandler:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 166,
+            "content": "    def __init__(self, uow: UnitOfWork, merchant_repo: MerchantRepository, event_bus: EventBus):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 167,
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 168,
-            "content": "    def _map_row_to_merchant(self, row: sqlite3.Row) -> Merchant:",
+            "content": "        self._merchant_repo = merchant_repo",
             "type": "REMOVED"
           },
           {
             "lineNumber": 169,
-            "content": "        webhook_url = WebhookUrl(row['webhook_url']) if row['webhook_url'] else None",
+            "content": "        self._event_bus = event_bus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 170,
-            "content": "        return Merchant(",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 171,
-            "content": "            id=row['id'], ",
+            "content": "    def handle(self, cmd: ToggleMerchantCommand) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 172,
-            "content": "            name=row['name'],",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 173,
-            "content": "            api_key=ApiKey(row['api_key']), ",
+            "content": "            merchant = self._merchant_repo.get_by_id(cmd.merchant_id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 174,
-            "content": "            is_active=bool(row['is_active']),",
+            "content": "            if not merchant:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 175,
-            "content": "            webhook_url=webhook_url,",
+            "content": "                raise ValueError(f\"Merchant with id {cmd.merchant_id} not found.\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 176,
-            "content": "            webhook_secret=row['webhook_secret'],",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 177,
-            "content": "            webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
+            "content": "            merchant.toggle()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 178,
-            "content": "        )",
+            "content": "            self._merchant_repo.update(merchant)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 179,
-            "content": "",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 180,
-            "content": "    def add(self, merchant: Merchant) -> int:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 181,
-            "content": "        cursor = self._uow.conn.execute(",
+            "content": "            event = (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 182,
-            "content": "            \"\"\"INSERT INTO merchants (name, api_key, is_active, webhook_url, webhook_secret, webhook_enabled) ",
+            "content": "                MerchantActivatedEvent(merchant_id=merchant.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 183,
-            "content": "               VALUES (?, ?, ?, ?, ?, ?)\"\"\",",
+            "content": "                if merchant.is_active",
             "type": "REMOVED"
           },
           {
             "lineNumber": 184,
-            "content": "            (",
+            "content": "                else MerchantDeactivatedEvent(merchant_id=merchant.id)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 185,
-            "content": "                merchant.name, merchant.api_key.value, merchant.is_active,",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 186,
-            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
+            "content": "            self._event_bus.publish(event)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 187,
-            "content": "                merchant.webhook_secret,",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 188,
-            "content": "                merchant.webhook_enabled",
+            "content": "src\\identity\\application\\handlers\\on_account_created_handler.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 189,
-            "content": "            )",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 190,
-            "content": "        )",
+            "content": "from src.common.domain.ports.event_bus import EventBus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 191,
-            "content": "        return cursor.lastrowid",
+            "content": "from src.common.infrastructure.generators import generate_card_number",
             "type": "REMOVED"
           },
           {
             "lineNumber": 192,
-            "content": "",
+            "content": "from src.ledger.domain.events.account_events import AccountCreatedEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 193,
-            "content": "    def update(self, merchant: Merchant) -> None:",
+            "content": "from src.identity.domain.events.card_events import CardAssignedEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 194,
-            "content": "        self._uow.conn.execute(",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 195,
-            "content": "            \"\"\"UPDATE merchants ",
+            "content": "class OnAccountCreatedHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 196,
-            "content": "               SET is_active = ?, webhook_url = ?, webhook_secret = ?, webhook_enabled = ? ",
+            "content": "    def __init__(self, uow: UnitOfWork, event_bus: EventBus):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 197,
-            "content": "               WHERE id = ?\"\"\",",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 198,
-            "content": "            (",
+            "content": "        self._event_bus = event_bus",
             "type": "REMOVED"
           },
           {
             "lineNumber": 199,
-            "content": "                merchant.is_active, ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 200,
-            "content": "                merchant.webhook_url.value if merchant.webhook_url else None,",
+            "content": "    def handle(self, event: AccountCreatedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 201,
-            "content": "                merchant.webhook_secret,",
+            "content": "        if event.user_id is None and event.merchant_id is None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 202,
-            "content": "                merchant.webhook_enabled,",
+            "content": "            return",
             "type": "REMOVED"
           },
           {
             "lineNumber": 203,
-            "content": "                merchant.id",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 204,
-            "content": "            )",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 205,
-            "content": "        )",
+            "content": "            card_number = generate_card_number(lambda _: False)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 206,
-            "content": "",
+            "content": "            self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 207,
-            "content": "    def get_by_id(self, merchant_id: int) -> Optional[Merchant]:",
+            "content": "                \"INSERT INTO user_cards (user_id, merchant_id, account_id, card_number) VALUES (?, ?, ?, ?)\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 208,
-            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE id = ?\", (merchant_id,))",
+            "content": "                (event.user_id, event.merchant_id, event.account_id, card_number)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 209,
-            "content": "        row = cursor.fetchone()",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 210,
-            "content": "        return self._map_row_to_merchant(row) if row else None",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 211,
-            "content": "",
+            "content": "            self._event_bus.publish(CardAssignedEvent(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 212,
-            "content": "    def get_all_summaries(self) -> List[MerchantSummaryDTO]:",
+            "content": "                account_id=event.account_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 213,
-            "content": "        rows = self._uow.conn.execute(\"SELECT * FROM merchant_summaries\").fetchall()",
+            "content": "                user_id=event.user_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 214,
-            "content": "        return [",
+            "content": "                merchant_id=event.merchant_id,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 215,
-            "content": "            MerchantSummaryDTO(",
+            "content": "                card_number=card_number",
             "type": "REMOVED"
           },
           {
             "lineNumber": 216,
-            "content": "                id=row['id'], ",
+            "content": "            ))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 217,
-            "content": "                name=row['name'], ",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 218,
-            "content": "                api_key=row['api_key'], ",
+            "content": "src\\identity\\application\\handlers\\merchant_read_model_handlers.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 219,
-            "content": "                is_active=bool(row['is_active']),",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 220,
-            "content": "                webhook_url=row['webhook_url'],",
+            "content": "from src.identity.domain.events.merchant_events import (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 221,
-            "content": "                webhook_enabled=bool(row['webhook_enabled']) if row['webhook_enabled'] else False",
+            "content": "    MerchantOnboardedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 222,
-            "content": "            ) for row in rows",
+            "content": "    MerchantActivatedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 223,
-            "content": "        ]",
+            "content": "    MerchantDeactivatedEvent,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 224,
-            "content": "",
+            "content": "    MerchantWebhookConfiguredEvent",
             "type": "REMOVED"
           },
           {
             "lineNumber": 225,
-            "content": "    def get_by_api_key(self, api_key: ApiKey) -> Optional[Merchant]:",
+            "content": ")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 226,
-            "content": "        cursor = self._uow.conn.execute(\"SELECT * FROM merchants WHERE api_key = ?\", (api_key.value,))",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 227,
-            "content": "        row = cursor.fetchone()",
+            "content": "class MerchantOnboardedReadModelHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 228,
-            "content": "        return self._map_row_to_merchant(row) if row else None",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 229,
-            "content": "",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 230,
-            "content": "    def get_webhook_status(self, merchant_id: int) -> Optional[WebhookStatusDTO]:",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 231,
-            "content": "        cursor = self._uow.conn.execute(",
+            "content": "    def handle(self, event: MerchantOnboardedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 232,
-            "content": "            \"SELECT webhook_url, webhook_enabled FROM merchants WHERE id = ?\", (merchant_id,)",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 233,
-            "content": "        )",
+            "content": "            self._uow.conn.execute(",
             "type": "REMOVED"
           },
           {
             "lineNumber": 234,
-            "content": "        row = cursor.fetchone()",
+            "content": "                \"INSERT INTO merchant_summaries (id, name, api_key, is_active) VALUES (?, ?, ?, 1)\",",
             "type": "REMOVED"
           },
           {
             "lineNumber": 235,
-            "content": "        if not row: return None",
+            "content": "                (event.merchant_id, event.name, event.api_key.value)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 236,
-            "content": "        return WebhookStatusDTO(",
+            "content": "            )",
             "type": "REMOVED"
           },
           {
             "lineNumber": 237,
-            "content": "            webhook_url=row['webhook_url'], ",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 238,
-            "content": "            webhook_enabled=bool(row['webhook_enabled'])",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 239,
-            "content": "        )",
+            "content": "class MerchantToggledReadModelHandler:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 240,
-            "content": "",
+            "content": "    def __init__(self, uow: UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 241,
-            "content": "src\\common\\infrastructure\\generators.py :",
+            "content": "        self._uow = uow",
             "type": "REMOVED"
           },
           {
             "lineNumber": 242,
-            "content": "import secrets",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 243,
-            "content": "import random",
+            "content": "    def handle_activated(self, event: MerchantActivatedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 244,
-            "content": "import string",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 245,
-            "content": "from typing import Callable",
+            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 1 WHERE id = ?\", (event.merchant_id,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 246,
-            "content": "",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 247,
-            "content": "def generate_api_key() -> str: return f\"pay_{secrets.token_urlsafe(32)}\"",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 248,
-            "content": "def generate_otp_code() -> str: return ''.join(random.choices(string.digits, k=5))",
+            "content": "    def handle_deactivated(self, event: MerchantDeactivatedEvent) -> None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 249,
-            "content": "",
+            "content": "        with self._uow:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 250,
-            "content": "def generate_card_number(check_exists_func: Callable[[str], bool]) -> str:",
+            "content": "            self._uow.conn.execute(\"UPDATE merchant_summaries SET is_active = 0 WHERE id = ?\", (event.merchant_id,))",
             "type": "REMOVED"
           },
           {
             "lineNumber": 251,
-            "content": "    while True:",
+            "content": "            self._uow.commit()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 252,
-            "content": "        # Generate the first 15 random digits",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 253,
-            "content": "        digits = [str(random.randint(0, 9)) for _ in range(15)]",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 254,
-            "content": "        ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 255,
-            "content": "        # Calculate the 16th digit (Luhn check digit)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 256,
-            "content": "        test_digits = digits + ['0']",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 257,
-            "content": "        reverse_digits = test_digits[::-1]",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 258,
-            "content": "        total = 0",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 259,
-            "content": "        for i, digit in enumerate(reverse_digits):",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 260,
-            "content": "            n = int(digit)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 261,
-            "content": "            if i % 2 == 1:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 262,
-            "content": "                n *= 2",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 263,
-            "content": "                if n > 9:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 264,
-            "content": "                    n -= 9",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 265,
-            "content": "            total += n",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 266,
-            "content": "            ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 267,
-            "content": "        check_digit = (10 - (total % 10)) % 10",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 268,
-            "content": "        num = ''.join(digits) + str(check_digit)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 269,
-            "content": "        ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 270,
-            "content": "        if not check_exists_func(num): ",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 271,
-            "content": "            return num",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 272,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 253,
+            "content": "class MerchantWebhookConfiguredReadModelHandler:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 254,
+            "content": "    def __init__(self, uow: UnitOfWork):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 255,
+            "content": "        self._uow = uow",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 256,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 257,
+            "content": "    def handle(self, event: MerchantWebhookConfiguredEvent) -> None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 258,
+            "content": "        with self._uow:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 259,
+            "content": "            self._uow.conn.execute(",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 260,
+            "content": "                \"UPDATE merchant_summaries SET webhook_url = ?, webhook_enabled = ? WHERE id = ?\",",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 261,
+            "content": "                (event.webhook_url, event.webhook_enabled, event.merchant_id)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 262,
+            "content": "            )",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 263,
+            "content": "            self._uow.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 264,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 265,
+            "content": "src\\identity\\application\\dto\\merchant_summary.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 266,
+            "content": "from dataclasses import dataclass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 267,
+            "content": "from typing import Optional",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 268,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 269,
+            "content": "@dataclass",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 270,
+            "content": "class MerchantSummaryDTO:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 271,
+            "content": "    id: int",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 272,
+            "content": "    name: str",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 273,
-            "content": "def generate_account_number(check_exists_func: Callable[[str], bool]) -> str:",
+            "content": "    api_key: str",
             "type": "REMOVED"
           },
           {
             "lineNumber": 274,
-            "content": "    while True:",
+            "content": "    is_active: bool",
             "type": "REMOVED"
           },
           {
             "lineNumber": 275,
-            "content": "        num = ''.join([str(random.randint(0, 9)) for _ in range(10)])",
+            "content": "    webhook_url: Optional[str] = None",
             "type": "REMOVED"
           },
           {
             "lineNumber": 276,
-            "content": "        if not check_exists_func(num): return num",
+            "content": "    webhook_enabled: bool = False",
             "type": "REMOVED"
           },
           {
@@ -13518,72 +14020,72 @@
           },
           {
             "lineNumber": 278,
-            "content": "def generate_gateway_token(check_exists_func: Callable[[str], bool]) -> str:",
+            "content": "src\\identity\\application\\dto\\webhook_status_dto.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 279,
-            "content": "    while True:",
+            "content": "from dataclasses import dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 280,
-            "content": "        token = f\"gw_{secrets.token_urlsafe(24)}\"",
+            "content": "from typing import Optional",
             "type": "REMOVED"
           },
           {
             "lineNumber": 281,
-            "content": "        if not check_exists_func(token): return token",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 282,
-            "content": "",
+            "content": "@dataclass",
             "type": "REMOVED"
           },
           {
             "lineNumber": 283,
-            "content": "src\\common\\infrastructure\\persistence\\sqlite_unit_of_work.py :",
+            "content": "class WebhookStatusDTO:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 284,
-            "content": "import sqlite3",
+            "content": "    webhook_url: Optional[str]",
             "type": "REMOVED"
           },
           {
             "lineNumber": 285,
-            "content": "import contextvars",
+            "content": "    webhook_enabled: bool",
             "type": "REMOVED"
           },
           {
             "lineNumber": 286,
-            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 287,
-            "content": "from src.common.infrastructure.database import DB_PATH",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 288,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 287,
+            "content": "src\\common\\infrastructure\\persistence\\sqlite_unit_of_work.py :",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 288,
+            "content": "import sqlite3",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 289,
-            "content": "# ContextVar to hold the active connection for ambient transactions",
+            "content": "import contextvars",
             "type": "REMOVED"
           },
           {
             "lineNumber": 290,
-            "content": "_current_conn = contextvars.ContextVar(\"current_conn\", default=None)",
+            "content": "from src.common.domain.ports.unit_of_work import UnitOfWork",
             "type": "REMOVED"
           },
           {
             "lineNumber": 291,
-            "content": "_nesting_level = contextvars.ContextVar(\"nesting_level\", default=0)",
+            "content": "from src.common.infrastructure.database import DB_PATH",
             "type": "REMOVED"
           },
           {
@@ -13593,162 +14095,162 @@
           },
           {
             "lineNumber": 293,
-            "content": "class SqliteUnitOfWork(UnitOfWork):",
+            "content": "# ContextVar to hold the active connection for ambient transactions",
             "type": "REMOVED"
           },
           {
             "lineNumber": 294,
-            "content": "    \"\"\"SQLite implementation of the UnitOfWork pattern with Ambient Transaction support.\"\"\"",
+            "content": "_current_conn = contextvars.ContextVar(\"current_conn\", default=None)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 295,
-            "content": "    ",
+            "content": "_nesting_level = contextvars.ContextVar(\"nesting_level\", default=0)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 296,
-            "content": "    def __enter__(self):",
+            "content": "",
             "type": "REMOVED"
           },
           {
             "lineNumber": 297,
-            "content": "        conn = _current_conn.get()",
+            "content": "class SqliteUnitOfWork(UnitOfWork):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 298,
-            "content": "        if conn is None:",
+            "content": "    \"\"\"SQLite implementation of the UnitOfWork pattern with Ambient Transaction support.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 299,
-            "content": "            conn = sqlite3.connect(DB_PATH, timeout=10.0)",
+            "content": "    ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 300,
-            "content": "            conn.row_factory = sqlite3.Row",
+            "content": "    def __enter__(self):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 301,
-            "content": "            conn.execute(\"PRAGMA foreign_keys = ON;\")",
+            "content": "        conn = _current_conn.get()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 302,
-            "content": "            conn.execute(\"PRAGMA journal_mode=WAL;\")",
+            "content": "        if conn is None:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 303,
-            "content": "            _current_conn.set(conn)",
+            "content": "            conn = sqlite3.connect(DB_PATH, timeout=10.0)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 304,
-            "content": "            ",
+            "content": "            conn.row_factory = sqlite3.Row",
             "type": "REMOVED"
           },
           {
             "lineNumber": 305,
-            "content": "        self.conn = conn",
+            "content": "            conn.execute(\"PRAGMA foreign_keys = ON;\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 306,
-            "content": "        _nesting_level.set(_nesting_level.get() + 1)",
+            "content": "            conn.execute(\"PRAGMA journal_mode=WAL;\")",
             "type": "REMOVED"
           },
           {
             "lineNumber": 307,
-            "content": "        return self",
+            "content": "            _current_conn.set(conn)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 308,
-            "content": "",
+            "content": "            ",
             "type": "REMOVED"
           },
           {
             "lineNumber": 309,
-            "content": "    def __exit__(self, exc_type, exc_val, exc_tb):",
+            "content": "        self.conn = conn",
             "type": "REMOVED"
           },
           {
             "lineNumber": 310,
-            "content": "        _nesting_level.set(_nesting_level.get() - 1)",
+            "content": "        _nesting_level.set(_nesting_level.get() + 1)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 311,
-            "content": "        if _nesting_level.get() == 0:",
+            "content": "        return self",
             "type": "REMOVED"
           },
           {
             "lineNumber": 312,
-            "content": "            try:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 313,
-            "content": "                if exc_type is None:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 314,
-            "content": "                    self.commit()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 315,
-            "content": "                else:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 316,
-            "content": "                    self.rollback()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 317,
-            "content": "            finally:",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 318,
-            "content": "                self.conn.close()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 319,
-            "content": "                _current_conn.set(None)",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 320,
-            "content": "                self.conn = None",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 321,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 313,
+            "content": "    def __exit__(self, exc_type, exc_val, exc_tb):",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 314,
+            "content": "        _nesting_level.set(_nesting_level.get() - 1)",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 315,
+            "content": "        if _nesting_level.get() == 0:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 316,
+            "content": "            try:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 317,
+            "content": "                if exc_type is None:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 318,
+            "content": "                    self.commit()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 319,
+            "content": "                else:",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 320,
+            "content": "                    self.rollback()",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 321,
+            "content": "            finally:",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 322,
-            "content": "    def commit(self):",
+            "content": "                self.conn.close()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 323,
-            "content": "        if self.conn:",
+            "content": "                _current_conn.set(None)",
             "type": "REMOVED"
           },
           {
             "lineNumber": 324,
-            "content": "            self.conn.commit()",
+            "content": "                self.conn = None",
             "type": "REMOVED"
           },
           {
@@ -13758,7 +14260,7 @@
           },
           {
             "lineNumber": 326,
-            "content": "    def rollback(self):",
+            "content": "    def commit(self):",
             "type": "REMOVED"
           },
           {
@@ -13768,7 +14270,7 @@
           },
           {
             "lineNumber": 328,
-            "content": "            self.conn.rollback()",
+            "content": "            self.conn.commit()",
             "type": "REMOVED"
           },
           {
@@ -13778,42 +14280,42 @@
           },
           {
             "lineNumber": 330,
-            "content": "    @staticmethod",
+            "content": "    def rollback(self):",
             "type": "REMOVED"
           },
           {
             "lineNumber": 331,
-            "content": "    def get_current_connection():",
+            "content": "        if self.conn:",
             "type": "REMOVED"
           },
           {
             "lineNumber": 332,
-            "content": "        \"\"\"Return the active ambient connection, or None if outside a UoW.\"\"\"",
+            "content": "            self.conn.rollback()",
             "type": "REMOVED"
           },
           {
             "lineNumber": 333,
-            "content": "        return _current_conn.get()",
-            "type": "REMOVED"
-          },
-          {
-            "lineNumber": 334,
             "content": "",
             "type": "REMOVED"
           },
           {
+            "lineNumber": 334,
+            "content": "    @staticmethod",
+            "type": "REMOVED"
+          },
+          {
             "lineNumber": 335,
-            "content": "src\\common\\domain\\ports\\event_bus.py :",
+            "content": "    def get_current_connection():",
             "type": "REMOVED"
           },
           {
             "lineNumber": 336,
-            "content": "from abc import ABC, abstractmethod",
+            "content": "        \"\"\"Return the active ambient connection, or None if outside a UoW.\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 337,
-            "content": "from typing import Any, Callable",
+            "content": "        return _current_conn.get()",
             "type": "REMOVED"
           },
           {
@@ -13823,61 +14325,66 @@
           },
           {
             "lineNumber": 339,
-            "content": "class EventBus(ABC):",
+            "content": "src\\common\\infrastructure\\database\\schemas\\identity\\merchant_summaries_schema.py :",
             "type": "REMOVED"
           },
           {
             "lineNumber": 340,
-            "content": "    \"\"\"Port for publishing and subscribing to Domain Events.\"\"\"",
+            "content": "MERCHANT_SUMMARIES_SCHEMA = \"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 341,
-            "content": "    ",
+            "content": "CREATE TABLE IF NOT EXISTS merchant_summaries (",
             "type": "REMOVED"
           },
           {
             "lineNumber": 342,
-            "content": "    @abstractmethod",
+            "content": "    id INTEGER PRIMARY KEY,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 343,
-            "content": "    def subscribe(self, event_type: type, handler: Callable) -> None:",
+            "content": "    name TEXT NOT NULL,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 344,
-            "content": "        raise NotImplementedError",
+            "content": "    api_key TEXT NOT NULL,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 345,
-            "content": "",
+            "content": "    is_active BOOLEAN NOT NULL DEFAULT 1,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 346,
-            "content": "    @abstractmethod",
+            "content": "    webhook_url TEXT,",
             "type": "REMOVED"
           },
           {
             "lineNumber": 347,
-            "content": "    def publish(self, event: Any) -> None:",
+            "content": "    webhook_enabled BOOLEAN NOT NULL DEFAULT 0",
             "type": "REMOVED"
           },
           {
             "lineNumber": 348,
-            "content": "        raise NotImplementedError",
+            "content": ");",
             "type": "REMOVED"
           },
           {
             "lineNumber": 349,
-            "content": "",
+            "content": "\"\"\"",
             "type": "REMOVED"
           },
           {
             "lineNumber": 350,
+            "content": "",
+            "type": "REMOVED"
+          },
+          {
+            "lineNumber": 351,
             "content": "",
             "type": "REMOVED"
           }
@@ -14104,22 +14611,22 @@
     ".git/COMMIT_EDITMSG": {
       "id": "f06bae2a-b8b5-44a0-9aea-0f8134538c1e",
       "filePath": ".git/COMMIT_EDITMSG",
-      "hashValue": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
+      "hashValue": "c4cd653deecc1b2e2ae5ba9a4f3cb61a2a41bd72d600af0326203d2e589a87f2",
       "diff": {
         "filePath": ".git/COMMIT_EDITMSG",
-        "oldHash": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
-        "newHash": "05accb9c18d22f5f5d16776064d9a736a76e85084819b4f5aab6c8bda2809933",
+        "oldHash": "c4cd653deecc1b2e2ae5ba9a4f3cb61a2a41bd72d600af0326203d2e589a87f2",
+        "newHash": "c4cd653deecc1b2e2ae5ba9a4f3cb61a2a41bd72d600af0326203d2e589a87f2",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "updated administration dashboard doc",
+            "content": "updated card provisioning doc",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "updated merchant management doc and fixed critical bugs while revewing the doc",
+            "content": "updated administration dashboard doc",
             "type": "REMOVED"
           }
         ],
@@ -14129,15 +14636,15 @@
     ".git/logs/HEAD": {
       "id": "52f127c3-0ec1-4b1f-a2c1-c14de43afc54",
       "filePath": ".git/logs/HEAD",
-      "hashValue": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
+      "hashValue": "b0441d5c7ce5966797a711ac4ed3af5e59a45356f1e8594430cc2448ffa69e36",
       "diff": {
         "filePath": ".git/logs/HEAD",
-        "oldHash": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
-        "newHash": "2c0ab288048110176bfdac90ee109d5ca7b78d6d0681f79cbb0948aaf3b8df99",
+        "oldHash": "b0441d5c7ce5966797a711ac4ed3af5e59a45356f1e8594430cc2448ffa69e36",
+        "newHash": "b0441d5c7ce5966797a711ac4ed3af5e59a45356f1e8594430cc2448ffa69e36",
         "addedLines": [
           {
-            "lineNumber": 183,
-            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050 b404ea9dfdd09c88d8936ded142ef233b78fb7d0 Shahrokh <shahrokh.hatami2004@gmail.com> 1784647006 +0330\tcommit: updated administration dashboard doc",
+            "lineNumber": 184,
+            "content": "b404ea9dfdd09c88d8936ded142ef233b78fb7d0 0980c94ca04a5f6f38c4d33a328c08e41d67e1c1 Shahrokh <shahrokh.hatami2004@gmail.com> 1784648608 +0330\tcommit: updated card provisioning doc",
             "type": "ADDED"
           }
         ],
@@ -14148,15 +14655,15 @@
     ".git/logs/refs/heads/dev": {
       "id": "0f651d09-0dc1-4827-9abc-c7782d0d1f02",
       "filePath": ".git/logs/refs/heads/dev",
-      "hashValue": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
+      "hashValue": "1613ff8c9a90fd29f4017f785e439a869d8e6d5eca00e2f9c8d62cac2370bc46",
       "diff": {
         "filePath": ".git/logs/refs/heads/dev",
-        "oldHash": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
-        "newHash": "601c3aa7e5d54af378b444261918669cb86803bdcec50d1a09b596ed2b9ce859",
+        "oldHash": "1613ff8c9a90fd29f4017f785e439a869d8e6d5eca00e2f9c8d62cac2370bc46",
+        "newHash": "1613ff8c9a90fd29f4017f785e439a869d8e6d5eca00e2f9c8d62cac2370bc46",
         "addedLines": [
           {
-            "lineNumber": 16,
-            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050 b404ea9dfdd09c88d8936ded142ef233b78fb7d0 Shahrokh <shahrokh.hatami2004@gmail.com> 1784647006 +0330\tcommit: updated administration dashboard doc",
+            "lineNumber": 17,
+            "content": "b404ea9dfdd09c88d8936ded142ef233b78fb7d0 0980c94ca04a5f6f38c4d33a328c08e41d67e1c1 Shahrokh <shahrokh.hatami2004@gmail.com> 1784648608 +0330\tcommit: updated card provisioning doc",
             "type": "ADDED"
           }
         ],
@@ -14167,22 +14674,22 @@
     ".git/refs/heads/dev": {
       "id": "89943f45-244d-45c9-9d9f-634cd6c164a0",
       "filePath": ".git/refs/heads/dev",
-      "hashValue": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
+      "hashValue": "7df51d6d6709dfb4a48dc86aec7ac9a12295bc825068629fb860ae8484951971",
       "diff": {
         "filePath": ".git/refs/heads/dev",
-        "oldHash": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
-        "newHash": "95841027290b1f682354c8e5b1d3377f46d468bfb8cc0e0d579abe6f1ea0dae3",
+        "oldHash": "7df51d6d6709dfb4a48dc86aec7ac9a12295bc825068629fb860ae8484951971",
+        "newHash": "7df51d6d6709dfb4a48dc86aec7ac9a12295bc825068629fb860ae8484951971",
         "addedLines": [
           {
             "lineNumber": 1,
-            "content": "b404ea9dfdd09c88d8936ded142ef233b78fb7d0",
+            "content": "0980c94ca04a5f6f38c4d33a328c08e41d67e1c1",
             "type": "ADDED"
           }
         ],
         "removedLines": [
           {
             "lineNumber": 1,
-            "content": "6db4093413a47705f7d90bf2bfafa0c74806a050",
+            "content": "b404ea9dfdd09c88d8936ded142ef233b78fb7d0",
             "type": "REMOVED"
           }
         ],
@@ -14289,6 +14796,78 @@
       "id": "8837012e-89e0-4821-83ac-b2f85449248a",
       "filePath": "src/app/di/__pycache__/identity_di.cpython-313.pyc",
       "hashValue": "12a2d468d22e4a8584ae68e3d868b5ffe9ed2d1d4ff5ac36996ae13c39e34e93",
+      "diff": null
+    },
+    ".git/objects/74/b7cd8a83e5d7fb84d3b10338f2f4560f5c3b48": {
+      "id": "906b3a0f-9856-4d40-aab2-7e3e8f5a3ebb",
+      "filePath": ".git/objects/74/b7cd8a83e5d7fb84d3b10338f2f4560f5c3b48",
+      "hashValue": "aa0e0431a976ccba07a438f3b050d40a41ba6fed4bb8b9222755cfcff54a77c6",
+      "diff": null
+    },
+    ".git/objects/34/8f6be6878fc2f6323e7c0d72120662cfaeaf09": {
+      "id": "627abe17-e7b7-477b-90f7-3622299e5a22",
+      "filePath": ".git/objects/34/8f6be6878fc2f6323e7c0d72120662cfaeaf09",
+      "hashValue": "b542e525ab2c635078c7f79bf20524093bac78b5a166a1d1e807653b49a8774d",
+      "diff": null
+    },
+    ".git/objects/11/1f7114101dccbda0730cc9a80352108714fd15": {
+      "id": "76c20c40-a2e0-4c36-8982-7a78c038e0e6",
+      "filePath": ".git/objects/11/1f7114101dccbda0730cc9a80352108714fd15",
+      "hashValue": "aa92658d9b01db201f5e5654b748e486298624a417059026c1ba5819356476bb",
+      "diff": null
+    },
+    ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack": {
+      "id": "3e4727e7-b4f4-41ed-94f6-40df3b78aeb4",
+      "filePath": ".git/objects/pack/pack-687ee2ab91f6497eb4a9b528e2a231904c72f1fb.pack",
+      "hashValue": "af0593c6e2fdb7ebfe766ff15c35d16df23f7685463a2efef4cb515f407160ee",
+      "diff": null
+    },
+    ".git/objects/e0/2a8d7a901572a82607b3d3abb7b62e0ebce4b0": {
+      "id": "612d550c-faea-4fb1-9bca-1045c7b7897b",
+      "filePath": ".git/objects/e0/2a8d7a901572a82607b3d3abb7b62e0ebce4b0",
+      "hashValue": "3d5b4a0c109a65ca941c3c0eb1dfd7f7673deeab6715d20f3324e6f82674dd2a",
+      "diff": null
+    },
+    ".git/objects/e4/d01f83c08150bd22e8376e23a0532971aef5dc": {
+      "id": "e0d350f9-9357-48ae-a0d2-f80fecd2d06b",
+      "filePath": ".git/objects/e4/d01f83c08150bd22e8376e23a0532971aef5dc",
+      "hashValue": "6f11247c83e61e941a4cb3b0c0baee72f4d4aa1a05f4a32b65eec3ab0a2dbc3a",
+      "diff": null
+    },
+    ".git/objects/e3/ed5b8d374f741e467e3865634d7bb3582ee582": {
+      "id": "4a39d11c-56f7-4451-944f-0576c66054e6",
+      "filePath": ".git/objects/e3/ed5b8d374f741e467e3865634d7bb3582ee582",
+      "hashValue": "67d84240e5ce759086045bc3f50402210dd3abc3121dac1bce6b0ad8f9af99c9",
+      "diff": null
+    },
+    ".git/objects/7e/28e12c341e0801c7d5d98fa66e89281ee9d62c": {
+      "id": "c2643aea-6e13-4d03-8b4a-4109ecddcd85",
+      "filePath": ".git/objects/7e/28e12c341e0801c7d5d98fa66e89281ee9d62c",
+      "hashValue": "580bf7816d6f2f167fec85dd24cd7e30c2142ae2534ade7e62193149be0f1123",
+      "diff": null
+    },
+    ".git/objects/7f/880c3053ec8064ed10d1074b3e231d90b84e1b": {
+      "id": "7e83b5a5-b8ba-479b-8648-2cb73549e030",
+      "filePath": ".git/objects/7f/880c3053ec8064ed10d1074b3e231d90b84e1b",
+      "hashValue": "cadd4ed9aad2e9fae1aeaf821cb9935bbd33202754a886c9ce175bc3302cad3b",
+      "diff": null
+    },
+    ".git/objects/bd/f49d057e2c8acb6d028498cec678cbdbf984c4": {
+      "id": "1979fa76-0869-443b-ab4c-2e734d7ab83f",
+      "filePath": ".git/objects/bd/f49d057e2c8acb6d028498cec678cbdbf984c4",
+      "hashValue": "d03104a40397b2b46ca88cf8829e9511ceb8e81a55508ff982c43d36d1ac0069",
+      "diff": null
+    },
+    ".git/objects/7a/5d5f0a7d809c27ddfde57b9ea578b245ed4686": {
+      "id": "ae199ea3-7d64-422f-8885-1ff8dbfd03c9",
+      "filePath": ".git/objects/7a/5d5f0a7d809c27ddfde57b9ea578b245ed4686",
+      "hashValue": "9a5ad91ce70eb32a8f4af93a6c5d9bad346e2614d7914249b625a3839cadd2db",
+      "diff": null
+    },
+    ".git/objects/09/80c94ca04a5f6f38c4d33a328c08e41d67e1c1": {
+      "id": "b793d715-9bca-4544-bd53-cba66deb5045",
+      "filePath": ".git/objects/09/80c94ca04a5f6f38c4d33a328c08e41d67e1c1",
+      "hashValue": "dc580dc5e3a12532bea8154e0e2fbf3c032d9b1390124f05c5487cc1147b233b",
       "diff": null
     }
   }
